@@ -1,1 +1,21 @@
 .idea/
+将删除 .env.example
+将删除 .gitattributes
+将删除 .gitignore
+将删除 app/
+将删除 artisan
+将删除 bootstrap/
+将删除 composer.json
+将删除 composer.lock
+将删除 config/
+将删除 database/
+将删除 package.json
+将删除 phpunit.xml
+将删除 public/
+将删除 readme.md
+将删除 resources/
+将删除 routes/
+将删除 server.php
+将删除 storage/
+将删除 tests/
+将删除 webpack.mix.js
