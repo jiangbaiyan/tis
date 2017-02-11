@@ -15,14 +15,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test',function (){
-    dd("test");
-});
 
-Route::post('email/users',['uses'=>'UserController@registerByEmail']);
-Route::post('email/users/active/{email}/{emailActiveToken}',['uses'=>'UserController@activeByEmail']);
-Route::get('email/token',['uses'=>'UserController@loginByEmail']);
-Route::delete('email/token',['uses'=>'UserController@logoutByEmail']);
+Route::post('email/users',['uses'=>'EmailUserController@registerByEmail']);
+Route::post('email/users/active/{email}/{emailActiveToken}',['uses'=>'EmailUserController@activeByEmail']);
+Route::get('email/token',['uses'=>'EmailUserController@loginByEmail']);
+Route::delete('email/token',['uses'=>'EmailUserController@logoutByEmail']);
 
-Route::post('/test',['uses'=>'UserController@test']);
+Route::post('phone/users',['uses'=>'PhoneUserController@registerByPhone']);
+Route::get('phone/users/code',['uses'=>'PhoneUserController@getCode']);
+Route::get('phone/token',['uses'=>'PhoneUserController@loginByPhone']);
+Route::delete('phone/token',['uses'=>'PhoneUserController@logoutByPhone']);
+
+Route::get('test','TestController@test');
+
 
