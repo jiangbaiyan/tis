@@ -131,7 +131,7 @@ class UserController extends Controller
         $token_exist = Redis::exists('LoginToken_'.$input['email']);
         if(!empty($token_exist)||Redis::ttl('LoginToken_'.$input['email'])==0)
         {
-            Response::json(array("content"=>"token not exists","status"=>404));
+            return Response::json(array("content"=>"token not exists","status"=>404));
         }
 
         Redis::del('LoginToken_'.$input['email']);
