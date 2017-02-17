@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
 
-class UserController extends Controller
+class EmailUserController extends Controller
 {
     public function registerByEmail(Request $request)
     {
@@ -74,7 +74,7 @@ class UserController extends Controller
         $token_exists = Redis::exists("emailToken_".$email);
         if(!$token_exists)
         {
-            return Response::json(array("content"=>"email not exists","status"=>404));
+            return Response::json(array("content"=>"email not found","status"=>404));
         }
         $token = Redis::get("emailToken_".$email);
         if($token!=$emailActiveToken)
