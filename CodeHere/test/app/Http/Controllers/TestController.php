@@ -9,7 +9,7 @@
 namespace App\Http\Controllers;
 
 
-use App\EmailUser;
+use App\Test;
 use Illuminate\Http\Request;
 
 class TestController extends Controller
@@ -18,10 +18,15 @@ class TestController extends Controller
     {
         $input= $request->all();
 
-        $user = new EmailUser();
+        $user = new Test();
 
-        $exist = $user->isExist($input);
+        $validate = $user->checkValidate($input);
 
-        return response()->json($exist);
+        if($validate->fails()){
+            $warnings = $validate->messages();
+            $show_warning = $warnings->first();
+            return response()->json($warnings);
+            //print_r($show_warning);
+        }
     }
 }

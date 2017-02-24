@@ -10,58 +10,77 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use iscms\Alisms\SendsmsPusher as Sms;
-
+use App\PhoneUser;
 
 class PhoneUserController extends Controller
 {
 
     public $sms;
 
+    private $model;
+
     public function _construct(Sms $sms)
     {
-        $this->sms=$sms;
+        $this->sms = $sms;
+        $this->model = new PhoneUser();
     }
 
     public function registerByPhone(Request $request)
     {
-        $this->validate($request,[
-            'phone'=>'required|max:255',
-            'password'=>'required|max:255',
-            'code'=>'required|max:255'
-        ]);
 
-        $user = $request->all();
+        $input = $request->all();
 
+        $user = new PhoneUser();
 
-        $phoneUser = PhoneUser::where('phone','=',$user['phone'])->first();
+        $type = "register";
+
+        $validate = $user->checkValidate($input,$type);
+
+        if($validate->fails()){
+            $warnings = $validate->messages();
+            //$show_warning = $warnings->first();
+            return response()->json($warnings);
+            //print_r($show_warning);
+        }
+
+        $phoneUser = $user->where('phone','=',$input['phone'])->first();
 
         if($phoneUser)
         {
-            return Response::json(array("content"=>"phone has existed","status"=>402));
+            return response()->json(array("content"=>"phone has existed","status"=>402));
         }
 
-        $hash_password = Hash::make($user["password"]);
+        $hash_password = Hash::make($input["password"]);
 
-        $code = Redis::get('IT:STRING:USER:CODE:'.$user['phone']);
+        $code = Redis::get('IT:STRING:USER:CODE:'.$input['phone']);
 
-        if(strcmp($code,$user['code'])!=0)
+        if(strcmp($code,$input['code'])!=0)
         {
-            return Response::json(array("content"=>"wrong code","status"=>404));
+            return response()->json(array("content"=>"wrong code","status"=>404));
         }
 
-        PhoneUser::create(array('phone'=>$user["phone"],'password'=>$hash_password,'active'=>true));
+        PhoneUser::create(array('phone'=>$input["phone"],'password'=>$hash_password,'active'=>true));
 
-        return  Response::json(array("content"=>"register success","status"=>200));
+        return  response()->json(array("content"=>"register success","status"=>200));
     }
 
     public function getCode(Request $request)
     {
-
-        $this->validate($request,[
-            "phone"=>"required|max:255"
-        ]);
-
         $input = $request->all();
+
+        $user = new PhoneUser();
+
+        $type = "code";
+
+        $validate = $user->checkValidate($input,$type);
+
+        if($validate->fails()){
+            $warnings = $validate->messages();
+            //$show_warning = $warnings->first();
+            return response()->json($warnings);
+            //print_r($show_warning);
+        }
+
         // 判断该手机在10分钟内是否已经发过短信
         $exists = Redis::exists('IT:STRING:USER:CODE:'.$input['phone']);
 
@@ -74,12 +93,12 @@ class PhoneUserController extends Controller
             'code'    => "$num"
         ];
 
-        $phone = "$input[phone]";
+        $phone = $input['phone'];
         $name = '短信测试';
         $content = json_encode($smsParams);
         $code = 'SMS_42940004';
         //
-        $data=$this->sms->send("$phone","$name","$content","$code");
+        $data=$this->sms->send($phone,$name,$content,$code);
         if(property_exists($data,'result')){
             Redis::sEtex('IT:STRING:USER:CODE:'.$phone,600,$num);
             return response()->json(['content'=>'send sms success','status'=>'200']);
@@ -90,49 +109,68 @@ class PhoneUserController extends Controller
 
     public function LoginByPhone(Request $request)
     {
+        $input = $request->all();
 
-        $this->validate($request,[
-            'phone'=>'required|max:255',
-            'password'=>'required|max:255'
-        ]);
+        $user = new PhoneUser();
 
-        $user = $request->all();
-        $phoneUser = new PhoneUser();
-        if(!$phoneUser->isExist($user))
-            return Response::json(array("content"=>"phone not exists","status"=>404));
-        $phoneUser = PhoneUser::where('phone','=',$user["phone"])->first();
+        $type = "login";
 
-        if(Hash::check(($phoneUser->password),$user["password"]))
-            return Response::json(array("content"=>"wrong password","status"=>404));
+        $validate = $user->checkValidate($input,$type);
 
-        $token = Hash::make($user['phone'].$user['password'].date(DATE_W3C));
+        if($validate->fails()){
+            $warnings = $validate->messages();
+            $show_warning = $warnings->first();
+            return response()->json($warnings);
+            //print_r($show_warning);
+        }
 
-        Redis::set('LoginToken_'.$user['phone'],$token);
-        Redis::expire('LoginToken_'.$user['phone'],3600);
+        $phoneUser = $user->where('phone','=',$input["phone"])->first();
+
+        if(!$phoneUser)
+            return response()->json(array("content"=>"phone not exists","status"=>404));
+
+
+        if(Hash::check(($phoneUser->password),$input["password"]))
+            return response()->json(array("content"=>"wrong password","status"=>404));
+
+        $token = Hash::make($input['phone'].$input['password'].date(DATE_W3C));
+
+        Redis::set('LoginToken_'.$input['phone'],$token);
+        Redis::expire('LoginToken_'.$input['phone'],3600);
 
         return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600));
     }
 
     public function LogoutByPhone(Request $request)
     {
-        $this->validate($request,[
-            'phone'=>'required|max:255'
-        ]);
-
         $input = $request->all();
 
-        $phoneUser = new PhoneUser();
-        if(!$phoneUser->isExist($input))
-            return Response::json(array("content"=>"phone not exists","status"=>404));
+        $user = new PhoneUser();
+
+        $type = "login";
+
+        $validate = $user->checkValidate($input,$type);
+
+        if($validate->fails()){
+            $warnings = $validate->messages();
+            $show_warning = $warnings->first();
+            return response()->json($warnings);
+            //print_r($show_warning);
+        }
+
+        $phoneUser = $user->where('phone','=',$input["phone"])->first();
+
+        if(!$phoneUser)
+            return response()->json(array("content"=>"phone not exists","status"=>404));
 
         $token_exist = Redis::exists('LoginToken_'.$input['phone']);
         if(!empty($token_exist)||Redis::ttl('LoginToken_'.$input['phone'])==0)
         {
-            Response::json(array("content"=>"token not exists","status"=>404));
+            response()->json(array("content"=>"token not exists","status"=>404));
         }
 
         Redis::del('LoginToken_'.$input['phone']);
 
-        return Response::json(array("content"=>"logout success","status"=>200));
+        return response()->json(array("content"=>"logout success","status"=>200));
     }
 }

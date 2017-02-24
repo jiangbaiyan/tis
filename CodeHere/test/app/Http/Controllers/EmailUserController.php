@@ -19,6 +19,14 @@ use Illuminate\Support\Facades\Redis;
 
 class EmailUserController extends Controller
 {
+    public function test(Request $request)
+    { $this->validate($request,[
+        'email'=>'required|email|max:255',
+        'password'=>'required|max:255'
+    ]);
+        return Response::json(['value'=>'true']);
+    }
+
     public function registerByEmail(Request $request)
     {
         $this->validate($request,[
@@ -74,7 +82,7 @@ class EmailUserController extends Controller
         $token_exists = Redis::exists("emailToken_".$email);
         if(!$token_exists)
         {
-            return Response::json(array("content"=>"email not found","status"=>404));
+            return Response::json(array("content"=>"email not exists","status"=>404));
         }
         $token = Redis::get("emailToken_".$email);
         if($token!=$emailActiveToken)

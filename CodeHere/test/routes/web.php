@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 
-Route::post('email/users',['uses'=>'EmailUserController@registerByEmail']);
+Route::post('email/users',['uses'=>'EmailUserController@test']);
 Route::post('email/users/active/{email}/{emailActiveToken}',['uses'=>'EmailUserController@activeByEmail']);
 Route::get('email/token',['uses'=>'EmailUserController@loginByEmail']);
 Route::delete('email/token',['uses'=>'EmailUserController@logoutByEmail']);
@@ -26,6 +26,6 @@ Route::get('phone/users/code',['uses'=>'PhoneUserController@getCode']);
 Route::get('phone/token',['uses'=>'PhoneUserController@loginByPhone']);
 Route::delete('phone/token',['uses'=>'PhoneUserController@logoutByPhone']);
 
-Route::get('test','TestController@test')->middleware('CheckLogin');
+Route::get('test','TestController@test');
 
 
