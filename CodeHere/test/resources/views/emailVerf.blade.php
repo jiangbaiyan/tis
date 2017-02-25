@@ -6,7 +6,8 @@
 </head>
 <body>
 <h1>Hi!</h1>
-<p>请点击下方链接激活你的账号</p>
-<a href="{{ URL('email/users/active')."/".$token."/".$email}}" target="_blank">点击激活您的账号</a>
+<p>您的验证码为：</p>
+<!--<a href="" target="_blank">点击激活您的账号</a>-->
+<h2>{{$token}}</h2>
 </body>
 </html>

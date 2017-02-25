@@ -19,7 +19,11 @@ class PhoneUserController extends Controller
 
     private $model;
 
-    public function _construct(Sms $sms)
+    private $phoneTokenPrefix = 'phoneToken_';
+
+    private $LoginTokenPrefix = 'loginToken_';
+
+    public function __construct(Sms $sms)
     {
         $this->sms = $sms;
         $this->model = new PhoneUser();
@@ -27,14 +31,11 @@ class PhoneUserController extends Controller
 
     public function registerByPhone(Request $request)
     {
-
         $input = $request->all();
-
-        $user = new PhoneUser();
 
         $type = "register";
 
-        $validate = $user->checkValidate($input,$type);
+        $validate = $this->model->checkValidate($input,$type);
 
         if($validate->fails()){
             $warnings = $validate->messages();
@@ -43,7 +44,7 @@ class PhoneUserController extends Controller
             //print_r($show_warning);
         }
 
-        $phoneUser = $user->where('phone','=',$input['phone'])->first();
+        $phoneUser = $this->model->where('phone','=',$input['phone'])->first();
 
         if($phoneUser)
         {
@@ -52,7 +53,7 @@ class PhoneUserController extends Controller
 
         $hash_password = Hash::make($input["password"]);
 
-        $code = Redis::get('IT:STRING:USER:CODE:'.$input['phone']);
+        $code = Redis::get($this->phoneTokenPrefix.$input['phone']);
 
         if(strcmp($code,$input['code'])!=0)
         {
@@ -68,11 +69,9 @@ class PhoneUserController extends Controller
     {
         $input = $request->all();
 
-        $user = new PhoneUser();
-
         $type = "code";
 
-        $validate = $user->checkValidate($input,$type);
+        $validate = $this->model->checkValidate($input,$type);
 
         if($validate->fails()){
             $warnings = $validate->messages();
@@ -82,7 +81,7 @@ class PhoneUserController extends Controller
         }
 
         // 判断该手机在10分钟内是否已经发过短信
-        $exists = Redis::exists('IT:STRING:USER:CODE:'.$input['phone']);
+        $exists = Redis::exists($this->phoneTokenPrefix.$input['phone']);
 
         if(!empty($exists)){
             return response()->json(['content'=>'send too frequently','status'=>'402']);
@@ -100,7 +99,7 @@ class PhoneUserController extends Controller
         //
         $data=$this->sms->send($phone,$name,$content,$code);
         if(property_exists($data,'result')){
-            Redis::sEtex('IT:STRING:USER:CODE:'.$phone,600,$num);
+            Redis::sEtex($this->phoneTokenPrefix.$phone,600,$num);
             return response()->json(['content'=>'send sms success','status'=>'200']);
         }else{
             return response()->json(['content'=>'send sms fall','status'=>'500']);
@@ -115,7 +114,7 @@ class PhoneUserController extends Controller
 
         $type = "login";
 
-        $validate = $user->checkValidate($input,$type);
+        $validate = $this->model->checkValidate($input,$type);
 
         if($validate->fails()){
             $warnings = $validate->messages();
@@ -124,7 +123,7 @@ class PhoneUserController extends Controller
             //print_r($show_warning);
         }
 
-        $phoneUser = $user->where('phone','=',$input["phone"])->first();
+        $phoneUser = $this->model->where('phone','=',$input["phone"])->first();
 
         if(!$phoneUser)
             return response()->json(array("content"=>"phone not exists","status"=>404));
@@ -135,8 +134,8 @@ class PhoneUserController extends Controller
 
         $token = Hash::make($input['phone'].$input['password'].date(DATE_W3C));
 
-        Redis::set('LoginToken_'.$input['phone'],$token);
-        Redis::expire('LoginToken_'.$input['phone'],3600);
+        Redis::set($this->LoginTokenPrefix.$input['phone'],$token);
+        Redis::expire($this->LoginTokenPrefix.$input['phone'],3600);
 
         return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600));
     }
@@ -145,11 +144,9 @@ class PhoneUserController extends Controller
     {
         $input = $request->all();
 
-        $user = new PhoneUser();
-
         $type = "login";
 
-        $validate = $user->checkValidate($input,$type);
+        $validate = $this->model->checkValidate($input,$type);
 
         if($validate->fails()){
             $warnings = $validate->messages();
@@ -158,18 +155,18 @@ class PhoneUserController extends Controller
             //print_r($show_warning);
         }
 
-        $phoneUser = $user->where('phone','=',$input["phone"])->first();
+        $phoneUser = $this->model->where('phone','=',$input["phone"])->first();
 
         if(!$phoneUser)
             return response()->json(array("content"=>"phone not exists","status"=>404));
 
-        $token_exist = Redis::exists('LoginToken_'.$input['phone']);
-        if(!empty($token_exist)||Redis::ttl('LoginToken_'.$input['phone'])==0)
+        $token_exist = Redis::exists($this->LoginTokenPrefix.$input['phone']);
+        if(!empty($token_exist)||Redis::ttl($this->LoginTokenPrefix.$input['phone'])==0)
         {
             response()->json(array("content"=>"token not exists","status"=>404));
         }
 
-        Redis::del('LoginToken_'.$input['phone']);
+        Redis::del($this->LoginTokenPrefix.$input['phone']);
 
         return response()->json(array("content"=>"logout success","status"=>200));
     }

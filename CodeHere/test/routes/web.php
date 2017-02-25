@@ -16,8 +16,8 @@ Route::get('/', function () {
 });
 
 
-Route::post('email/users',['uses'=>'EmailUserController@test']);
-Route::post('email/users/active/{email}/{emailActiveToken}',['uses'=>'EmailUserController@activeByEmail']);
+Route::post('email/users',['uses'=>'EmailUserController@registerByEmail']);
+Route::post('email/users/code',['uses'=>'EmailUserController@getCode']);
 Route::get('email/token',['uses'=>'EmailUserController@loginByEmail']);
 Route::delete('email/token',['uses'=>'EmailUserController@logoutByEmail']);
 

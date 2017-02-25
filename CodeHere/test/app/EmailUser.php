@@ -10,28 +10,40 @@ class EmailUser extends Model
     //
     protected $table = 'emailUsers';
 
-    protected $fillable = ['email','password'];
-
-    public function isExist($user)
+    public function checkValidate($data,$type)
     {
-        $email_exists = $this->where('email',$user['email'])->exists();
-        if($email_exists)
-            return true;
-        else return false;
-    }
+        switch ($type)
+        {
+            case "register":
+                $rules = array(
+                    'email'=>'required|email',
+                    'password'=>'required|min:6'
+                );
+                break;
+            case "code":
+                $rules = array(
+                    'email'=>'required|email',
+                );
+                break;
+            case "login":
+                $rules = array(
+                    'email'=>'required|email',
+                    'password'=>'required|min:6'
+                );
+                break;
+            case "logout":
+                $rules = array(
+                    'email'=>'required|email',
+                );
+                break;
+        }
 
-    public function checkValidate($data)
-    {
-        $rules = array(
-            'email'=>'required|email',
-            'password'=>'required|min:6'
-        );
         $message = array(
             'required' => 'need :attribute',
             'between' => ':attribute length must between :min and :max'
         );
         $attribute = array(
-            'phone'=>'phone',
+            'email'=>'email',
             'password'=>'password'
         );
 

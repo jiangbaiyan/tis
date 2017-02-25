@@ -19,59 +19,59 @@ use Illuminate\Support\Facades\Redis;
 
 class EmailUserController extends Controller
 {
-    public function test(Request $request)
-    { $this->validate($request,[
-        'email'=>'required|email|max:255',
-        'password'=>'required|max:255'
-    ]);
-        return Response::json(['value'=>'true']);
+    private $model;
+
+    private $emailTokenPrefix = 'emailToken_';
+
+    private $LoginTokenPrefix = 'loginToken_';
+
+    public function __construct()
+    {
+        $this->model = new EmailUser();
     }
 
     public function registerByEmail(Request $request)
     {
-        $this->validate($request,[
-            'email'=>'required|email|max:255',
-            'password'=>'required|max:255'
-        ]);
+        $input = $request->all();
 
+        $type = "register";
 
+        $validate = $this->model->checkValidate($input,$type);
 
-        $user = $request->all();
+        if($validate->fails()){
+            $warnings = $validate->messages();
+            //$show_warning = $warnings->first();
+            return response()->json($warnings);
+            //print_r($show_warning);
+        }
 
-        //return dd($user["email"],$user["password"]);
-
-        $emailUser = EmailUser::where('email','=',$user['email'])->first();
+        $emailUser = $this->model->where('email','=',$input['email'])->first();
 
         if($emailUser)
         {
-            return Response::json(array("content"=>"email has existed","status"=>402));
+            return response()->json(array("content"=>"email has existed","status"=>402));
         }
 
-        $hash_password = Hash::make($user["password"]);
+        $hash_password = Hash::make($input["password"]);
 
+        $code = Redis::get($this->emailTokenPrefix.$input['phone']);
 
-        $token = Hash::make($user['email'].$user['password']);
-        $email_address = $user["email"];
-
-
-
-        Mail::send('emailVerf',['token'=>$token,'email'=>$email_address],function($message)use($email_address)
+        if(strcmp($code,$input['code'])!=0)
         {
-            $message->to($email_address)->subject("test");
-        });
+            return response()->json(array("content"=>"wrong code","status"=>404));
+        }
 
-        Redis::set('emailToken_'.$user['email'],$token);
-        EmailUser::create(array('email'=>$user["email"],'password'=>$hash_password));
+        EmailUser::create(array('email'=>$input["email"],'password'=>$hash_password,'active'=>true));
 
-        return Response::json(array("content"=>"register success","status"=>200));
+        return response()->json(array("content"=>"register success","status"=>200));
     }
 
-    public function ActiveByEmail($email,$emailActiveToken)
+    /*public function ActiveByEmail($email,$emailActiveToken)
     {
 
         if($email==null)
         {
-            return Response::json(array("content"=>"email required","status"=>402));;
+            return Response::json(array("content"=>"email required","status"=>402));
         }
 
         if($emailActiveToken==null)
@@ -94,56 +94,105 @@ class EmailUserController extends Controller
         $user->active = true;
         $user->save();
         return Response::json(array("content"=>"active success","status"=>200));
+    }*/
+
+    public function getCode(Request $request)
+    {
+        $input = $request->all();
+
+        $type = "code";
+
+        $validate = $this->model->checkValidate($input,$type);
+
+        if($validate->fails()){
+            $warnings = $validate->messages();
+            //$show_warning = $warnings->first();
+            return response()->json($warnings);
+            //print_r($show_warning);
+        }
+
+        $exists = Redis::exists('emailToken_'.$input['email']);
+
+        if(!empty($exists)){
+            return response()->json(['content'=>'send too frequently','status'=>'402']);
+        }
+
+        $token = rand(100000,999999);
+        $email_address = $input["email"];
+
+        Mail::send('emailVerf',['token'=>$token,'email'=>$email_address],function($message)use($email_address)
+        {
+            $message->to($email_address)->subject("test");
+        });
+
+        Redis::set('emailToken_'.$input['email'],$token);
+
+        return response()->json(['content'=>'send email success','status'=>'200']);
     }
 
     public function LoginByEmail(Request $request)
     {
+        $input = $request->all();
 
-        $this->validate($request,[
-            'email'=>'required|email|max:255',
-            'password'=>'required|max:255'
-        ]);
+        $type = "login";
 
-        $user = $request->all();
-        $emailUser = new EmailUser();
-        if(!$emailUser->isExist($user))
-            return Response::json(array("content"=>"email not exists","status"=>404));
-        $emailUser = EmailUser::where('email','=',$user["email"])->first();
+        $validate = $this->model->checkValidate($input,$type);
+
+        if($validate->fails()){
+            $warnings = $validate->messages();
+            //$show_warning = $warnings->first();
+            return response()->json($warnings);
+            //print_r($show_warning);
+        }
+
+        $emailUser = $this->model->where('email','=',$input['email'])->first();
+
+        if(!$emailUser)
+            return response()->json(array("content"=>"email not exists","status"=>404));
+        $emailUser = $this->model->where('email','=',$input["email"])->first();
 
         if(!$emailUser->active)
-            return Response::json(array("content"=>"email not active","status"=>402));
+            return response()->json(array("content"=>"email not active","status"=>402));
 
-        if(Hash::check(($emailUser->password),$user["password"]))
-            return Response::json(array("content"=>"wrong password","status"=>404));
+        if(Hash::check(($emailUser->password),$input["password"]))
+            return response()->json(array("content"=>"wrong password","status"=>404));
 
-        $token = Hash::make($user['email'].$user['password'].date(DATE_W3C));
+        $token = Hash::make($input['email'].$input['password'].date(DATE_W3C));
 
-        Redis::set('LoginToken_'.$user['email'],$token);
-        Redis::expire('LoginToken_'.$user['email'],3600);
+        Redis::set($this->LoginTokenPrefix.$input['email'],$token);
+        Redis::expire($this->LoginTokenPrefix.$input['email'],3600);
 
         return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600));
     }
 
     public function LogoutByEmail(Request $request)
     {
-        $this->validate($request,[
-            'email'=>'required|email|max:255'
-        ]);
-
         $input = $request->all();
 
-        $emailUser = new EmailUser();
-        if(!$emailUser->isExist($input))
-            return Response::json(array("content"=>"email not exists","status"=>404));
+        $type = "logout";
 
-        $token_exist = Redis::exists('LoginToken_'.$input['email']);
-        if(!empty($token_exist)||Redis::ttl('LoginToken_'.$input['email'])==0)
-        {
-            return Response::json(array("content"=>"token not exists","status"=>404));
+        $validate = $this->model->checkValidate($input,$type);
+
+        if($validate->fails()){
+            $warnings = $validate->messages();
+            //$show_warning = $warnings->first();
+            return response()->json($warnings);
+            //print_r($show_warning);
         }
 
-        Redis::del('LoginToken_'.$input['email']);
+        $emailUser = $this->model->where('email','=',$input['email'])->first();
 
-        return Response::json(array("content"=>"logout success","status"=>200));
+        if(!$emailUser)
+            return response()->json(array("content"=>"email not exists","status"=>404));
+
+        $token_exist = Redis::exists($this->LoginTokenPrefix.$input['email']);
+        if(!empty($token_exist)||Redis::ttl($this->LoginTokenPrefix.$input['email'])==0)
+        {
+            return response()->json(array("content"=>"token not exists","status"=>404));
+        }
+
+        Redis::del($this->LoginTokenPrefix.$input['email']);
+
+        return response()->json(array("content"=>"logout success","status"=>200));
     }
 }
