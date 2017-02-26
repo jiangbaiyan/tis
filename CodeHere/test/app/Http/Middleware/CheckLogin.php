@@ -3,8 +3,10 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Cookie;
 use Response;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Hash;
 
 class CheckLogin
 {
@@ -38,7 +40,8 @@ class CheckLogin
         }
 
         $token = Redis::get($this->LoginTokenPrefix.$input["user"]);
-        if(!strcmp($token,$input["login_token"]))
+        $cookie_token = Cookie::get('token');
+        if(strcmp($token,$cookie_token)!=0)
         {
             return Response::json(array("content"=>"wrong login token","status"=>404));
         }

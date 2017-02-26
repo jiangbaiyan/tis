@@ -8,6 +8,9 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cookie;
+use Response;
 use Illuminate\Support\Facades\Redis;
 use iscms\Alisms\SendsmsPusher as Sms;
 use App\PhoneUser;
@@ -129,7 +132,7 @@ class PhoneUserController extends Controller
             return response()->json(array("content"=>"phone not exists","status"=>404));
 
 
-        if(Hash::check(($phoneUser->password),$input["password"]))
+        if(!Hash::check($input["password"],$phoneUser->password))
             return response()->json(array("content"=>"wrong password","status"=>404));
 
         $token = Hash::make($input['phone'].$input['password'].date(DATE_W3C));
@@ -144,7 +147,7 @@ class PhoneUserController extends Controller
     {
         $input = $request->all();
 
-        $type = "login";
+        $type = "logout";
 
         $validate = $this->model->checkValidate($input,$type);
 

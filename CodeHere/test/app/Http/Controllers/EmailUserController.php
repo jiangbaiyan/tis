@@ -154,7 +154,7 @@ class EmailUserController extends Controller
         if(!$emailUser->active)
             return response()->json(array("content"=>"email not active","status"=>402));
 
-        if(Hash::check(($emailUser->password),$input["password"]))
+        if(!Hash::check($input["password"],$emailUser->password))
             return response()->json(array("content"=>"wrong password","status"=>404));
 
         $token = Hash::make($input['email'].$input['password'].date(DATE_W3C));
