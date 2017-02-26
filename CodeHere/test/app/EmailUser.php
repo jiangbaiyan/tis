@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
 
 class EmailUser extends Model
 {
