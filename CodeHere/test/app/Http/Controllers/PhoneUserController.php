@@ -155,18 +155,18 @@ class PhoneUserController extends Controller
             //print_r($show_warning);
         }
 
-        $phoneUser = $this->model->where('phone','=',$input["phone"])->first();
+        $phoneUser = $this->model->where('phone','=',$input["user"])->first();
 
         if(!$phoneUser)
             return response()->json(array("content"=>"phone not exists","status"=>404));
 
-        $token_exist = Redis::exists($this->LoginTokenPrefix.$input['phone']);
-        if(!empty($token_exist)||Redis::ttl($this->LoginTokenPrefix.$input['phone'])==0)
+        $token_exist = Redis::exists($this->LoginTokenPrefix.$input['user']);
+        if(!empty($token_exist)||Redis::ttl($this->LoginTokenPrefix.$input['user'])==0)
         {
             response()->json(array("content"=>"token not exists","status"=>404));
         }
 
-        Redis::del($this->LoginTokenPrefix.$input['phone']);
+        Redis::del($this->LoginTokenPrefix.$input['user']);
 
         return response()->json(array("content"=>"logout success","status"=>200));
     }

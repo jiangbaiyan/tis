@@ -15,6 +15,9 @@ class CheckLogin
      * @param  \Closure  $next
      * @return mixed
      */
+
+    private $LoginTokenPrefix = 'loginToken_';
+
     public function handle($request, Closure $next)
     {
 
@@ -28,13 +31,13 @@ class CheckLogin
             return Response::json(array("content"=>"need user","status"=>402));
         }*/
 
-        $token_exists = Redis::exists("LoginToken_".$input["user"]);
+        $token_exists = Redis::exists($this->LoginTokenPrefix.$input["user"]);
         if(empty($token_exists))
         {
             return Response::json(array("content"=>"token not exists","status"=>404));
         }
 
-        $token = Redis::get("LoginToken_".$input);
+        $token = Redis::get($this->LoginTokenPrefix.$input["user"]);
         if(!strcmp($token,$input["login_token"]))
         {
             return Response::json(array("content"=>"wrong login token","status"=>404));

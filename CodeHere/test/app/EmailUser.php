@@ -11,6 +11,8 @@ class EmailUser extends Model
     //
     protected $table = 'emailUsers';
 
+    protected $fillable = ['email','password','active'];
+
     public function checkValidate($data,$type)
     {
         switch ($type)
@@ -34,7 +36,7 @@ class EmailUser extends Model
                 break;
             case "logout":
                 $rules = array(
-                    'email'=>'required|email',
+                    'user'=>'required',
                 );
                 break;
         }

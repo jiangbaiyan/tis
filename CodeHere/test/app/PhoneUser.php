@@ -10,6 +10,8 @@ class PhoneUser extends Model
     //
     protected $table = 'phoneUsers';
 
+    protected $fillable = ['phone','password','active'];
+
     public function checkValidate($data,$type)
     {
         switch ($type)
@@ -33,7 +35,7 @@ class PhoneUser extends Model
                 break;
             case "logout":
                 $rules = array(
-                    'phone'=>'required',
+                    'user'=>'required',
                 );
                 break;
         }

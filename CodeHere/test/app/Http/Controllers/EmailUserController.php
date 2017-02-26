@@ -54,7 +54,7 @@ class EmailUserController extends Controller
 
         $hash_password = Hash::make($input["password"]);
 
-        $code = Redis::get($this->emailTokenPrefix.$input['phone']);
+        $code = Redis::get($this->emailTokenPrefix.$input['email']);
 
         if(strcmp($code,$input['code'])!=0)
         {
@@ -180,18 +180,18 @@ class EmailUserController extends Controller
             //print_r($show_warning);
         }
 
-        $emailUser = $this->model->where('email','=',$input['email'])->first();
+        $emailUser = $this->model->where('email','=',$input['user'])->first();
 
         if(!$emailUser)
             return response()->json(array("content"=>"email not exists","status"=>404));
 
-        $token_exist = Redis::exists($this->LoginTokenPrefix.$input['email']);
-        if(!empty($token_exist)||Redis::ttl($this->LoginTokenPrefix.$input['email'])==0)
+        $token_exist = Redis::exists($this->LoginTokenPrefix.$input['user']);
+        if(empty($token_exist)||Redis::ttl($this->LoginTokenPrefix.$input['user'])==0)
         {
             return response()->json(array("content"=>"token not exists","status"=>404));
         }
 
-        Redis::del($this->LoginTokenPrefix.$input['email']);
+        Redis::del($this->LoginTokenPrefix.$input['user']);
 
         return response()->json(array("content"=>"logout success","status"=>200));
     }

@@ -19,12 +19,12 @@ Route::get('/', function () {
 Route::post('email/users',['uses'=>'EmailUserController@registerByEmail']);
 Route::get('email/users/code',['uses'=>'EmailUserController@getCode']);
 Route::get('email/token',['uses'=>'EmailUserController@loginByEmail']);
-Route::delete('email/token',['uses'=>'EmailUserController@logoutByEmail']);
+Route::delete('email/token',['uses'=>'EmailUserController@logoutByEmail'])->middleware('CheckLogin');
 
 Route::post('phone/users',['uses'=>'PhoneUserController@registerByPhone']);
 Route::get('phone/users/code',['uses'=>'PhoneUserController@getCode']);
 Route::get('phone/token',['uses'=>'PhoneUserController@loginByPhone']);
-Route::delete('phone/token',['uses'=>'PhoneUserController@logoutByPhone']);
+Route::delete('phone/token',['uses'=>'PhoneUserController@logoutByPhone'])->middleware('CheckLogin');
 
 Route::get('test','TestController@test');
 
