@@ -70,6 +70,7 @@
     "state": 200, 
     "msg":"success"
     }
+
 ***
 - **投递方式**：GET  
 - **路径**：email/users/code
@@ -94,6 +95,7 @@
     "state": 200, 
     "msg":"success"
     }
+    
 ***
 - **投递方式**：GET  
 - **路径**：phone/users/code
