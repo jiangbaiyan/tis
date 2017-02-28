@@ -6,22 +6,31 @@
 - **参数**：{
     "email": "value1", 
     "password": "value2", 
+    "code":"value3",
 }
 
-- **回复**：
+- **回复**：- 
 
 
     - 用户已存在: {
+    "content": null, 
     "state":402,
-    "msg":"email has exist"
+    "msg":"phone has exist"
+    }
+
+    - 验证码错误或缺失:{
+    "state":404，
+    "msg":"wrong code"
     }
 
     - 参数缺失:{
-    "state":400,
+    "state":404,
     "msg":"message required"
     }
 
-    - 邮件验证码发送成功: {
+
+    - 用户创建成功: {
+    "content":emailUser,
     "state": 200, 
     "msg":"success"
     }
@@ -63,27 +72,25 @@
     }
 ***
 - **投递方式**：GET  
-- **路径**：email/users/active/{email}/{emailActiveToken}
+- **路径**：email/users/code
 - **参数**：{
--   "email":"value1",
-    "emailActiveToken":"value2"
+    "email":"vaule1"
 }
 
 - **回复**：
 
 
-    - 用户不存在: {
-    "content": null, 
-    "state":404,
-    "msg":"email not found"
+    - 邮件发送过于频繁: {
+    "state":402,
+    "msg":"send too frequently"
     }
-
+    
     - 参数缺失:{
-    "state":400,
+    "state":404,
     "msg":"message required"
     }
-
-    - 用户激活成功: {
+    
+    - 邮件发送此成功: {
     "state": 200, 
     "msg":"success"
     }
