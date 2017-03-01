@@ -15,6 +15,14 @@ class CreateHoldConferencesTable extends Migration
     {
         Schema::create('holdConferences', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("name")->nullable();
+            $table->string("conference_name")->nullable();
+            $table->string("conference_type")->nullable();
+            $table->string("conference_address")->nullable();
+            $table->dateTime("start_time")->nullable();
+            $table->dateTime("stop_time")->nullable();
+            $table->integer("headcount")->nullable();
+            $table->integer("overseas_headcount")->nullable();
             $table->timestamps();
         });
     }

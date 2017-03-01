@@ -15,6 +15,15 @@ class CreateAwardsTable extends Migration
     {
         Schema::create('awards', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("name")->nullable();
+            $table->string("achievement_name")->nullable();
+            $table->string("award_name")->nullable();
+            $table->string("award_rating")->nullable();
+            $table->dateTime("award_time")->nullable();
+            $table->string("certificate_number")->nullable();
+            $table->string("prize_winner")->nullable();
+            $table->string("identity_rating")->nullable();
+            $table->string("remark")->nullable();
             $table->timestamps();
         });
     }

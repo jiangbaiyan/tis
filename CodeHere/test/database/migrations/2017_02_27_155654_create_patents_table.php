@@ -15,6 +15,14 @@ class CreatePatentsTable extends Migration
     {
         Schema::create('patents', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("proposer")->nullable();
+            $table->string("patent_name")->nullable();
+            $table->string("type")->nullable();
+            $table->string("application_number")->nullable();
+            $table->dateTime("apply_time")->nullable();
+            $table->dateTime("authorization_time")->nullable();
+            $table->string("certificate_number")->nullable();
+            $table->string("patentee")->nullable();
             $table->timestamps();
         });
     }

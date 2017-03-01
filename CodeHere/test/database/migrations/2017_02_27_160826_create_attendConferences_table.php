@@ -15,6 +15,11 @@ class CreateAttendConferencesTable extends Migration
     {
         Schema::create('attendConferences', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("name")->nullable();
+            $table->string("conference_topic")->nullable();
+            $table->string("conference_type")->nullable();
+            $table->string("conference_address")->nullable();
+            $table->dateTime("conference_time")->nullable();
             $table->timestamps();
         });
     }

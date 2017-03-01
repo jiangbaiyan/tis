@@ -15,6 +15,12 @@ class CreateGoAbordInfosTable extends Migration
     {
         Schema::create('goAbordInfos', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("name")->nullable();
+            $table->string("go_abord_type")->nullable();
+            $table->string("destination")->nullable();
+            $table->string("institution_name")->nullable();
+            $table->dateTime("start_time")->nullable();
+            $table->dateTime("stop_time")->nullable();
             $table->timestamps();
         });
     }
