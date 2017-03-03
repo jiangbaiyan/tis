@@ -26,6 +26,8 @@ Route::get('phone/users/code',['uses'=>'PhoneUserController@getCode']);
 Route::get('phone/token',['uses'=>'PhoneUserController@loginByPhone']);
 Route::delete('phone/token',['uses'=>'PhoneUserController@logoutByPhone'])->middleware('CheckLogin');
 
+Route::post('accounts',['uses'=>'AccountController@update'])->middleware('CheckLogin');
+
 Route::get('test','TestController@test');
 
 

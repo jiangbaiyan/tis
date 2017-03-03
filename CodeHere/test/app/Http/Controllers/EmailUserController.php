@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Account;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Crypt;
 use Mail;
@@ -61,7 +62,10 @@ class EmailUserController extends Controller
             return response()->json(array("content"=>"wrong code","status"=>404));
         }
 
-        EmailUser::create(array('email'=>$input["email"],'password'=>$hash_password,'active'=>true));
+        Account::create(array('user'=>$input["email"]));
+        $account_id = Account::where('user','=',$input["email"])->first()->id;
+        EmailUser::create(array('email'=>$input["email"],'password'=>$hash_password,'active'=>true,'id'=>$account_id));
+
 
         return response()->json(array("content"=>"register success","status"=>200));
     }

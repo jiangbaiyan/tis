@@ -63,7 +63,9 @@ class PhoneUserController extends Controller
             return response()->json(array("content"=>"wrong code","status"=>404));
         }
 
-        PhoneUser::create(array('phone'=>$input["phone"],'password'=>$hash_password,'active'=>true));
+        Account::create(array('user'=>$input["phone"]));
+        $account_id = Account::where('user','=',$input["phone"])->first()->id;
+        PhoneUser::create(array('phone'=>$input["phone"],'password'=>$hash_password,'active'=>true,'id'=>$account_id));
 
         return  response()->json(array("content"=>"register success","status"=>200));
     }
