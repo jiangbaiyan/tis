@@ -142,7 +142,7 @@ class PhoneUserController extends Controller
         Redis::set($this->LoginTokenPrefix.$input['phone'],$token);
         Redis::expire($this->LoginTokenPrefix.$input['phone'],3600);
 
-        return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600));
+        return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600))->withCookie(Cookie::make('user',$input["email"],3600));
     }
 
     public function LogoutByPhone(Request $request)

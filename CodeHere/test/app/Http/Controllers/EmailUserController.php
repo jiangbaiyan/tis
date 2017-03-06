@@ -166,7 +166,7 @@ class EmailUserController extends Controller
         Redis::set($this->LoginTokenPrefix.$input['email'],$token);
         Redis::expire($this->LoginTokenPrefix.$input['email'],3600);
 
-        return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600));
+        return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600))->withCookie(Cookie::make('user',$input["email"],3600));
     }
 
     public function LogoutByEmail(Request $request)

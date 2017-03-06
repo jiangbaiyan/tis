@@ -33,13 +33,15 @@ class CheckLogin
             return Response::json(array("content"=>"need user","status"=>402));
         }*/
 
-        $token_exists = Redis::exists($this->LoginTokenPrefix.$input["user"]);
+        $cookie_user = Cookie::get('user');
+
+        $token_exists = Redis::exists($this->LoginTokenPrefix.$cookie_user);
         if(empty($token_exists))
         {
             return Response::json(array("content"=>"token not exists","status"=>404));
         }
 
-        $token = Redis::get($this->LoginTokenPrefix.$input["user"]);
+        $token = Redis::get($this->LoginTokenPrefix.$cookie_user);
         $cookie_token = Cookie::get('token');
         if(strcmp($token,$cookie_token)!=0)
         {

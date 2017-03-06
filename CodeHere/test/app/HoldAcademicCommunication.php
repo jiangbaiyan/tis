@@ -10,6 +10,6 @@ class HoldAcademicCommunication extends Model
 
     protected $table = 'holdAcademicCommunications';
 
-    protected $fillable = ['name','project_name','cooperative_partner',
+    protected $fillable = ['user','name','project_name','cooperative_partner',
         'start_time','stop_time'];
 }

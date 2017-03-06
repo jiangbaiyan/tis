@@ -18,7 +18,6 @@ class CreatePhoneUsersTable extends Migration
             $table->string('phone');
             $table->string('password');
             $table->boolean('active')->default(false);
-            $table->foreign('account_id')->references('id')->on('accounts');
             $table->timestamps();
         });
     }

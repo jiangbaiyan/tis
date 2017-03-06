@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Account;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
 class AccountController extends Controller
 {
@@ -18,7 +19,7 @@ class AccountController extends Controller
     public function update(Request $request)
     {
         $input = $request->all();
-        $user = $input["user"];
+        $user = Cookie::get('user');
 
         $user_model = $this->model->where('user','=',$user)->first();
 

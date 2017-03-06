@@ -15,6 +15,7 @@ class CreateLiteraturesTable extends Migration
     {
         Schema::create('literatures', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("user");
             $table->string("author")->nullable();
             $table->string("literature_name")->nullable();
             $table->string("publisher_name")->nullable();

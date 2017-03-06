@@ -10,6 +10,6 @@ class GoAbordInfo extends Model
 
     protected $table = 'goAbordInfos';
 
-    protected $fillable = ['name','go_abord_type','destination',
+    protected $fillable = ['user','name','go_abord_type','destination',
         'institution_name','start_time','stop_time'];
 }

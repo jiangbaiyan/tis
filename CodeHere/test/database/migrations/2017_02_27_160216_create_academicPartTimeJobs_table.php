@@ -15,6 +15,7 @@ class CreateAcademicPartTimeJobsTable extends Migration
     {
         Schema::create('academicPartTimeJobs', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("user");
             $table->string("duty")->nullable();
             $table->dateTime("start_time")->nullable();
             $table->dateTime("stop_time")->nullable();

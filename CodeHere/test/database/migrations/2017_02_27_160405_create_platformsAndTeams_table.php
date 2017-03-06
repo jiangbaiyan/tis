@@ -15,6 +15,7 @@ class CreatePlatformsAndTeamsTable extends Migration
     {
         Schema::create('platformsAndTeams', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("user");
             $table->boolean("is_academy_host")->nullable();
             $table->string("platform_and_team_name")->nullable();
             $table->string("platform_and_team_rank")->nullable();

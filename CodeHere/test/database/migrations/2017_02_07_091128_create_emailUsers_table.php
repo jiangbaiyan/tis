@@ -18,7 +18,6 @@ class CreateEmailUsersTable extends Migration
             $table->string('email');
             $table->string('password');
             $table->boolean('active')->default(false);
-            $table->foreign('account_id')->references('id')->on('accounts');
             $table->timestamps();
         });
     }

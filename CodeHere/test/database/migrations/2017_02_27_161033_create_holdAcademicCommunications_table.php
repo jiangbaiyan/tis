@@ -15,6 +15,7 @@ class CreateHoldAcademicCommunicationsTable extends Migration
     {
         Schema::create('holdAcademicCommunications', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("user");
             $table->string("name")->nullable();
             $table->string("project_name")->nullable();
             $table->string("cooperative_partner")->nullable();

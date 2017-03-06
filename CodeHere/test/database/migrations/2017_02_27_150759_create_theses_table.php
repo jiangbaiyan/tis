@@ -15,6 +15,7 @@ class CreateThesesTable extends Migration
     {
         Schema::create('theses', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("user");
             $table->string("name")->nullable();
             $table->string("thesis_topic")->nullable();
             $table->string("periodical_or_conference")->nullable();
