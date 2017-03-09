@@ -38,7 +38,7 @@ class ProjectController extends Controller
         return response()->json(array("content"=>"add success","status"=>200));
     }
 
-    public function remove(Request &$request)
+    public function remove(Request $request)
     {
         $input = $request->all();
 
@@ -55,7 +55,7 @@ class ProjectController extends Controller
 
         $user = Cookie::get('user');
 
-        $project = $this->model()->where('project_topic','=',$input['project_topic'])->first();
+        $project = $this->model()->find($input['id']);
 
         if($project==null)
         {

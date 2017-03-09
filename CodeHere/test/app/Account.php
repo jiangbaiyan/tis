@@ -15,4 +15,6 @@ class Account extends Model
         'address','telephone','mobile_phone','email',
         'edu_experience','work_experience','research',
         'teaching_experience','achievement','icon_path'];
+
+    protected $guarded = ['id'];
 }

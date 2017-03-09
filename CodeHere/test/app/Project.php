@@ -15,6 +15,8 @@ class Project extends Model
         'project_principal','project_approval_time'.'research_expenditure',
         'existing_money','total_expenditure','project_classify','is_audited'];
 
+    protected $guarded = ['id'];
+
     public function checkValidate($data,$type)
     {
         switch ($type)
@@ -38,7 +40,7 @@ class Project extends Model
                 break;
             case 'remove':
                 $rules = array(
-                    'project_topic'=>'required'
+                    'id'=>'required'
                 );
                 break;
         }
@@ -49,6 +51,7 @@ class Project extends Model
             'between' => ':attribute length must between :min and :max'
         );
         $attribute = array(
+            'id'=>'id',
             'user'=>'user',
             'level'=>'level',
             'personal_info'=>'personal_info',

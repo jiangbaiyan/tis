@@ -13,6 +13,8 @@ class EmailUser extends Model
 
     protected $fillable = ['email','password','active'];
 
+    protected $guarded = ['id'];
+
     public function checkValidate($data,$type)
     {
         switch ($type)

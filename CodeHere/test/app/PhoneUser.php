@@ -12,6 +12,8 @@ class PhoneUser extends Model
 
     protected $fillable = ['phone','password','active'];
 
+    protected $guarded = ['id'];
+
     public function checkValidate($data,$type)
     {
         switch ($type)
