@@ -71,4 +71,19 @@ class LiteratureController extends Controller
 
         return  response()->json(array("content"=>"data remove success","status"=>200));
     }
+
+    public function get(Request $request)
+    {
+        //$input = $request->all();
+        $user = Cookie::get('user');
+
+        $info = $this->model->where('user','=',$user)->get();
+
+        if(!$info)
+        {
+            return request()->json(array("content"=>"user not exist","status"=>404));
+        }
+
+        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+    }
 }

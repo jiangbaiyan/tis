@@ -23,6 +23,11 @@ class AccountController extends Controller
 
         $user_model = $this->model->where('user','=',$user)->first();
 
+        if(!$user_model)
+        {
+            return request()->json(array("content"=>"user not exist","status"=>404));
+        }
+
         if($user_model->update($input))
         {
             return request()->json(array("content"=>"account update success","status"=>200));
@@ -31,5 +36,20 @@ class AccountController extends Controller
         {
             return request()->json(array("content"=>"account update fail","status"=>402));
         }
+    }
+
+    public function get(Request $request)
+    {
+        $input = $request->all();
+        $user = Cookie::get('user');
+
+        $user_model = $this->model->where('user','=',$user)->first();
+
+        if(!$user_model)
+        {
+            return request()->json(array("content"=>"user not exist","status"=>404));
+        }
+
+        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$user_model));
     }
 }
