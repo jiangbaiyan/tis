@@ -129,7 +129,8 @@ class EmailUserController extends Controller
             $message->to($email_address)->subject("test");
         });
 
-        Redis::set('emailToken_'.$input['email'],$token);
+       // Redis::set('emailToken_'.$input['email'],$token);
+        Redis::sEtex($this->emailTokenPrefix.$email_address,30,$token);
 
         return response()->json(['content'=>'send email success','status'=>'200']);
     }

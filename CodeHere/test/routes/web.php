@@ -15,8 +15,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::group(['prefix'=>'api'],function () {
-
     Route::group(['prefix'=>'email'],function() {
         Route::post('users',['uses'=>'EmailUserController@registerByEmail']);
         Route::get('users/code',['uses'=>'EmailUserController@getCode']);
@@ -81,7 +79,6 @@ Route::group(['prefix'=>'api'],function () {
         Route::delete('thesis',['uses'=>'ThesisController@remove']);
     });
 
-});
 
 
 

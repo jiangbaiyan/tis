@@ -98,9 +98,9 @@ class PhoneUserController extends Controller
         ];
 
         $phone = $input['phone'];
-        $name = '短信测试';
+        $name = '教师信息系统';
         $content = json_encode($smsParams);
-        $code = 'SMS_42940004';
+        $code = 'SMS_57925111';
         //
         $data=$this->sms->send($phone,$name,$content,$code);
         if(property_exists($data,'result')){

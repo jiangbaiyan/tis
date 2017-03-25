@@ -83,7 +83,7 @@ class AttendConferenceController extends Controller
 
         $info = $this->model->where('user','=',$user)->get();
 
-        if(!$info)
+        if($info==null)
         {
             return request()->json(array("content"=>"user not exist","status"=>404));
         }
