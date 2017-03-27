@@ -130,7 +130,7 @@ class EmailUserController extends Controller
         });
 
        // Redis::set('emailToken_'.$input['email'],$token);
-        Redis::sEtex($this->emailTokenPrefix.$email_address,30,$token);
+        Redis::sEtex($this->emailTokenPrefix.$email_address,600,$token);
 
         return response()->json(['content'=>'send email success','status'=>'200']);
     }
@@ -162,12 +162,12 @@ class EmailUserController extends Controller
         if(!Hash::check($input["password"],$emailUser->password))
             return response()->json(array("content"=>"wrong password","status"=>404));
 
-        $token = Hash::make($input['email'].$input['password'].date(DATE_W3C));
+        else {$token = Hash::make($input['email'].$input['password'].date(DATE_W3C));
 
         Redis::set($this->LoginTokenPrefix.$input['email'],$token);
         Redis::expire($this->LoginTokenPrefix.$input['email'],3600);
 
-        return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600))->withCookie(Cookie::make('user',$input["email"],3600));
+        return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600))->withCookie(Cookie::make('user',$input["email"],3600));}
     }
 
     public function LogoutByEmail(Request $request)

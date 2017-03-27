@@ -89,7 +89,8 @@ class PhoneUserController extends Controller
         $exists = Redis::exists($this->phoneTokenPrefix.$input['phone']);
 
         if(!empty($exists)){
-            return response()->json(['content'=>'send too frequently','status'=>'402']);
+            return response()
+                ->json(['content'=>'send too frequently','status'=>'402']);
         }
 
         $num = rand(100000,999999);
@@ -105,9 +106,11 @@ class PhoneUserController extends Controller
         $data=$this->sms->send($phone,$name,$content,$code);
         if(property_exists($data,'result')){
             Redis::sEtex($this->phoneTokenPrefix.$phone,600,$num);
-            return response()->json(['content'=>'send sms success','status'=>'200']);
+            return response()
+                ->json(['content'=>'send sms success','status'=>'200']);
         }else{
-            return response()->json(['content'=>'send sms fall','status'=>'500']);
+            return response()
+                ->json(['content'=>'send sms fall','status'=>'500']);
         }
     }
 
@@ -142,7 +145,7 @@ class PhoneUserController extends Controller
         Redis::set($this->LoginTokenPrefix.$input['phone'],$token);
         Redis::expire($this->LoginTokenPrefix.$input['phone'],3600);
 
-        return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600))->withCookie(Cookie::make('user',$input["email"],3600));
+        return Response::json(array("content"=>"login success","status"=>200))->withCookie(Cookie::make('token',$token,3600))->withCookie(Cookie::make('user',$input["phone"],3600));
     }
 
     public function LogoutByPhone(Request $request)

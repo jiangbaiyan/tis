@@ -15,6 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::group(['middleware'=>'EnableCrossRequest'],function (){
     Route::group(['prefix'=>'email'],function() {
         Route::post('users',['uses'=>'EmailUserController@registerByEmail']);
         Route::get('users/code',['uses'=>'EmailUserController@getCode']);
@@ -78,6 +79,9 @@ Route::get('/', function () {
         Route::get('thesis',['uses'=>'ThesisController@get']);
         Route::delete('thesis',['uses'=>'ThesisController@remove']);
     });
+});
+
+
 
 
 
