@@ -16,10 +16,10 @@ class EnableCrossRequestMiddleware
     public function handle($request, Closure $next)
     {
 
-        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Origin: http://teacher.cloudshm.com');
         header('Access-Control-Allow-Headers: Origin, Content-Type, Cookie, Accept, Authorization, X-Requested-With');
-        header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
-        //$response->header('Access-Control-Allow-Credentials', 'false');
+        header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
+        header('Access-Control-Allow-Credentials: true');
         return $next($request);
     }
 }

@@ -81,9 +81,9 @@ class GoAbordInfoController extends Controller
 
         if(!$info)
         {
-            return request()->json(array("content"=>"user not exist","status"=>404));
+            return response()->json(array("content"=>"user not exist","status"=>404));
         }
 
-        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        return response()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
     }
 }

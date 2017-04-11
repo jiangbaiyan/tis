@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Cookie;
 use Response;
 use Illuminate\Support\Facades\Redis;
 use iscms\Alisms\SendsmsPusher as Sms;
+use App\Account;
 use App\PhoneUser;
 
 class PhoneUserController extends Controller
