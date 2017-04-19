@@ -18,20 +18,21 @@ Route::group(['prefix'=>'api'],function (){
             Route::group(['prefix'=>'email'],function() {
                 Route::post('users',['uses'=>'EmailUserController@registerByEmail']);
                 Route::get('users/code',['uses'=>'EmailUserController@getCode']);
-                Route::get('token',['uses'=>'EmailUserController@loginByEmail']);
+                Route::post('token',['uses'=>'EmailUserController@loginByEmail']);
                 Route::delete('token',['uses'=>'EmailUserController@logoutByEmail'])->middleware('CheckLogin');
             });
 
             Route::group(['prefix'=>'phone'],function () {
                 Route::post('users',['uses'=>'PhoneUserController@registerByPhone']);
                 Route::get('users/code',['uses'=>'PhoneUserController@getCode']);
-                Route::get('token',['uses'=>'PhoneUserController@loginByPhone']);
+                Route::post('token',['uses'=>'PhoneUserController@loginByPhone']);
                 Route::delete('token',['uses'=>'PhoneUserController@logoutByPhone'])->middleware('CheckLogin');
             });
 
             Route::group(['middleware'=>'CheckLogin'],function () {
 
-                Route::post('account',['uses'=>'AccountController@update']);
+                Route::post('account',['uses'=>'AccountController@add']);
+                Route::put('account',['uses'=>'AccountController@update']);
                 Route::get('account',['uses'=>'AccountController@get']);
 
                 Route::post('academicPartTimeJob',['uses'=>'AcademicPartTimeJobController@add']);
