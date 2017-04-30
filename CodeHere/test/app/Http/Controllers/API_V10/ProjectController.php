@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V10;
 
-use App\Literature;
+use App\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
-class LiteratureController extends Controller
+class ProjectController extends Controller
 {
     //
     private $model;
 
     public function __construct()
     {
-        $this->model = new Literature();
+        $this->model = new Project();
     }
 
     public function add(Request $request)
@@ -31,9 +32,8 @@ class LiteratureController extends Controller
         }
 
         $user = Cookie::get('user');
-        $input['user']=$user;
 
-        $this->model->create($input);
+        Project::create($input);
 
         return response()->json(array("content"=>"add success","status"=>200));
     }
@@ -55,21 +55,21 @@ class LiteratureController extends Controller
 
         $user = Cookie::get('user');
 
-        $Literature = $this->model()->find($input['id']);
+        $project = $this->model()->find($input['id']);
 
-        if($Literature==null)
+        if($project==null)
         {
-            return  response()->json(array("content"=>"data not found","status"=>404));
+            return  response()->json(array("content"=>"project not found","status"=>404));
         }
 
-        if($Literature->user!=$user)
+        if($project->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $Literature->delete();
+        $project->delete();
 
-        return  response()->json(array("content"=>"data remove success","status"=>200));
+        return  response()->json(array("content"=>"project remove success","status"=>200));
     }
 
     public function get(Request $request)

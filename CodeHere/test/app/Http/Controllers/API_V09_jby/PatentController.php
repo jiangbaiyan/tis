@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V09_jby;
 
-use App\HoldConference;
+use App\Patent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
-class HoldConferenceController extends Controller
+class PatentController extends Controller
 {
     //
+
     private $model;
 
     public function __construct()
     {
-        $this->model = new HoldConference();
+        $this->model = new Patent();
     }
 
     public function add(Request $request)
@@ -55,26 +57,25 @@ class HoldConferenceController extends Controller
 
         $user = Cookie::get('user');
 
-        $HoldConference = $this->model()->find($input['id']);
+        $Patent = $this->model->find($input['id']);
 
-        if($HoldConference==null)
+        if($Patent==null)
         {
             return  response()->json(array("content"=>"data not found","status"=>404));
         }
 
-        if($HoldConference->user!=$user)
+        if($Patent->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $HoldConference->delete();
+        $Patent->delete();
 
         return  response()->json(array("content"=>"data remove success","status"=>200));
     }
 
     public function get(Request $request)
     {
-        //$input = $request->all();
         $user = Cookie::get('user');
 
         $info = $this->model->where('user','=',$user)->get();
@@ -84,6 +85,17 @@ class HoldConferenceController extends Controller
             return request()->json(array("content"=>"user not exist","status"=>404));
         }
 
-        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        $info = [
+            'user' => $user,
+            'proposer' => '胡耿然',
+            'patent_name' => '大众密码学研究',
+            'type' => '发明专利',
+            'application_number' => '20170312153.7',
+            'apply_time' => '2017-04-29',
+            'authorization_time' => '2017-04-29',
+            'certificate_number' => '20312102012',
+            'patentee' => '蒋佰言'
+        ];
+        return response()->json(array("content"=>"data require success",'status'=>200,'data'=>$info));
     }
 }

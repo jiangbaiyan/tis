@@ -11,8 +11,8 @@
 |
 */
 
-
-Route::group(['prefix'=>'api'],function (){
+//API v1.0
+Route::group(['prefix'=>'api','namespace' => 'API_V10'],function (){
     Route::group(['prefix'=>'v1.0'],function(){
         Route::group(['middleware'=>'EnableCrossRequest'],function (){
             Route::group(['prefix'=>'email'],function() {
@@ -29,7 +29,7 @@ Route::group(['prefix'=>'api'],function (){
                 Route::delete('token',['uses'=>'PhoneUserController@logoutByPhone'])->middleware('CheckLogin');
             });
 
-            Route::group(['middleware'=>'CheckLogin'],function () {
+          Route::group(['middleware'=>'CheckLogin'],function () {
 
                 Route::post('account',['uses'=>'AccountController@add']);
                 Route::put('account',['uses'=>'AccountController@update']);
@@ -83,12 +83,30 @@ Route::group(['prefix'=>'api'],function (){
     });
 });
 
-
-
-
-
-
-
-
 Route::get('test','TestController@test');
 
+
+
+//API_v0.9，科技模块
+Route::group(['prefix' => 'api','namespace' => 'API_V09_jby'],function(){
+    Route::group(['prefix' => 'v0.9'],function(){
+        Route::group(['middleware' => 'CheckLogin'],function (){
+
+            //论文模块
+            Route::post('thesis',['uses'=>'ThesisController@add']);
+            Route::get('thesis',['uses'=>'ThesisController@get']);
+            Route::delete('thesis',['uses'=>'ThesisController@remove']);
+
+            //专利模块
+            Route::post('patent',['uses'=>'PatentController@add']);
+            Route::get('patent',['uses'=>'PatentController@get']);
+            Route::delete('patent',['uses'=>'PatentController@remove']);
+
+            //著作和教材
+            Route::post('literature',['uses'=>'LiteratureController@add']);
+            Route::get('literature',['uses'=>'LiteratureController@get']);
+            Route::delete('literature',['uses'=>'LiteratureController@remove']);
+
+        });
+    });
+});

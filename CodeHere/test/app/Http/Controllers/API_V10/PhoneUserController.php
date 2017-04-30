@@ -6,7 +6,7 @@
  * Time: 下午3:53
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V10;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cookie;
@@ -131,16 +131,17 @@ class PhoneUserController extends Controller
             return response()->json($warnings);
             //print_r($show_warning);
         }
-
+        //检查手机号是否存在
         $phoneUser = $this->model->where('phone','=',$input["phone"])->first();
 
         if(!$phoneUser)
             return response()->json(array("content"=>"phone not exists","status"=>404));
 
-
+        //检测用户名与密码是否匹配
         if(!Hash::check($input["password"],$phoneUser->password))
             return response()->json(array("content"=>"wrong password","status"=>404));
 
+        //设置token
         $token = Hash::make($input['phone'].$input['password'].date(DATE_W3C));
 
         Redis::set($this->LoginTokenPrefix.$input['phone'],$token);

@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V10;
 
-use App\PlatformAndTeam;
+use App\GoAbordInfo;
 use Illuminate\Http\Request;
 
-class PlatformAndTeamController extends Controller
+class GoAbordInfoController extends Controller
 {
     //
-
     private $model;
 
     public function __construct()
     {
-        $this->model = new PlatformAndTeam();
+        $this->model = new GoAbordInfo();
     }
 
     public function add(Request $request)
@@ -56,19 +55,19 @@ class PlatformAndTeamController extends Controller
 
         $user = Cookie::get('user');
 
-        $PlatformAndTeam = $this->model()->find($input['id']);
+        $GoAbordInfo = $this->model()->find($input['id']);
 
-        if($PlatformAndTeam==null)
+        if($GoAbordInfo==null)
         {
             return  response()->json(array("content"=>"data not found","status"=>404));
         }
 
-        if($PlatformAndTeam->user!=$user)
+        if($GoAbordInfo->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $PlatformAndTeam->delete();
+        $GoAbordInfo->delete();
 
         return  response()->json(array("content"=>"data remove success","status"=>200));
     }
@@ -82,9 +81,9 @@ class PlatformAndTeamController extends Controller
 
         if(!$info)
         {
-            return request()->json(array("content"=>"user not exist","status"=>404));
+            return response()->json(array("content"=>"user not exist","status"=>404));
         }
 
-        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        return response()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
     }
 }

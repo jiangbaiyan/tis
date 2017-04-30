@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V10;
 
-use App\GoAbordInfo;
+use App\Patent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
-class GoAbordInfoController extends Controller
+class PatentController extends Controller
 {
     //
+
     private $model;
 
     public function __construct()
     {
-        $this->model = new GoAbordInfo();
+        $this->model = new Patent();
     }
 
     public function add(Request $request)
@@ -55,19 +57,19 @@ class GoAbordInfoController extends Controller
 
         $user = Cookie::get('user');
 
-        $GoAbordInfo = $this->model()->find($input['id']);
+        $Patent = $this->model()->find($input['id']);
 
-        if($GoAbordInfo==null)
+        if($Patent==null)
         {
             return  response()->json(array("content"=>"data not found","status"=>404));
         }
 
-        if($GoAbordInfo->user!=$user)
+        if($Patent->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $GoAbordInfo->delete();
+        $Patent->delete();
 
         return  response()->json(array("content"=>"data remove success","status"=>200));
     }
@@ -81,9 +83,9 @@ class GoAbordInfoController extends Controller
 
         if(!$info)
         {
-            return response()->json(array("content"=>"user not exist","status"=>404));
+            return request()->json(array("content"=>"user not exist","status"=>404));
         }
 
-        return response()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        return response()->json(array("content"=>"data require success",'status'=>200,'data'=>$info));
     }
 }

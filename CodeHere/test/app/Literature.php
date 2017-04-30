@@ -3,10 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
 
 class Literature extends Model
 {
-    //
 
     protected $table = 'literatures';
 
@@ -24,7 +24,7 @@ class Literature extends Model
                     'author'=>'required',
                     'literature_name'=>'required',
                     'publisher_name'=>'required',
-                    'publish_time'=>'required',
+                    'publish_time'=>'required|date',
                     'publisher_type'=>'required',
                     'literature_honor'=>'required',
                     'ISBN'=>'required'
@@ -36,25 +36,11 @@ class Literature extends Model
                 );
                 break;
         }
-
-
         $message = array(
             'required' => 'need :attribute',
-            'between' => ':attribute length must between :min and :max'
         );
-        $attribute = array(
-            'id'=>'id',
-            'user'=>'user',
-            'author'=>'author',
-            'literature_name'=>'literature_name',
-            'publisher_name'=>'publisher_name',
-            'publish_time'=>'publish_time',
-            'publisher_type'=>'publisher_type',
-            'literature_honor'=>'literature_honor',
-            'ISBN'=>'ISBN'
-        );
-
-        $validate = Validator::make($data,$rules,$message,$attribute);
+        $validate = Validator::make($data,$rules,$message);
         return $validate;
     }
+
 }

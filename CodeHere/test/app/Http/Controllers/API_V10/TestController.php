@@ -6,7 +6,7 @@
  * Time: 下午4:18
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V10;
 
 
 use App\Test;

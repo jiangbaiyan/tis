@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V09_jby;
 
-use App\AcademicPartTimeJob;
+use App\Thesis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
-class AcademicPartTimeJobController extends Controller
+class ThesisController extends Controller
 {
-    //
-
     private $model;
 
     public function __construct()
     {
-        $this->model = new AcademicPartTimeJob();
+        $this->model = new Thesis();
     }
 
     public function add(Request $request)
@@ -57,7 +55,7 @@ class AcademicPartTimeJobController extends Controller
 
         $user = Cookie::get('user');
 
-        $Thesis = $this->model()->find($input['id']);
+        $Thesis = $this->model->find($input['id']);
 
         if($Thesis==null)
         {
@@ -83,9 +81,29 @@ class AcademicPartTimeJobController extends Controller
 
         if(!$info)
         {
-            return request()->json(array("content"=>"user not exist","status"=>404));
+            return response()->json(array("content"=>"user not exist","status"=>404));
         }
 
-        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        //假数据
+        $info = [
+            'user' => $user,
+            'name' => '胡耿然',
+            'thesis_topic' => '随机非奇异Hermite标准型研究',
+            'periodical_or_conference' => '数论期刊（JOURNAL OF NUMBER THEORY）',
+            'ISSN_or_ISBN' => 'ISSN：0022-314X',
+            'issue' => '7',
+            'volume' => '164',
+            'page_number' => '66-86',
+            'publication_year' => '2016',
+            'publication_time' => '2016-7-1',
+            'SCI' => '4',
+            'EI' => '否',
+            'CCF' => 'CCF期刊C类',
+            'is_include_by_domestic_periodical' => '否',
+            'accession_number' => '000372298400014',
+            'remark'  => '',
+            'author_rank' => '1/4'
+        ];
+        return response()->json(array("content"=>"data require success",'status'=>200,'data'=>$info));
     }
 }

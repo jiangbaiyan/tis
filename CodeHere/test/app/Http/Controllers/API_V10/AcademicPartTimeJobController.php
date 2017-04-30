@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V10;
 
-use App\Thesis;
+use App\AcademicPartTimeJob;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
-class ThesisController extends Controller
+class AcademicPartTimeJobController extends Controller
 {
     //
 
@@ -13,7 +14,7 @@ class ThesisController extends Controller
 
     public function __construct()
     {
-        $this->model = new Thesis();
+        $this->model = new AcademicPartTimeJob();
     }
 
     public function add(Request $request)

@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V10;
 
-use App\Patent;
+use App\Thesis;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
-class PatentController extends Controller
+class ThesisController extends Controller
 {
     //
 
@@ -13,7 +14,7 @@ class PatentController extends Controller
 
     public function __construct()
     {
-        $this->model = new Patent();
+        $this->model = new Thesis();
     }
 
     public function add(Request $request)
@@ -56,19 +57,19 @@ class PatentController extends Controller
 
         $user = Cookie::get('user');
 
-        $Patent = $this->model()->find($input['id']);
+        $Thesis = $this->model()->find($input['id']);
 
-        if($Patent==null)
+        if($Thesis==null)
         {
             return  response()->json(array("content"=>"data not found","status"=>404));
         }
 
-        if($Patent->user!=$user)
+        if($Thesis->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $Patent->delete();
+        $Thesis->delete();
 
         return  response()->json(array("content"=>"data remove success","status"=>200));
     }
@@ -85,6 +86,6 @@ class PatentController extends Controller
             return request()->json(array("content"=>"user not exist","status"=>404));
         }
 
-        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        return response()->json(array("content"=>"data require success",'status'=>200,'data'=>$info));
     }
 }

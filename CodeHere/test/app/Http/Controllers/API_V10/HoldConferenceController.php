@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V10;
 
-use App\Project;
+use App\HoldConference;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cookie;
 
-class ProjectController extends Controller
+class HoldConferenceController extends Controller
 {
     //
     private $model;
 
     public function __construct()
     {
-        $this->model = new Project();
+        $this->model = new HoldConference();
     }
 
     public function add(Request $request)
@@ -32,8 +31,9 @@ class ProjectController extends Controller
         }
 
         $user = Cookie::get('user');
+        $input['user']=$user;
 
-        Project::create($input);
+        $this->model->create($input);
 
         return response()->json(array("content"=>"add success","status"=>200));
     }
@@ -55,21 +55,21 @@ class ProjectController extends Controller
 
         $user = Cookie::get('user');
 
-        $project = $this->model()->find($input['id']);
+        $HoldConference = $this->model()->find($input['id']);
 
-        if($project==null)
+        if($HoldConference==null)
         {
-            return  response()->json(array("content"=>"project not found","status"=>404));
+            return  response()->json(array("content"=>"data not found","status"=>404));
         }
 
-        if($project->user!=$user)
+        if($HoldConference->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $project->delete();
+        $HoldConference->delete();
 
-        return  response()->json(array("content"=>"project remove success","status"=>200));
+        return  response()->json(array("content"=>"data remove success","status"=>200));
     }
 
     public function get(Request $request)

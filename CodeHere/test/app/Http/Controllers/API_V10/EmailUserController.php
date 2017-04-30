@@ -6,7 +6,7 @@
  * Time: 下午4:58
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V10;
 
 use App\Account;
 use Illuminate\Support\Facades\Cookie;

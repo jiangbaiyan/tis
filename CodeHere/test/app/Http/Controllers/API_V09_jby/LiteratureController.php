@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API_V09_jby;
 
-use App\HoldAcademicCommunication;
+use App\Literature;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
-class HoldAcademicCommunicationController extends Controller
+class LiteratureController extends Controller
 {
     //
     private $model;
 
     public function __construct()
     {
-        $this->model = new HoldAcademicCommunication();
+        $this->model = new Literature();
     }
 
     public function add(Request $request)
@@ -55,19 +56,19 @@ class HoldAcademicCommunicationController extends Controller
 
         $user = Cookie::get('user');
 
-        $HoldAcademicCommunication = $this->model()->find($input['id']);
+        $Literature = $this->model->find($input['id']);
 
-        if($HoldAcademicCommunication==null)
+        if($Literature==null)
         {
             return  response()->json(array("content"=>"data not found","status"=>404));
         }
 
-        if($HoldAcademicCommunication->user!=$user)
+        if($Literature->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $HoldAcademicCommunication->delete();
+        $Literature->delete();
 
         return  response()->json(array("content"=>"data remove success","status"=>200));
     }
@@ -84,6 +85,17 @@ class HoldAcademicCommunicationController extends Controller
             return request()->json(array("content"=>"user not exist","status"=>404));
         }
 
-        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        $info = [
+            'author'=>'胡耿然',
+            'literature_name'=>'大众密码学',
+            'publisher_name'=>'2017-04-30',
+            'publish_time'=>'2017-04-30',
+            'publisher_
+            type'=>'教育类',
+            'literature_honor'=>'十二五规划教材',
+            'ISBN'=>'0000-0000-0000-0000'
+        ];
+
+        return response()->json(array("content"=>"data require success",'status'=>200,'data'=>$info));
     }
 }
