@@ -1,0 +1,5 @@
+①首先命令行运行composer update获取vendor文件夹
+②把.env.example文件名改为.env
+③把env文件内的信息改成本机上的配置信息
+④在框架根目录命令行运行 php artisan key:generate
+⑤进行API测试
