@@ -24,20 +24,15 @@ class Literature extends Model
                     'author'=>'required',
                     'literature_name'=>'required',
                     'publisher_name'=>'required',
-                    'publish_time'=>'required|date',
+                    'publish_time'=>'required',
                     'publisher_type'=>'required',
                     'literature_honor'=>'required',
                     'ISBN'=>'required'
                 );
                 break;
-            case 'remove':
-                $rules = array(
-                    'id'=>'required'
-                );
-                break;
         }
         $message = array(
-            'required' => 'need :attribute',
+            'required' => "'status':'400,'msg':'need :attribute'",
         );
         $validate = Validator::make($data,$rules,$message);
         return $validate;

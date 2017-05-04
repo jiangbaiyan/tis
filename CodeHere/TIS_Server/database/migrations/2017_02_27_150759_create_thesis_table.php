@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateThesesTable extends Migration
+class CreateThesisTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateThesesTable extends Migration
      */
     public function up()
     {
-        Schema::create('theses', function (Blueprint $table) {
+        Schema::create('thesis', function (Blueprint $table) {
             $table->increments('id');
             $table->string("user");
             $table->string("name")->nullable();

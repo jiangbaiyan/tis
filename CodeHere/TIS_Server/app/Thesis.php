@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 class Thesis extends Model
 {
 
-    protected $table = 'theses';
+    protected $table = 'thesis';
 
     protected $fillable = ['user','name','thesis_topic','periodical_or_conference',
         'ISSN_or_ISBN','issue','volume','page_number','publication_year',
@@ -23,32 +23,24 @@ class Thesis extends Model
                 $rules = [
                     'name' => 'required',
                     'thesis_topic'=> 'required',
-                    'periodical_or_conference' => 'required|integer',
+                    'periodical_or_conference' => 'required',
                     'ISSN_or_ISBN' => 'required',
-                    'issue' => 'required|integer',
-                    'volume' => 'required|integer',
+                    'issue' => 'required',
+                    'volume' => 'required',
                     'page_number' => 'required',
-                    'publication_year' => 'required|integer',
-                    'publication_time' => 'required|date',
+                    'publication_year' => 'required',
+                    'publication_time' => 'required',
                     'SCI' => 'required',
                     'EI' => 'required',
                     'CCF' => 'required',
                     'is_include_by_domestic_periodical' => 'required',
-                    'accession_number' => 'required|numeric',
+                    'accession_number' => 'required',
                     'author_rank' => 'required'
-                ];
-                break;
-            case 'remove':
-                $rules = [
-                    'id' => 'required'
                 ];
                 break;
         }
         $messages = [
-            'required' => 'need :attribute',
-            'integer' => ':attribute must be an integer',
-            'date' => ':attribute is not a valid date format',
-            'numeric' => ':attribute is not a valid number'
+            'required' => "'status':'400,'msg':'need :attribute'",
         ];
         $validate = Validator::make($data,$rules,$messages);
         return $validate;

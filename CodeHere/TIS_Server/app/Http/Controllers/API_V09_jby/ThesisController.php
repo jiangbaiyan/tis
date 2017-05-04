@@ -18,75 +18,39 @@ class ThesisController extends Controller
     public function add(Request $request)
     {
         $input = $request->all();
-
         $type = 'add';
-
         $validate = $this->model->checkValidate($input,$type);
-
         if($validate->fails()){
             $warnings = $validate->messages();
-            //$show_warning = $warnings->first();
             return response()->json($warnings);
-            //print_r($show_warning);
         }
-
         $user = Cookie::get('user');
         $input['user']=$user;
-
         $this->model->create($input);
-
-        return response()->json(array("content"=>"add success","status"=>200));
+        return response()->json(array("status"=>200,"msg"=>"add success"));
     }
 
-    public function remove(Request $request)
+    public function remove()
     {
-        $input = $request->all();
-
-        $type = 'remove';
-
-        $validate = $this->model->checkValidate($input,$type);
-
-        if($validate->fails()){
-            $warnings = $validate->messages();
-            //$show_warning = $warnings->first();
-            return response()->json($warnings);
-            //print_r($show_warning);
-        }
-
         $user = Cookie::get('user');
-
-        $Thesis = $this->model->find($input['id']);
-
-        if($Thesis==null)
-        {
-            return  response()->json(array("content"=>"data not found","status"=>404));
+        $thesisDelete = Thesis::where('user','=',$user)->delete();
+        if($thesisDelete){
+            return response()->json(['status' => 200,'msg' => 'data remove success']);
         }
-
-        if($Thesis->user!=$user)
-        {
-            return  response()->json(array("content"=>"wrong user","status"=>402));
+        else{
+            return response()->json(['status' => 404,'msg' => 'data not found']);
         }
-
-        $Thesis->delete();
-
-        return  response()->json(array("content"=>"data remove success","status"=>200));
     }
 
-    public function get(Request $request)
+    public function get()
     {
-        //$input = $request->all();
         $user = Cookie::get('user');
-
         $info = $this->model->where('user','=',$user)->get();
-
-        if(!$info)
-        {
-            return response()->json(array("content"=>"user not exist","status"=>404));
+        if(!$info) {
+            return response()->json(array("status"=>404,"msg"=>"user not exist"));
         }
-
         //假数据
         $info = [
-            'user' => $user,
             'name' => '胡耿然',
             'thesis_topic' => '随机非奇异Hermite标准型研究',
             'periodical_or_conference' => '数论期刊（JOURNAL OF NUMBER THEORY）',
@@ -104,6 +68,6 @@ class ThesisController extends Controller
             'remark'  => '',
             'author_rank' => '1/4'
         ];
-        return response()->json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        return response()->json(array('status'=>200,"msg"=>"data require success",'data'=>$info));
     }
 }

@@ -23,24 +23,16 @@ class Patent extends Model
                     'proposer' => 'required',
                     'patent_name' => 'required',
                     'type' => 'required',
-                    'application_number' => 'required|numeric',
-                    'apply_time' => 'required|date',
-                    'authorization_time' => 'required|date',
-                    'certificate_number' => 'required|numeric',
+                    'application_number' => 'required',
+                    'apply_time' => 'required',
+                    'authorization_time' => 'required',
+                    'certificate_number' => 'required',
                     'patentee' => 'required'
-                ];
-                break;
-            case 'remove':
-                $rules = [
-                    'id' => 'required'
                 ];
                 break;
         }
         $messages = [
-            'required' => 'need :attribute',
-            'integer' => ':attribute must be an integer',
-            'date' => ':attribute is not a valid date format',
-            'numeric' => ':attribute is not a valid number'
+            'required' => "'status':'400,'msg':'need :attribute'",
         ];
         $validate = Validator::make($data,$rules,$messages);
         return $validate;
