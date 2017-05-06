@@ -4,8 +4,7 @@ namespace App\Http\Controllers\API_V10;
 
 use App\Account;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class AccountController extends Controller
 {
@@ -16,7 +15,6 @@ class AccountController extends Controller
     {
         $this->model = new Account();
     }
-
 
     public function update(Request $request)
     {
@@ -45,5 +43,36 @@ class AccountController extends Controller
             return response()->json(array("status"=>404,"msg"=>"user not exists"));
         }
         return response()->json(array('status'=>200,"msg"=>"data require success",'data'=>$user_model));
+    }
+
+    public function uploadHead(Request $request){
+        if (!$request->hasFile('head')) {//判断请求中是否有文件
+            return response()->json(['status' => '400', 'msg' => 'need file']);
+        }
+        $file = $request->file('head');
+        $inputUser = $request->input('user');//注意这用圆括号，而不是方括号
+        $ext = $file->getClientOriginalExtension();//获取扩展名
+        $allowedExt =['jpg','png','jpeg'];//允许的图片格式
+        for ($i = 0;$i<count($allowedExt);$i++){
+            if ($ext==$allowedExt[$i]){
+                break;
+            }
+            else{
+                return response()->json(['status' => 402,'msg' => 'wrong file format']);
+            }
+        }
+        $path = Storage::putFileAs('head',$file,'Head '.$inputUser.date(' Y-m-d H：m：s').'.'.$ext);//上传文件
+        if (!$path){
+            return response()->json(['status' => 402,'msg' => 'file uploaded failed']);
+        }
+        $user = $this->model->where('user','=',$inputUser)->first();//数据库查询
+        if (!$user){
+            return response()->json(['status' => 404,'msg' => 'user not exists']);
+        }
+        $user->icon_path = $path;//将路径写入数据库
+        if(!$user->save()){
+            return response()->json(['status' => 402,'msg' => 'path database written failed']);
+        }
+        return response()->json(['status' => '200','msg' => 'file uploaded successfully','path' => $path]);
     }
 }

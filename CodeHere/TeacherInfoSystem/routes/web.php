@@ -20,19 +20,20 @@ Route::group(['prefix'=>'api','namespace' => 'API_V10'],function (){
                 Route::post('users',['uses'=>'EmailUserController@registerByEmail']);
                 Route::post('users/code',['uses'=>'EmailUserController@getCode']);
                 Route::post('token',['uses'=>'EmailUserController@loginByEmail']);
-                Route::delete('token',['uses'=>'EmailUserController@logoutByEmail'])->middleware('CheckLogin');
+                Route::post('deleteToken',['uses'=>'EmailUserController@logoutByEmail'])->middleware('CheckLogin');
             });
 
             Route::group(['prefix'=>'phone'],function () {
                 Route::post('users',['uses'=>'PhoneUserController@registerByPhone']);
                 Route::post('users/code',['uses'=>'PhoneUserController@getCode']);
                 Route::post('token',['uses'=>'PhoneUserController@loginByPhone']);
-                Route::delete('token',['uses'=>'PhoneUserController@logoutByPhone'])->middleware('CheckLogin');
+                Route::post('deleteToken',['uses'=>'PhoneUserController@logoutByPhone'])->middleware('CheckLogin');
             });
 
           Route::group(['middleware'=>'CheckLogin'],function () {
-                Route::put('account',['uses'=>'AccountController@update']);
-                Route::post('account',['uses'=>'AccountController@get']);
+                Route::post('updateAccount','AccountController@update');
+                Route::post('account','AccountController@get');
+                Route::post('uploadHead','AccountController@uploadHead');
             });
         });
     });

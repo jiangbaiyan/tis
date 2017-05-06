@@ -9,8 +9,6 @@
 namespace App\Http\Controllers\API_V10;
 
 use App\Account;
-use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Crypt;
 use Mail;
 use App\EmailUser;
 use Response;

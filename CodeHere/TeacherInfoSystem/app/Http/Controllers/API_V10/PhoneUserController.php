@@ -9,7 +9,6 @@
 namespace App\Http\Controllers\API_V10;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Cookie;
 use Response;
 use Illuminate\Support\Facades\Redis;
 use iscms\Alisms\SendsmsPusher as Sms;
