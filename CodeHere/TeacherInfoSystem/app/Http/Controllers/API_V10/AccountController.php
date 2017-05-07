@@ -52,14 +52,8 @@ class AccountController extends Controller
         $file = $request->file('head');
         $inputUser = $request->input('user');//注意这用圆括号，而不是方括号
         $ext = $file->getClientOriginalExtension();//获取扩展名
-        $allowedExt =['jpg','png','jpeg'];//允许的图片格式
-        for ($i = 0;$i<count($allowedExt);$i++){
-            if ($ext==$allowedExt[$i]){
-                break;
-            }
-            else{
-                return response()->json(['status' => 402,'msg' => 'wrong file format']);
-            }
+        if($ext!='jpg' && $ext!='png' && $ext!='jpeg'){
+            return response()->json(['status' => 402,'msg' => 'wrong file format']);
         }
         $path = Storage::putFileAs('head',$file,'Head_'.$inputUser.'_'.time().'.'.$ext);//上传文件
         if (!$path){
