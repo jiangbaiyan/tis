@@ -61,7 +61,7 @@ class AccountController extends Controller
                 return response()->json(['status' => 402,'msg' => 'wrong file format']);
             }
         }
-        $path = Storage::putFileAs('head',$file,'Head '.$inputUser.date(' Y-m-d H：m：s').'.'.$ext);//上传文件
+        $path = Storage::putFileAs('head',$file,'Head_'.$inputUser.'_'.time().'.'.$ext);//上传文件
         if (!$path){
             return response()->json(['status' => 402,'msg' => 'file uploaded failed']);
         }
