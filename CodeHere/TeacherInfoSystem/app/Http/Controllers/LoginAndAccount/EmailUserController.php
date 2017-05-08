@@ -6,7 +6,7 @@
  * Time: 下午4:58
  */
 
-namespace App\Http\Controllers\API_V10;
+namespace App\Http\Controllers\LoginAndAccount;
 
 use App\Account;
 use Mail;

@@ -6,7 +6,7 @@
  * Time: 下午3:53
  */
 
-namespace App\Http\Controllers\API_V10;
+namespace App\Http\Controllers\LoginAndAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Response;

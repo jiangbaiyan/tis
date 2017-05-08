@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API_V10;
+namespace App\Http\Controllers\LoginAndAccount;
 
 use App\Account;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class AccountController extends Controller
         }
         else
         {
-            return response()->json(array("status"=>402,"msg"=>"account update fail"));
+            return response()->json(array("status"=>402,"msg"=>"account update failed"));
         }
     }
 

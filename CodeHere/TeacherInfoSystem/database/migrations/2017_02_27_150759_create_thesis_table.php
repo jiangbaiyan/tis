@@ -32,6 +32,7 @@ class CreateThesisTable extends Migration
             $table->string("accession_number")->nullable();
             $table->text("remark")->nullable();
             $table->string("author_rank")->nullable();
+            $table->string('icon_path')->nullable();
             $table->timestamps();
         });
     }

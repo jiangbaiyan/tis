@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\API_V10;
+namespace App\Http\Controllers\LoginAndAccount;
 
-use App\HoldConference;
+use App\Award;
 use Illuminate\Http\Request;
 
-class HoldConferenceController extends Controller
+class AwardController extends Controller
 {
     //
     private $model;
 
     public function __construct()
     {
-        $this->model = new HoldConference();
+        $this->model = new Award();
     }
 
     public function add(Request $request)
@@ -55,19 +55,19 @@ class HoldConferenceController extends Controller
 
         $user = Cookie::get('user');
 
-        $HoldConference = $this->model()->find($input['id']);
+        $Award = $this->model()->find($input['id']);
 
-        if($HoldConference==null)
+        if($Award==null)
         {
             return  response()->json(array("content"=>"data not found","status"=>404));
         }
 
-        if($HoldConference->user!=$user)
+        if($Award->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $HoldConference->delete();
+        $Award->delete();
 
         return  response()->json(array("content"=>"data remove success","status"=>200));
     }
@@ -81,9 +81,9 @@ class HoldConferenceController extends Controller
 
         if(!$info)
         {
-            return request()->json(array("content"=>"user not exist","status"=>404));
+            return response()->json(array("content"=>"user not exist","status"=>404));
         }
 
-        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        return response()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
     }
 }

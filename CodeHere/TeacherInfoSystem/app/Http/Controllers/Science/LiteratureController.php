@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API_V09;
+namespace App\Http\Controllers\Science;
 
 use App\Literature;
 use Illuminate\Http\Request;

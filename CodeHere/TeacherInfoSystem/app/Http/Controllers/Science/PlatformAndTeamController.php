@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\API_V09;
+namespace App\Http\Controllers\Science;
 
-use App\Patent;
+use App\PlatformAndTeam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
-class PatentController extends Controller
+class PlatformAndTeamController extends Controller
 {
 
     private $model;
 
     public function __construct()
     {
-        $this->model = new Patent();
+        $this->model = new PlatformAndTeam();
     }
 
     public function add(Request $request)
@@ -28,14 +28,14 @@ class PatentController extends Controller
         $user = Cookie::get('user');
         $input['user']=$user;
         $this->model->create($input);
-        return response()->json(array("status"=>200,"msg"=>"add success",));
+        return response()->json(array("status"=>200,"msg"=>"add success"));
     }
 
     public function remove()
     {
         $user = Cookie::get('user');
-        $patentDelete = Patent::where('user','=',$user)->delete();
-        if($patentDelete){
+        $platformAndTeamDelete = PlatformAndTeam::where('user','=',$user)->delete();
+        if($platformAndTeamDelete){
             return response()->json(['status' => 200,'msg' => 'data remove success']);
         }
         else{
@@ -48,19 +48,14 @@ class PatentController extends Controller
         $user = Cookie::get('user');
         $info = $this->model->where('user','=',$user)->get();
         if(!$info) {
-            return response()->json(array("status"=>404,"msg"=>"user not exist",));
+            return response()->json(["status"=>404,"msg"=>"user not exist"]);
         }
-        //假数据
         $info = [
-            'proposer' => '胡耿然',
-            'patent_name' => '大众密码学研究',
-            'type' => '发明专利',
-            'application_number' => '20170312153.7',
-            'apply_time' => '2017-04-29',
-            'authorization_time' => '2017-04-29',
-            'certificate_number' => '20312102012',
-            'patentee' => '蒋佰言'
+            'is_academy_host' => 1,//1代表本学院主持人
+            'platform_and_team_name' => '教学辅助平台团队',
+            'platform_and_team_rank' => 'A',
+            'member_info' => '胡耿然、胡丽琴'
         ];
-        return response()->json(array('status'=>200,"msg"=>"data require success",'data'=>$info));
+        return response()->json(['status'=>200,"msg"=>"data require success",'data'=>$info]);
     }
 }

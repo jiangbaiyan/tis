@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\API_V09;
+namespace App\Http\Controllers\Science;
 
-use App\PlatformAndTeam;
+use App\AcademicPartTimeJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
-class PlatformAndTeamController extends Controller
+class AcademicPartTimeJobController extends Controller
 {
-
     private $model;
 
     public function __construct()
     {
-        $this->model = new PlatformAndTeam();
+        $this->model = new AcademicPartTimeJob();
     }
 
     public function add(Request $request)
@@ -34,8 +33,8 @@ class PlatformAndTeamController extends Controller
     public function remove()
     {
         $user = Cookie::get('user');
-        $platformAndTeamDelete = PlatformAndTeam::where('user','=',$user)->delete();
-        if($platformAndTeamDelete){
+        $academicPartTimeJobDelete = AcademicPartTimeJob::where('user','=',$user)->delete();
+        if($academicPartTimeJobDelete){
             return response()->json(['status' => 200,'msg' => 'data remove success']);
         }
         else{
@@ -48,14 +47,16 @@ class PlatformAndTeamController extends Controller
         $user = Cookie::get('user');
         $info = $this->model->where('user','=',$user)->get();
         if(!$info) {
-            return response()->json(["status"=>404,"msg"=>"user not exist"]);
+            return response()->json(array("status"=>404,"msg"=>"user not exist"));
         }
+
         $info = [
-            'is_academy_host' => 1,//1代表本学院主持人
-            'platform_and_team_name' => '教学辅助平台团队',
-            'platform_and_team_rank' => 'A',
-            'member_info' => '胡耿然、胡丽琴'
+            'duty' => '杭州电子科技大学教授',
+            'start_time' => '2010',
+            'stop_time' => '2016',
+            'institution_name' => '互联网+培训机构',
+            'part_time_duty' => '讲师'
         ];
-        return response()->json(['status'=>200,"msg"=>"data require success",'data'=>$info]);
+        return response()->json(array('status'=>200,"msg"=>"data require success",'data'=>$info));
     }
 }

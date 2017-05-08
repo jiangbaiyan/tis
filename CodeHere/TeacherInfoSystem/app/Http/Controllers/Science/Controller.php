@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API_V10;
+namespace App\Http\Controllers\Science;
 
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;

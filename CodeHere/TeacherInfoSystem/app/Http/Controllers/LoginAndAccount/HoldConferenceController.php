@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\API_V10;
+namespace App\Http\Controllers\LoginAndAccount;
 
-use App\AttendConference;
+use App\HoldConference;
 use Illuminate\Http\Request;
 
-class AttendConferenceController extends Controller
+class HoldConferenceController extends Controller
 {
     //
     private $model;
 
     public function __construct()
     {
-        $this->model = new AttendConference();
+        $this->model = new HoldConference();
     }
 
     public function add(Request $request)
@@ -38,10 +38,6 @@ class AttendConferenceController extends Controller
         return response()->json(array("content"=>"add success","status"=>200));
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function remove(Request $request)
     {
         $input = $request->all();
@@ -59,19 +55,19 @@ class AttendConferenceController extends Controller
 
         $user = Cookie::get('user');
 
-        $AttendConference = $this->model()->find($input['id']);
+        $HoldConference = $this->model()->find($input['id']);
 
-        if($AttendConference==null)
+        if($HoldConference==null)
         {
             return  response()->json(array("content"=>"data not found","status"=>404));
         }
 
-        if($AttendConference->user!=$user)
+        if($HoldConference->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $AttendConference->delete();
+        $HoldConference->delete();
 
         return  response()->json(array("content"=>"data remove success","status"=>200));
     }
@@ -83,11 +79,11 @@ class AttendConferenceController extends Controller
 
         $info = $this->model->where('user','=',$user)->get();
 
-        if($info==null)
+        if(!$info)
         {
-            return response()->json(array("content"=>"user not exist","status"=>404));
+            return request()->json(array("content"=>"user not exist","status"=>404));
         }
 
-        return response()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
+        return request()-json(array("content"=>"data require success",'status'=>200,'data'=>$info));
     }
 }

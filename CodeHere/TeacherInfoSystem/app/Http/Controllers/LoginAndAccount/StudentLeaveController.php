@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API_V10;
+namespace App\Http\Controllers\LoginAndAccount;
 
 use Illuminate\Http\Request;
 

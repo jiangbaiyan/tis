@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\API_V10;
+namespace App\Http\Controllers\LoginAndAccount;
 
-use App\GoAbordInfo;
+use App\AttendConference;
 use Illuminate\Http\Request;
 
-class GoAbordInfoController extends Controller
+class AttendConferenceController extends Controller
 {
     //
     private $model;
 
     public function __construct()
     {
-        $this->model = new GoAbordInfo();
+        $this->model = new AttendConference();
     }
 
     public function add(Request $request)
@@ -38,6 +38,10 @@ class GoAbordInfoController extends Controller
         return response()->json(array("content"=>"add success","status"=>200));
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function remove(Request $request)
     {
         $input = $request->all();
@@ -55,19 +59,19 @@ class GoAbordInfoController extends Controller
 
         $user = Cookie::get('user');
 
-        $GoAbordInfo = $this->model()->find($input['id']);
+        $AttendConference = $this->model()->find($input['id']);
 
-        if($GoAbordInfo==null)
+        if($AttendConference==null)
         {
             return  response()->json(array("content"=>"data not found","status"=>404));
         }
 
-        if($GoAbordInfo->user!=$user)
+        if($AttendConference->user!=$user)
         {
             return  response()->json(array("content"=>"wrong user","status"=>402));
         }
 
-        $GoAbordInfo->delete();
+        $AttendConference->delete();
 
         return  response()->json(array("content"=>"data remove success","status"=>200));
     }
@@ -79,7 +83,7 @@ class GoAbordInfoController extends Controller
 
         $info = $this->model->where('user','=',$user)->get();
 
-        if(!$info)
+        if($info==null)
         {
             return response()->json(array("content"=>"user not exist","status"=>404));
         }
