@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Science;
 
 use App\Patent;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cookie;
 
 class PatentController extends Controller
 {
@@ -16,51 +15,44 @@ class PatentController extends Controller
         $this->model = new Patent();
     }
 
-    public function add(Request $request)
+    public function update(Request $request)
     {
-        $input = $request->all();
-        $type = 'add';
-        $validate = $this->model->checkValidate($input,$type);
-        if($validate->fails()){
-            $warnings = $validate->messages();
-            return response()->json($warnings);
+        $data = $request->all();
+        $user = $request->input('user');
+        $patent = $this->thesisModel->where('user','=',$user)->first();
+        if(!$patent) {
+            return response()->json(["status"=>404,"msg"=>"user not exists"]);
         }
-        $user = Cookie::get('user');
-        $input['user']=$user;
-        $this->model->create($input);
-        return response()->json(array("status"=>200,"msg"=>"add success",));
+        if($patent->update($data)) {
+            return response()->json(["status"=>200,"msg"=>"patent update successfully"]);
+        }
+        else {
+            return response()->json(["status"=>402,"msg"=>"patent update failed"]);
+        }
     }
 
-    public function remove()
+    public function delete(Request $request)
     {
-        $user = Cookie::get('user');
-        $patentDelete = Patent::where('user','=',$user)->delete();
-        if($patentDelete){
-            return response()->json(['status' => 200,'msg' => 'data remove success']);
+        $user = $request->input('user');
+        $patent = Patent::where('user','=',$user);
+        if (!$patent){
+            return response()->json(["status" => 404,"msg" => "user not exists"]);
+        }
+        if($patent->delete()){
+            return response()->json(['status' => 200,'msg' => 'patent deleted successfully']);
         }
         else{
-            return response()->json(['status' => 404,'msg' => 'data not found']);
+            return response()->json(['status' => 402,'msg' => 'patent deleted failed']);
         }
     }
 
-    public function get()
+    public function get(Request $request)
     {
-        $user = Cookie::get('user');
-        $info = $this->model->where('user','=',$user)->get();
-        if(!$info) {
-            return response()->json(array("status"=>404,"msg"=>"user not exist",));
+        $user = $request->input('user');
+        $patent = $this->model->where('user','=',$user)->first();
+        if (!$patent){
+            Patent::create(['user' => $user]);
         }
-        //假数据
-        $info = [
-            'proposer' => '胡耿然',
-            'patent_name' => '大众密码学研究',
-            'type' => '发明专利',
-            'application_number' => '20170312153.7',
-            'apply_time' => '2017-04-29',
-            'authorization_time' => '2017-04-29',
-            'certificate_number' => '20312102012',
-            'patentee' => '蒋佰言'
-        ];
-        return response()->json(array('status'=>200,"msg"=>"data require success",'data'=>$info));
+        return response()->json(['status'=>200,"msg"=>"data require successfully",'data'=>$patent]);
     }
 }

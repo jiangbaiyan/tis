@@ -15,26 +15,4 @@ class Patent extends Model
         'certificate_number','patentee'];
 
     protected $guarded = ['id'];
-
-    public function checkValidate($data,$type){
-        switch ($type){
-            case 'add':
-                $rules = [
-                    'proposer' => 'required',
-                    'patent_name' => 'required',
-                    'type' => 'required',
-                    'application_number' => 'required',
-                    'apply_time' => 'required',
-                    'authorization_time' => 'required',
-                    'certificate_number' => 'required',
-                    'patentee' => 'required'
-                ];
-                break;
-        }
-        $messages = [
-            'required' => "'status':400,'msg':'need :attribute'",
-        ];
-        $validate = Validator::make($data,$rules,$messages);
-        return $validate;
-    }
 }

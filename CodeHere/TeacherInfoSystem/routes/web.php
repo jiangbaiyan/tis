@@ -53,24 +53,24 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('deleteThesis', ['uses' => 'ThesisController@delete']);
 
                     //专利类
-                    Route::post('updatePatent', ['uses' => 'PatentController@add']);
+                    Route::post('updatePatent', ['uses' => 'PatentController@update']);
                     Route::post('getPatent', ['uses' => 'PatentController@get']);
-                    Route::post('deletePatent', ['uses' => 'PatentController@remove']);
+                    Route::post('deletePatent', ['uses' => 'PatentController@delete']);
 
                     //著作和教材类
-                    Route::post('updateLiterature', ['uses' => 'LiteratureController@add']);
+                    Route::post('updateLiterature', ['uses' => 'LiteratureController@update']);
                     Route::post('getLiterature', ['uses' => 'LiteratureController@get']);
-                    Route::post('deleteLiterature', ['uses' => 'LiteratureController@remove']);
+                    Route::post('deleteLiterature', ['uses' => 'LiteratureController@delete']);
 
                     //平台和团队信息类
-                    Route::post('updatePlatformAndTeam', ['uses' => 'platformAndTeamController@add']);
-                    Route::post('updatePlatformAndTeam', ['uses' => 'platformAndTeamController@get']);
-                    Route::post('updatePlatformAndTeam', ['uses' => 'platformAndTeamController@remove']);
+                    Route::post('updatePlatformAndTeam', ['uses' => 'platformAndTeamController@update']);
+                    Route::post('getPlatformAndTeam', ['uses' => 'platformAndTeamController@get']);
+                    Route::post('deletePlatformAndTeam', ['uses' => 'platformAndTeamController@delete']);
 
                     //学术兼职类
                     Route::post('getAcademicPartTimeJob', 'AcademicPartTimeJobController@get');
-                    Route::post('updateAcademicPartTimeJob', 'AcademicPartTimeJobController@add');
-                    Route::post('deleteAcademicPartTimeJob', 'AcademicPartTimeJobController@remove');
+                    Route::post('updateAcademicPartTimeJob', 'AcademicPartTimeJobController@update');
+                    Route::post('deleteAcademicPartTimeJob', 'AcademicPartTimeJobController@delete');
                 });
             });
         });
