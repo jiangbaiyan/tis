@@ -8,18 +8,11 @@ use Illuminate\Http\Request;
 class PatentController extends Controller
 {
 
-    private $model;
-
-    public function __construct()
-    {
-        $this->model = new Patent();
-    }
-
     public function update(Request $request)
     {
         $data = $request->all();
         $user = $request->input('user');
-        $patent = $this->thesisModel->where('user','=',$user)->first();
+        $patent = Patent::where('user','=',$user)->first();
         if(!$patent) {
             return response()->json(["status"=>404,"msg"=>"user not exists"]);
         }
@@ -49,7 +42,7 @@ class PatentController extends Controller
     public function get(Request $request)
     {
         $user = $request->input('user');
-        $patent = $this->model->where('user','=',$user)->first();
+        $patent = Patent::where('user','=',$user)->first();
         if (!$patent){
             Patent::create(['user' => $user]);
         }

@@ -63,6 +63,7 @@ class AccountController extends Controller
         if (!$user){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
+        $path = 'storage/'.$path;
         $user->icon_path = $path;//将路径写入数据库
         if(!$user->save()){
             return response()->json(['status' => 402,'msg' => 'path database written failed']);

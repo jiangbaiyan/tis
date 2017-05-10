@@ -48,9 +48,11 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                 Route::group(['middleware' => 'CheckLogin'],function () {
 
                     //论文类
-                    Route::post('updateThesis', ['uses' => 'ThesisController@update']);
-                    Route::post('getThesis', ['uses' => 'ThesisController@get']);
-                    Route::post('deleteThesis', ['uses' => 'ThesisController@delete']);
+                    Route::post('updateThesis', 'ThesisController@update');
+                    Route::post('getThesisDetail', 'ThesisController@getDetail');
+                    Route::post('getThesisIndex','ThesisController@getIndex');
+                    Route::post('deleteThesis', 'ThesisController@delete');
+                    Route::post('createThesis','ThesisController@create');
 
                     //专利类
                     Route::post('updatePatent', ['uses' => 'PatentController@update']);

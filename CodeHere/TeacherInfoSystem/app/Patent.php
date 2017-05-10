@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Validator;
 
 class Patent extends Model
 {
@@ -15,4 +14,5 @@ class Patent extends Model
         'certificate_number','patentee'];
 
     protected $guarded = ['id'];
+
 }

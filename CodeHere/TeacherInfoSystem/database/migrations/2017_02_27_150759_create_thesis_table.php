@@ -18,13 +18,14 @@ class CreateThesisTable extends Migration
             $table->string("user");
             $table->string("name")->nullable();
             $table->string("thesis_topic")->nullable();
+            $table->string("author")->nullable();
             $table->string("periodical_or_conference")->nullable();
             $table->string("ISSN_or_ISBN")->nullable();
             $table->string("issue")->nullable();
             $table->string("volume")->nullable();
             $table->string("page_number")->nullable();
-            $table->dateTime("publication_year")->nullable();
-            $table->dateTime("publication_time")->nullable();
+            $table->string("publication_year")->nullable();
+            $table->date("publication_time")->nullable();
             $table->string("SCI")->nullable();
             $table->string("EI")->nullable();
             $table->string("CCF")->nullable();
