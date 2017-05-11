@@ -25,7 +25,7 @@ class CheckLogin
     {
         $user = $request->user;
         $token = $request->token;
-        if (empty($user||$token)){
+        if (!$user||!$token){
             return response()->json(['status' => '400','msg' => 'need user or token']);
         }
         $token_exists = Redis::exists($this->LoginTokenPrefix.$user);

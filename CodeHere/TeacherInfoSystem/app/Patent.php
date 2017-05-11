@@ -11,7 +11,7 @@ class Patent extends Model
 
     protected $fillable = ['user','proposer','patent_name','type',
         'application_number','apply_time','authorization_time',
-        'certificate_number','patentee'];
+        'certificate_number','patentee','patent_path','cover_path'];
 
     protected $guarded = ['id'];
 

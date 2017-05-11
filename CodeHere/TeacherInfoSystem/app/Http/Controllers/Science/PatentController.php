@@ -7,45 +7,16 @@ use Illuminate\Http\Request;
 
 class PatentController extends Controller
 {
-
-    public function update(Request $request)
-    {
-        $data = $request->all();
+    public function get(Request $request){
         $user = $request->input('user');
-        $patent = Patent::where('user','=',$user)->first();
-        if(!$patent) {
-            return response()->json(["status"=>404,"msg"=>"user not exists"]);
-        }
-        if($patent->update($data)) {
-            return response()->json(["status"=>200,"msg"=>"patent update successfully"]);
-        }
-        else {
-            return response()->json(["status"=>402,"msg"=>"patent update failed"]);
-        }
-    }
-
-    public function delete(Request $request)
-    {
-        $user = $request->input('user');
-        $patent = Patent::where('user','=',$user);
-        if (!$patent){
-            return response()->json(["status" => 404,"msg" => "user not exists"]);
-        }
-        if($patent->delete()){
-            return response()->json(['status' => 200,'msg' => 'patent deleted successfully']);
-        }
-        else{
-            return response()->json(['status' => 402,'msg' => 'patent deleted failed']);
-        }
-    }
-
-    public function get(Request $request)
-    {
-        $user = $request->input('user');
-        $patent = Patent::where('user','=',$user)->first();
-        if (!$patent){
+        $patents = Patent::where('user','=',$user)->get();
+        if ($patents->isEmpty()){
             Patent::create(['user' => $user]);
         }
-        return response()->json(['status'=>200,"msg"=>"data require successfully",'data'=>$patent]);
+        return response()->json(['status' => 200,'msg' => 'patents required successfully','date' => $patents]);
+    }
+
+    public function update(Request $request){
+
     }
 }

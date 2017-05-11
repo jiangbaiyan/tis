@@ -55,9 +55,10 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('createThesis','ThesisController@create');
 
                     //专利类
-                    Route::post('updatePatent', ['uses' => 'PatentController@update']);
-                    Route::post('getPatent', ['uses' => 'PatentController@get']);
-                    Route::post('deletePatent', ['uses' => 'PatentController@delete']);
+                    Route::post('updatePatent','PatentController@update');
+                    Route::post('getPatent', 'PatentController@get');
+                    Route::post('deletePatent',  'PatentController@delete');
+                    Route::post('createPatent','PatentController@create');
 
                     //著作和教材类
                     Route::post('updateLiterature', ['uses' => 'LiteratureController@update']);
