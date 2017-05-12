@@ -85,35 +85,25 @@ class ThesisController extends Controller
 
     public function getIndex(Request $request){//获取论文首页多个论文
         $user = $request->input('user');
-        $theses = Thesis::select('id','user','thesis_name','author','periodical_or_conference','publication_time','thesis_path')->where('user','=',$user)->paginate(6);//这里直接用select查询部分字段即可！！！
-        if ($theses->isEmpty()){//第一次进来的时候需要根据用户名创建一条新记录（因为注册的时候并没有向这张表中写入user，注册的时候把所有表全写一遍user也是不现实的），如果表中已经有了记录那么直接进行查询！
-            Thesis::create(['user' => $user]);
-        }
+        $theses = Thesis::select('id','user','thesis_name','author','periodical_or_conference','publication_time','thesis_path')->where('user','=',$user)->paginate(6);
         $account = Account::where('user','=',$user)->first();
-        if(!$account) {//account表中的用户不存在
+        if(!$account) {
             return response()->json(["status"=>404,"msg"=>"user not exists"]);
         }
-        else if(!$account->icon_path){//account表中的用户存在，但是头像不存在
-            return response()->json(['status' => 404,'msg' => 'headPath not exists']);
-        }
-        else{
-            foreach ($theses as $thesis){
-                $thesis->icon_path = $account->icon_path;
-                $thesis->name = $account->name;//account表中用户、头像均存在，那么将Accounts表里的头像目录赋值给Thesis表
-                $thesis->save();
-            }
-        }
-        return response()->json(['status'=>200,"msg"=>"theses required successfully",'data'=>$theses]);
+        return response()->json(['status'=>200,"msg"=>"theses required successfully",'name' => $account->name,'icon_path' => $account->icon_path,'data'=>$theses]);
     }
 
-
-    public function getDetail(Request $request)//获取单个论文详细信息
-    {
+    public function getDetail(Request $request){//获取单个论文详细信息
+        $user = $request->input('user');
         $id = $request->input('id');
         $thesis = Thesis::find($id);
         if (!$thesis){
             return response()->json(['status' => 404,'msg' => 'thesis not exists']);
         }
-        return response()->json(['status' => 200,'msg' => 'thesis required successfully','data' => $thesis]);
+        $account = Account::where('user','=',$user)->first();
+        if(!$account) {
+            return response()->json(["status"=>404,"msg"=>"user not exists"]);
+        }
+        return response()->json(['status'=>200,"msg"=>"thesis required successfully",'name' => $account->name,'icon_path' => $account->icon_path,'data'=>$thesis]);
     }
 }

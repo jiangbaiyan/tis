@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Science;
 
+use App\Account;
 use App\Patent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -80,19 +81,25 @@ class PatentController extends Controller
 
     public function getIndex(Request $request){
         $user = $request->input('user');
-        $patents = Patent::select('proposer','patent_name','apply_time','authorization_time')->where('user','=',$user)->paginate(6);
-        if ($patents->isEmpty()){
-            Patent::create(['user' => $user]);
+        $patents = Patent::select('id','user','proposer','patent_name','apply_time','authorization_time')->where('user','=',$user)->paginate(6);
+        $account = Account::where('user','=',$user)->first();
+        if(!$account) {
+            return response()->json(["status"=>404,"msg"=>"user not exists"]);
         }
-        return response()->json(['status'=>200,"msg"=>"patents required successfully",'data'=>$patents]);
+        return response()->json(['status'=>200,"msg"=>"patents required successfully",'name' => $account->name,'icon_path' => $account->icon_path,'data'=>$patents]);
     }
 
     public function getDetail(Request $request){
+        $user = $request->input('user');
         $id = $request->input('id');
         $patent = Patent::find($id);
         if (!$patent){
             return response()->json(['status' => 404,'msg' => 'patent not exists']);
         }
-        return response()->json(['status' => 200,'msg' => 'patent required successfully','data' => $patent]);
+        $account = Account::where('user','=',$user)->first();
+        if(!$account) {
+            return response()->json(["status"=>404,"msg"=>"user not exists"]);
+        }
+        return response()->json(['status' => 200,'msg' => 'patent required successfully','name' => $account->name,'icon_path' => $account->icon_path,'data' => $patent]);
     }
 }

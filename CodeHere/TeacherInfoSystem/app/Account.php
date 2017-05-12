@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Validator;
 
 class Account extends Model
 {
-    //
-
     protected $table = 'accounts';
 
     protected $fillable = ['user','name','gender','birthday','politics_status',

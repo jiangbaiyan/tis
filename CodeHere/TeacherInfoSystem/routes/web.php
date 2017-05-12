@@ -45,7 +45,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
     Route::group(['prefix' => 'v1.0'],function(){
         Route::group(['prefix' => 'science'],function (){
             Route::group(['middleware'=>'EnableCrossRequest'],function (){
-                //Route::group(['middleware' => 'CheckLogin'],function () {
+                Route::group(['middleware' => 'CheckLogin'],function () {
 
                     //论文类
                     Route::post('updateThesis', 'ThesisController@update');
@@ -61,11 +61,13 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('deletePatent',  'PatentController@delete');
                     Route::post('createPatent','PatentController@create');
 
-
                     //著作和教材类
-                    Route::post('updateLiterature', ['uses' => 'LiteratureController@update']);
-                    Route::post('getLiterature', ['uses' => 'LiteratureController@get']);
-                    Route::post('deleteLiterature', ['uses' => 'LiteratureController@delete']);
+                    Route::post('updateLiterature', 'LiteratureController@update');
+                    Route::any('getLiteratureDetail', 'LiteratureController@getDetail');
+                    Route::any('getLiteratureIndex', 'LiteratureController@getIndex');
+                    Route::post('deleteLiterature', 'LiteratureController@delete');
+                    Route::post('createLiterature', 'LiteratureController@create');
+
 
                     //平台和团队信息类
                     Route::post('updatePlatformAndTeam', ['uses' => 'platformAndTeamController@update']);
@@ -76,7 +78,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('getAcademicPartTimeJob', 'AcademicPartTimeJobController@get');
                     Route::post('updateAcademicPartTimeJob', 'AcademicPartTimeJobController@update');
                     Route::post('deleteAcademicPartTimeJob', 'AcademicPartTimeJobController@delete');
-               // });
+                });
             });
         });
     });
