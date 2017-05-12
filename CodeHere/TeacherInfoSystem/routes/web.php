@@ -45,20 +45,22 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
     Route::group(['prefix' => 'v1.0'],function(){
         Route::group(['prefix' => 'science'],function (){
             Route::group(['middleware'=>'EnableCrossRequest'],function (){
-                Route::group(['middleware' => 'CheckLogin'],function () {
+                //Route::group(['middleware' => 'CheckLogin'],function () {
 
                     //论文类
                     Route::post('updateThesis', 'ThesisController@update');
-                    Route::post('getThesisDetail', 'ThesisController@getDetail');
-                    Route::post('getThesisIndex','ThesisController@getIndex');
+                    Route::any('getThesisDetail', 'ThesisController@getDetail');
+                    Route::any('getThesisIndex','ThesisController@getIndex');
                     Route::post('deleteThesis', 'ThesisController@delete');
                     Route::post('createThesis','ThesisController@create');
 
                     //专利类
                     Route::post('updatePatent','PatentController@update');
-                    Route::post('getPatent', 'PatentController@get');
+                    Route::any('getPatentIndex', 'PatentController@getIndex');
+                    Route::any('getPatentDetail', 'PatentController@getDetail');
                     Route::post('deletePatent',  'PatentController@delete');
                     Route::post('createPatent','PatentController@create');
+
 
                     //著作和教材类
                     Route::post('updateLiterature', ['uses' => 'LiteratureController@update']);
@@ -74,7 +76,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('getAcademicPartTimeJob', 'AcademicPartTimeJobController@get');
                     Route::post('updateAcademicPartTimeJob', 'AcademicPartTimeJobController@update');
                     Route::post('deleteAcademicPartTimeJob', 'AcademicPartTimeJobController@delete');
-                });
+               // });
             });
         });
     });
