@@ -41,7 +41,7 @@ class PatentController extends Controller
         $id = $request->input('id');
         $patent = Patent::find($id);
         if (!$patent){
-            return response()->json(['status' => 404,'msg' => 'patent not found']);
+            return response()->json(['status' => 404,'msg' => 'patent not exists']);
         }
         if ($request->hasFile('patent')){
             $file = $request->file('patent');
@@ -81,7 +81,7 @@ class PatentController extends Controller
 
     public function getIndex(Request $request){
         $user = $request->input('user');
-        $patents = Patent::select('id','user','proposer','patent_name','apply_time','authorization_time')->where('user','=',$user)->paginate(6);
+        $patents = Patent::select('id','user','proposer','patent_name','apply_time','authorization_time','patent_path')->where('user','=',$user)->paginate(6);
         $account = Account::where('user','=',$user)->first();
         if(!$account) {
             return response()->json(["status"=>404,"msg"=>"user not exists"]);

@@ -45,7 +45,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
     Route::group(['prefix' => 'v1.0'],function(){
         Route::group(['prefix' => 'science'],function (){
             Route::group(['middleware'=>'EnableCrossRequest'],function (){
-                Route::group(['middleware' => 'CheckLogin'],function () {
+                //Route::group(['middleware' => 'CheckLogin'],function () {
 
                     //论文类
                     Route::post('updateThesis', 'ThesisController@update');
@@ -75,10 +75,12 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('deletePlatformAndTeam', ['uses' => 'platformAndTeamController@delete']);
 
                     //学术兼职类
-                    Route::post('getAcademicPartTimeJob', 'AcademicPartTimeJobController@get');
+                    Route::post('getAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getIndex');
                     Route::post('updateAcademicPartTimeJob', 'AcademicPartTimeJobController@update');
                     Route::post('deleteAcademicPartTimeJob', 'AcademicPartTimeJobController@delete');
-                });
+                    Route::post('createAcademicPartTimeJob',
+                        'AcademicPartTimeJobController@create');
+               // });
             });
         });
     });

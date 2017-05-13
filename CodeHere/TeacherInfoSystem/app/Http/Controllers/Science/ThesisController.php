@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ThesisController extends Controller
 {
-
     public function create(Request $request){
         $data = $request->all();
         $user = $request->input('user');

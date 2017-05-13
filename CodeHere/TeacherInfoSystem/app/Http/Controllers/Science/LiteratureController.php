@@ -40,7 +40,7 @@ class LiteratureController extends Controller
         $id = $request->input('id');
         $literature = literature::find($id);
         if (!$literature){
-            return response()->json(['status' => 404,'msg' => 'literature not found']);
+            return response()->json(['status' => 404,'msg' => 'literature not exists']);
         }
         if ($request->hasFile('literature')){
             $file = $request->file('literature');
@@ -80,10 +80,7 @@ class LiteratureController extends Controller
 
     public function getIndex(Request $request){
         $user = $request->input('user');
-        $literatures = literature::select('id','user','author','literature_name','publisher_name','publish_time')->where('user','=',$user)->paginate(6);
-        if ($literatures->isEmpty()){
-            literature::create(['user' => $user]);
-        }
+        $literatures = literature::select('id','user','author','literature_name','publisher_name','publish_time','literature_path')->where('user','=',$user)->paginate(6);
         $account = Account::where('user','=',$user)->first();
         if(!$account) {
             return response()->json(["status"=>404,"msg"=>"user not exists"]);
