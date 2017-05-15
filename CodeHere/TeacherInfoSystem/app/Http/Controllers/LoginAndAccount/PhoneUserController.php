@@ -69,8 +69,7 @@ class PhoneUserController extends Controller
         // 判断该手机在10分钟内是否已经发过短信
         $exists = Redis::exists($this->phoneTokenPrefix.$input['phone']);
         if(!empty($exists)){
-            return response()
-                ->json(['content'=>'send too frequently','status'=>'402']);
+            return response()->json(['content'=>'send too frequently','status'=>'402']);
         }
         $num = rand(100000,999999);
         $smsParams = [
@@ -81,6 +80,7 @@ class PhoneUserController extends Controller
         $content = json_encode($smsParams);
         $code = 'SMS_57925111';
         $data=$this->sms->send($phone,$name,$content,$code);
+        echo $data['result'];
         if(property_exists($data,'result')){
             Redis::sEtex($this->phoneTokenPrefix.$phone,600,$num);
             return response()->json(['content'=>'send sms success','status'=>'200']);

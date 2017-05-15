@@ -45,19 +45,21 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
     Route::group(['prefix' => 'v1.0'],function(){
         Route::group(['prefix' => 'science'],function (){
             Route::group(['middleware'=>'EnableCrossRequest'],function (){
-                //Route::group(['middleware' => 'CheckLogin'],function () {
+                Route::group(['middleware' => 'CheckLogin'],function () {
 
                     //论文类
                     Route::post('updateThesis', 'ThesisController@update');
-                    Route::any('getThesisDetail', 'ThesisController@getDetail');
-                    Route::any('getThesisIndex','ThesisController@getIndex');
+                    Route::any('getNotVerifiedThesisIndex', 'ThesisController@getNotVerifiedIndex');
+                    Route::any('getVerifiedThesisIndex','ThesisController@getVerifiedIndex');
+                    Route::post('getThesisDetail','ThesisController@getDetail');
                     Route::post('deleteThesis', 'ThesisController@delete');
                     Route::post('createThesis','ThesisController@create');
 
                     //专利类
                     Route::post('updatePatent','PatentController@update');
-                    Route::any('getPatentIndex', 'PatentController@getIndex');
-                    Route::any('getPatentDetail', 'PatentController@getDetail');
+                    Route::any('getNotVerifiedPatentIndex', 'PatentController@getNotVerifiedIndex');
+                    Route::any('getVerifiedPatentIndex', 'PatentController@getVerifiedIndex');
+                    Route::post('getPatentDetail', 'PatentController@getDetail');
                     Route::post('deletePatent',  'PatentController@delete');
                     Route::post('createPatent','PatentController@create');
 
@@ -80,7 +82,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('deleteAcademicPartTimeJob', 'AcademicPartTimeJobController@delete');
                     Route::post('createAcademicPartTimeJob',
                         'AcademicPartTimeJobController@create');
-               // });
+                });
             });
         });
     });

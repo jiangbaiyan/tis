@@ -20,6 +20,10 @@ class PatentController extends Controller
         if (!$patent) {
             return response()->json(['status' => 402, 'msg' => 'patent created failed']);
         }
+        $account = Account::where('user','=',$user)->first();
+        if (!$account){
+            return response()->json(['status' => 404,'msg' => 'user not exists']);
+        }
         $file = $request->file('patent');
         $ext = $file->getClientOriginalExtension();
         if($ext!='pdf' && $ext!='doc' && $ext!='docx'){
@@ -31,6 +35,7 @@ class PatentController extends Controller
         }
         $path = 'storage/'.$path;
         $patent->patent_path = $path;
+        $patent->name = $account->name;
         $patent->save();
         return response()->json(['status' => 200,'msg' => 'patent created successfully']);
     }
@@ -79,16 +84,44 @@ class PatentController extends Controller
         }
     }
 
-    public function getIndex(Request $request){
+    public function getVerifiedIndex(Request $request){//获取已审核的多个论文信息
         $user = $request->input('user');
-        $patents = Patent::select('id','user','proposer','patent_name','apply_time','authorization_time','patent_path')->where('user','=',$user)->paginate(6);
         $account = Account::where('user','=',$user)->first();
-        if(!$account) {
-            return response()->json(["status"=>404,"msg"=>"user not exists"]);
+        if (!$account){
+            return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        return response()->json(['status'=>200,"msg"=>"patents required successfully",'name' => $account->name,'icon_path' => $account->icon_path,'data'=>$patents]);
+        if ($account->science_level){//如果是超级用户，可以看所有表中的信息
+            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where('verify_level','=',1)->paginate(6);
+        }
+        else{//如果是普通用户，只能看自己的信息
+            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where(['user' => $user,'verify_level' => 1])->paginate(6);
+        }
+        if (!$patents){
+            return response()->json(['status' => 402,'msg' => 'patents required failed']);
+        }
+        return response()->json(['status' => 200,'msg' => 'patents required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $patents]);
     }
 
+
+    public function getNotVerifiedIndex(Request $request){//获取未审核的多个论文信息
+        $user = $request->input('user');
+        $account = Account::where('user','=',$user)->first();
+        if (!$account){
+            return response()->json(['status' => 404,'msg' => 'user not exists']);
+        }
+        if ($account->science_level){//如果是超级用户，可以看所有表中的信息
+            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where('verify_level','=',0)->paginate(6);
+        }
+        else{//如果是普通用户，只能看自己的信息
+            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where(['user' => $user,'verify_level' => 0])->paginate(6);
+        }
+        if (!$patents){
+            return response()->json(['status' => 402,'msg' => 'patents required failed']);
+        }
+        return response()->json(['status' => 200,'msg' => 'patents required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $patents]);
+    }
+
+    
     public function getDetail(Request $request){
         $user = $request->input('user');
         $id = $request->input('id');
@@ -100,6 +133,6 @@ class PatentController extends Controller
         if(!$account) {
             return response()->json(["status"=>404,"msg"=>"user not exists"]);
         }
-        return response()->json(['status' => 200,'msg' => 'patent required successfully','name' => $account->name,'icon_path' => $account->icon_path,'data' => $patent]);
+        return response()->json(['status' => 200,'msg' => 'patent required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $patent]);
     }
 }

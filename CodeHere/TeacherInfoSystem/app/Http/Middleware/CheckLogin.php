@@ -38,7 +38,7 @@ class CheckLogin
 
         if(strcmp($redisToken,$token)!=0)
         {
-            return Response::json(array("status"=>404,"msg"=>"wrong login token"));
+            return Response::json(array("status"=>402,"msg"=>"wrong login token"));
         }
 
         return $next($request);

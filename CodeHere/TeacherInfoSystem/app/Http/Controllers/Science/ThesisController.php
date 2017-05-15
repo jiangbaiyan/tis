@@ -19,6 +19,10 @@ class ThesisController extends Controller
         if (!$thesis) {
             return response()->json(['status' => 402, 'msg' => 'thesis created failed']);
         }
+        $account = Account::where('user','=',$user)->first();
+        if (!$account){
+            return response()->json(['status' => 404,'msg' => 'user not exists']);
+        }
         $file = $request->file('thesis');
         $ext = $file->getClientOriginalExtension();
         if($ext!='pdf' && $ext!='doc' && $ext!='docx'){
@@ -30,10 +34,10 @@ class ThesisController extends Controller
         }
         $path = 'storage/'.$path;
         $thesis->thesis_path = $path;
+        $thesis->name = $account->name;
         $thesis->save();
         return response()->json(['status' => 200,'msg' => 'thesis created successfully']);
     }
-
 
     public function update(Request $request)
     {
@@ -82,14 +86,42 @@ class ThesisController extends Controller
         }
     }
 
-    public function getIndex(Request $request){//获取论文首页多个论文
+
+    public function getVerifiedIndex(Request $request){//获取已审核的多个论文信息
         $user = $request->input('user');
-        $theses = Thesis::select('id','user','thesis_name','author','periodical_or_conference','publication_time','thesis_path')->where('user','=',$user)->paginate(6);
         $account = Account::where('user','=',$user)->first();
-        if(!$account) {
-            return response()->json(["status"=>404,"msg"=>"user not exists"]);
+        if (!$account){
+            return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        return response()->json(['status'=>200,"msg"=>"theses required successfully",'name' => $account->name,'icon_path' => $account->icon_path,'data'=>$theses]);
+        if ($account->science_level){//如果是超级用户，可以看所有表中的信息
+            $theses = Thesis::select('id','user','thesis_name','author','periodical_or_conference','name','verify_level','thesis_path')->where('verify_level','=',1)->paginate(6);
+        }
+        else{//如果是普通用户，只能看自己的信息
+            $theses = Thesis::select('id','user','thesis_name','author','periodical_or_conference','name','verify_level','thesis_path')->where(['user' => $user,'verify_level' => 1])->paginate(6);
+        }
+        if (!$theses){
+            return response()->json(['status' => 402,'msg' => 'theses required failed']);
+        }
+        return response()->json(['status' => 200,'msg' => 'theses required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $theses]);
+    }
+
+
+    public function getNotVerifiedIndex(Request $request){//获取未审核的多个论文信息
+        $user = $request->input('user');
+        $account = Account::where('user','=',$user)->first();
+        if (!$account){
+            return response()->json(['status' => 404,'msg' => 'user not exists']);
+        }
+        if ($account->science_level){//如果是超级用户，可以看所有表中的信息
+            $theses = Thesis::select('id','user','thesis_name','author','periodical_or_conference','name','verify_level','thesis_path')->where('verify_level','=',0)->paginate(6);
+        }
+        else{//如果是普通用户，只能看自己的信息
+            $theses = Thesis::select('id','user','thesis_name','author','periodical_or_conference','name','verify_level','thesis_path')->where(['user' => $user,'verify_level' => 0])->paginate(6);
+        }
+        if (!$theses){
+            return response()->json(['status' => 402,'msg' => 'theses required failed']);
+        }
+        return response()->json(['status' => 200,'msg' => 'theses required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $theses]);
     }
 
     public function getDetail(Request $request){//获取单个论文详细信息
@@ -103,6 +135,6 @@ class ThesisController extends Controller
         if(!$account) {
             return response()->json(["status"=>404,"msg"=>"user not exists"]);
         }
-        return response()->json(['status'=>200,"msg"=>"thesis required successfully",'name' => $account->name,'icon_path' => $account->icon_path,'data'=>$thesis]);
+        return response()->json(['status'=>200,"msg"=>"thesis required successfully",'name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data'=>$thesis]);
     }
 }
