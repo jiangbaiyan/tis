@@ -18,14 +18,14 @@ Route::group(['prefix'=>'api','namespace' => 'LoginAndAccount'],function (){
         Route::group(['middleware'=>'EnableCrossRequest'],function (){
             Route::group(['prefix'=>'email'],function() {
                 Route::post('users',['uses'=>'EmailUserController@registerByEmail']);
-                Route::post('users/code',['uses'=>'EmailUserController@getCode']);
+                Route::any('users/code',['uses'=>'EmailUserController@getCode']);
                 Route::post('token',['uses'=>'EmailUserController@loginByEmail']);
                 Route::post('deleteToken',['uses'=>'EmailUserController@logoutByEmail'])->middleware('CheckLogin');
             });
 
             Route::group(['prefix'=>'phone'],function () {
                 Route::post('users',['uses'=>'PhoneUserController@registerByPhone']);
-                Route::post('users/code',['uses'=>'PhoneUserController@getCode']);
+                Route::any('users/code',['uses'=>'PhoneUserController@getCode']);
                 Route::post('token',['uses'=>'PhoneUserController@loginByPhone']);
                 Route::post('deleteToken',['uses'=>'PhoneUserController@logoutByPhone'])->middleware('CheckLogin');
             });
@@ -66,7 +66,8 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     //著作和教材类
                     Route::post('updateLiterature', 'LiteratureController@update');
                     Route::any('getLiteratureDetail', 'LiteratureController@getDetail');
-                    Route::any('getLiteratureIndex', 'LiteratureController@getIndex');
+                    Route::any('getVerifiedLiteratureIndex', 'LiteratureController@getVerifiedIndex');
+                    Route::any('getNotVerifiedLiteratureIndex', 'LiteratureController@getNotVerifiedIndex');
                     Route::post('deleteLiterature', 'LiteratureController@delete');
                     Route::post('createLiterature', 'LiteratureController@create');
 

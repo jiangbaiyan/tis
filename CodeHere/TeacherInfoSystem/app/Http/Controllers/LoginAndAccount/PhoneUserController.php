@@ -80,7 +80,6 @@ class PhoneUserController extends Controller
         $content = json_encode($smsParams);
         $code = 'SMS_57925111';
         $data=$this->sms->send($phone,$name,$content,$code);
-        echo $data['result'];
         if(property_exists($data,'result')){
             Redis::sEtex($this->phoneTokenPrefix.$phone,600,$num);
             return response()->json(['content'=>'send sms success','status'=>'200']);
@@ -106,7 +105,7 @@ class PhoneUserController extends Controller
         //设置token
         $token = Hash::make($phone.$password.date(DATE_W3C));
         Redis::set($this->LoginTokenPrefix.$phone,$token);
-        Redis::expire($this->LoginTokenPrefix.$phone,3600);
+        Redis::expire($this->LoginTokenPrefix.$phone,100000);
         return Response::json(array("status"=>200,"msg"=>"login success",'data' => ['user' => $phone,'token' => $token]));
     }
 
