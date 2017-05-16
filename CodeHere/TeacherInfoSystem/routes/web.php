@@ -65,20 +65,17 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
 
                     //著作和教材类
                     Route::post('updateLiterature', 'LiteratureController@update');
-                    Route::any('getLiteratureDetail', 'LiteratureController@getDetail');
+                    Route::post('getLiteratureDetail', 'LiteratureController@getDetail');
                     Route::any('getVerifiedLiteratureIndex', 'LiteratureController@getVerifiedIndex');
                     Route::any('getNotVerifiedLiteratureIndex', 'LiteratureController@getNotVerifiedIndex');
                     Route::post('deleteLiterature', 'LiteratureController@delete');
                     Route::post('createLiterature', 'LiteratureController@create');
 
 
-                    //平台和团队信息类
-                    Route::post('updatePlatformAndTeam', ['uses' => 'platformAndTeamController@update']);
-                    Route::post('getPlatformAndTeam', ['uses' => 'platformAndTeamController@get']);
-                    Route::post('deletePlatformAndTeam', ['uses' => 'platformAndTeamController@delete']);
-
                     //学术兼职类
-                    Route::post('getAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getIndex');
+                    Route::any('getVerifiedAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getVerifiedIndex');
+                    Route::any('getNotVerifiedAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getNotVerifiedIndex');
+                    Route::post('getAcademicPartTimeJobDetail', 'AcademicPartTimeJobController@getDetail');
                     Route::post('updateAcademicPartTimeJob', 'AcademicPartTimeJobController@update');
                     Route::post('deleteAcademicPartTimeJob', 'AcademicPartTimeJobController@delete');
                     Route::post('createAcademicPartTimeJob',
