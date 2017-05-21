@@ -11,8 +11,8 @@ class AcademicPartTimeJobController extends Controller
     public function create(Request $request){
         $data = $request->all();
         $user = $request->input('user');
-        if (!$request->input('duty')){
-            return response()->json(['status' => 400,'msg' => 'need duty']);
+        if (!$request->input('duty')||!$request->input('start_time')||!$request->input('stop_time')||!$request->input('institution_name')){
+            return response()->json(['status' => 400,'msg' => 'missing parameters']);
         }
         $account = Account::where('user','=',$user)->first();
         if (!$account){
@@ -65,10 +65,10 @@ class AcademicPartTimeJobController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where('verify_level','=',1)->paginate(6);
+            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where('verify_level','=',1)->orderBy('updated_at','desc')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where(['user' => $user,'verify_level' => 1])->paginate(6);
+            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where(['user' => $user,'verify_level' => 1])->orderBy('updated_at','desc')->paginate(6);
         }
         if (!$academicPartTimeJobs){
             return response()->json(['status' => 402,'msg' => 'academicPartTimeJobs required failed']);
@@ -84,10 +84,10 @@ class AcademicPartTimeJobController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where('verify_level','=',0)->paginate(6);
+            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where('verify_level','=',0)->orderBy('updated_at','desc')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where(['user' => $user,'verify_level' => 0])->paginate(6);
+            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where(['user' => $user,'verify_level' => 0])->orderBy('updated_at','desc')->paginate(6);
         }
         if (!$academicPartTimeJobs){
             return response()->json(['status' => 402,'msg' => 'academicPartTimeJobs required failed']);
@@ -99,7 +99,7 @@ class AcademicPartTimeJobController extends Controller
     public function getDetail(Request $request){
         $user = $request->input('user');
         $id = $request->input('id');
-        $academicPartTimeJob = AcademicPartTimeJob::select('id','user','name','verify_level','duty','start_time','stop_time','institution_name','created_at','updated_at')->find($id);
+        $academicPartTimeJob = AcademicPartTimeJob::select('id','user','name','verify_level','duty','start_time','stop_time','institution_name','science_core_index','remark','created_at','updated_at')->find($id);
         if (!$academicPartTimeJob){
             return response()->json(['status' => 404,'msg' => 'academicPartTimeJob not exists']);
         }

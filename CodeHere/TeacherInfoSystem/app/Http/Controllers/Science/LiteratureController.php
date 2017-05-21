@@ -12,8 +12,8 @@ class LiteratureController extends Controller
     public function create(Request $request){
         $data = $request->all();
         $user = $request->input('user');
-        if (!$request->input('literature_name')||!$request->hasFile('literature')){
-            return response()->json(['status' => 400,'msg' => 'need literature name or file']);
+        if (!$request->input('literature_name')||!$request->input('author_rank')||!$request->input('author')||!$request->input('literature_type')||!$request->input('publisher_name')||!$request->input('publish_time')||!$request->input('publisher_type')||!$request->input('ISBN')||!$request->input('ISSN')){
+            return response()->json(['status' => 400,'msg' => 'missing parameters']);
         }
         $literature = Literature::create($data);
         if (!$literature) {
@@ -23,17 +23,19 @@ class LiteratureController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $file = $request->file('literature');
-        $ext = $file->getClientOriginalExtension();
-        if($ext!='pdf' && $ext!='doc' && $ext!='docx'){
-            return response()->json(['status' => 402,'msg' => 'wrong file format']);
+        if ($request->hasFile('literature')){
+            $file = $request->file('literature');
+            $ext = $file->getClientOriginalExtension();
+            if($ext!='pdf' && $ext!='doc' && $ext!='docx'&&$ext!='PDF'&&$ext!='DOC'&&$ext!='DOCX'){
+                return response()->json(['status' => 402,'msg' => 'wrong file format']);
+            }
+            $path = Storage::putFileAs('literature',$file,'Literature_'.$user.'_'.time().'.'.$ext);
+            if (!$path){
+                return response()->json(['status' => 402,'msg' => 'file uploaded failed']);
+            }
+            $path = 'storage/'.$path;
+            $literature->literature_path = $path;
         }
-        $path = Storage::putFileAs('literature',$file,'Literature_'.$user.'_'.time().'.'.$ext);
-        if (!$path){
-            return response()->json(['status' => 402,'msg' => 'file uploaded failed']);
-        }
-        $path = 'storage/'.$path;
-        $literature->literature_path = $path;
         $literature->name = $account->name;
         $literature->save();
         return response()->json(['status' => 200,'msg' => 'literature created successfully']);
@@ -50,7 +52,7 @@ class LiteratureController extends Controller
         if ($request->hasFile('literature')){
             $file = $request->file('literature');
             $ext = $file->getClientOriginalExtension();
-            if($ext!='pdf' && $ext!='doc' && $ext!='docx'){
+            if($ext!='pdf' && $ext!='doc' && $ext!='docx'&&$ext!='PDF'&&$ext!='DOC'&&$ext!='DOCX'){
                 return response()->json(['status' => 402,'msg' => 'wrong file format']);
             }
             $path = Storage::putFileAs('literature',$file,'Literature_'.$user.'_'.time().'.'.$ext);
@@ -76,6 +78,9 @@ class LiteratureController extends Controller
             return response()->json(['status' => 404,'msg' => 'literature not exists']);
         }
         if ($literature->delete()){
+            if ($literature->literature_path!='#'){
+                Storage::delete(substr($literature->literature_path,8));
+            }
             return response()->json(['status' => 200,'msg' => 'literature deleted successfully']);
         }
         else {
@@ -90,10 +95,10 @@ class LiteratureController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $literatures = Literature::select('id','user','author','literature_name','publisher_name','name','verify_level','literature_path')->where('verify_level','=',1)->paginate(6);
+            $literatures = Literature::select('id','user','author','literature_name','publisher_name','name','verify_level','literature_path')->where('verify_level','=',1)->orderBy('updated_at','desc')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $literatures = Literature::select('id','user','author','literature_name','publisher_name','name','verify_level','literature_path')->where(['user' => $user,'verify_level' => 1])->paginate(6);
+            $literatures = Literature::select('id','user','author','literature_name','publisher_name','name','verify_level','literature_path')->where(['user' => $user,'verify_level' => 1])->orderBy('updated_at','desc')->paginate(6);
         }
         if (!$literatures){
             return response()->json(['status' => 402,'msg' => 'literatures required failed']);
@@ -109,10 +114,10 @@ class LiteratureController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $literatures = Literature::select('id','user','author','literature_name','publisher_name','name','verify_level','literature_path')->where('verify_level','=',0)->paginate(6);
+            $literatures = Literature::select('id','user','author','literature_name','publisher_name','name','verify_level','literature_path')->where('verify_level','=',0)->orderBy('updated_at','desc')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $literatures =Literature::select('id','user','author','literature_name','publisher_name','name','verify_level','literature_path')->where(['user' => $user,'verify_level' => 0])->paginate(6);
+            $literatures =Literature::select('id','user','author','literature_name','publisher_name','name','verify_level','literature_path')->where(['user' => $user,'verify_level' => 0])->orderBy('updated_at','desc')->paginate(6);
         }
         if (!$literatures){
             return response()->json(['status' => 402,'msg' => 'literatures required failed']);

@@ -10,7 +10,8 @@
         "iscms/alisms-for-laravel": "^0.0.3",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
-        "predis/predis": "^1.1"
+        "predis/predis": "^1.1",
+	"maatwebsite/excel": "~2.1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

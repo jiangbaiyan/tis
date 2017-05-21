@@ -12,7 +12,7 @@
 |
 */
 
- //个人信息模块
+ //登录注册、个人信息模块
 Route::group(['prefix'=>'api','namespace' => 'LoginAndAccount'],function (){
     Route::group(['prefix'=>'v1.0'],function(){
         Route::group(['middleware'=>'EnableCrossRequest'],function (){
@@ -32,7 +32,9 @@ Route::group(['prefix'=>'api','namespace' => 'LoginAndAccount'],function (){
 
           Route::group(['middleware'=>'CheckLogin'],function () {
                 Route::post('updateAccount','AccountController@update');
-                Route::post('account','AccountController@get');
+                Route::post('account','AccountController@get');//展示自己的信息
+                Route::post('getOthersIndex','AccountController@getOthersIndex');
+                Route::post('getOthersDetail','AccountController@getOthersDetail');
                 Route::post('uploadHead','AccountController@uploadHead');
             });
         });
@@ -40,12 +42,15 @@ Route::group(['prefix'=>'api','namespace' => 'LoginAndAccount'],function (){
 });
 
 
-//科技模块
+//科研模块
 Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
     Route::group(['prefix' => 'v1.0'],function(){
         Route::group(['prefix' => 'science'],function (){
             Route::group(['middleware'=>'EnableCrossRequest'],function (){
                 Route::group(['middleware' => 'CheckLogin'],function () {
+
+                    //导出到Excel(待实现)
+                    Route::post('thesisExport','ExcelController@thesisExport');
 
                     //论文类
                     Route::post('updateThesis', 'ThesisController@update');
@@ -71,6 +76,14 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('deleteLiterature', 'LiteratureController@delete');
                     Route::post('createLiterature', 'LiteratureController@create');
 
+                    //平台和团队类
+                    Route::any('getVerifiedPlatformAndTeamIndex','PlatformAndTeamController@getVerifiedIndex');
+                    Route::any('getNotVerifiedPlatformAndTeamIndex','PlatformAndTeamController@getNotVerifiedIndex');
+                    Route::post('getPlatformAndTeamDetail','PlatformAndTeamController@getDetail');
+                    Route::post('updatePlatformAndTeam','PlatformAndTeamController@update');
+                    Route::post('deletePlatformAndTeam','PlatformAndTeamController@delete');
+                    Route::post('createPlatformAndTeam','PlatformAndTeamController@create');
+
 
                     //学术兼职类
                     Route::any('getVerifiedAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getVerifiedIndex');
@@ -78,8 +91,31 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('getAcademicPartTimeJobDetail', 'AcademicPartTimeJobController@getDetail');
                     Route::post('updateAcademicPartTimeJob', 'AcademicPartTimeJobController@update');
                     Route::post('deleteAcademicPartTimeJob', 'AcademicPartTimeJobController@delete');
-                    Route::post('createAcademicPartTimeJob',
-                        'AcademicPartTimeJobController@create');
+                    Route::post('createAcademicPartTimeJob', 'AcademicPartTimeJobController@create');
+
+                    //科研奖励类
+                    Route::any('getVerifiedScienceAwardIndex','ScienceAwardController@getVerifiedIndex');
+                    Route::any('getNotVerifiedScienceAwardIndex','ScienceAwardController@getNotVerifiedIndex');
+                    Route::post('getScienceAwardDetail','ScienceAwardController@getDetail');
+                    Route::post('updateScienceAward','ScienceAwardController@update');
+                    Route::post('deleteScienceAward','ScienceAwardController@delete');
+                    Route::post('createScienceAward','ScienceAwardController@create');
+
+                    //项目类
+                    Route::any('getVerifiedProjectIndex','ProjectController@getVerifiedIndex');
+                    Route::any('getNotVerifiedProjectIndex','ProjectController@getNotVerifiedIndex');
+                    Route::post('getProjectDetail','ProjectController@getDetail');
+                    Route::post('updateProject','ProjectController@update');
+                    Route::post('deleteProject','ProjectController@delete');
+                    Route::post('createProject','ProjectController@create');
+
+                    //学术活动类
+                    Route::any('getVerifiedActivityIndex','ActivityController@getVerifiedIndex');
+                    Route::any('getNotVerifiedActivityIndex','ActivityController@getNotVerifiedIndex');
+                    Route::post('getActivityDetail','ActivityController@getDetail');
+                    Route::post('updateActivity','ActivityController@update');
+                    Route::post('deleteActivity','ActivityController@delete');
+                    Route::post('createActivity','ActivityController@create');
                 });
             });
         });

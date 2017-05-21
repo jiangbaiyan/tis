@@ -13,8 +13,8 @@ class PatentController extends Controller
     public function create(Request $request){
         $data = $request->all();
         $user = $request->input('user');
-        if (!$request->input('patent_name')||!$request->hasFile('patent')){
-            return response()->json(['status' => 400,'msg' => 'need patent name or file']);
+        if (!$request->input('patent_name')||!$request->input('proposer')||!$request->input('author_rank')||!$request->input('patent_type')||!$request->input('apply_time')||!$request->input('authorization_time')||!$request->input('certificate_number')||!$request->input('patent_number')){
+            return response()->json(['status' => 400,'msg' => 'missing parameters']);
         }
         $patent = Patent::create($data);
         if (!$patent) {
@@ -24,17 +24,19 @@ class PatentController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $file = $request->file('patent');
-        $ext = $file->getClientOriginalExtension();
-        if($ext!='pdf' && $ext!='doc' && $ext!='docx'){
-            return response()->json(['status' => 402,'msg' => 'wrong file format']);
+        if ($request->hasFile('patent')){
+            $file = $request->file('patent');
+            $ext = $file->getClientOriginalExtension();
+            if($ext!='pdf' && $ext!='doc' && $ext!='docx'&&$ext!='PDF'&&$ext!='DOC'&&$ext!='DOCX'){
+                return response()->json(['status' => 402,'msg' => 'wrong file format']);
+            }
+            $path = Storage::putFileAs('patent',$file,'Patent_'.$user.'_'.time().'.'.$ext);
+            if (!$path){
+                return response()->json(['status' => 402,'msg' => 'file uploaded failed']);
+            }
+            $path = 'storage/'.$path;
+            $patent->patent_path = $path;
         }
-        $path = Storage::putFileAs('patent',$file,'Patent_'.$user.'_'.time().'.'.$ext);
-        if (!$path){
-            return response()->json(['status' => 402,'msg' => 'file uploaded failed']);
-        }
-        $path = 'storage/'.$path;
-        $patent->patent_path = $path;
         $patent->name = $account->name;
         $patent->save();
         return response()->json(['status' => 200,'msg' => 'patent created successfully']);
@@ -51,7 +53,7 @@ class PatentController extends Controller
         if ($request->hasFile('patent')){
             $file = $request->file('patent');
             $ext = $file->getClientOriginalExtension();
-            if($ext!='pdf' && $ext!='doc' && $ext!='docx'){
+            if($ext!='pdf' && $ext!='doc' && $ext!='docx'&&$ext!='PDF'&&$ext!='DOC'&&$ext!='DOCX'){
                 return response()->json(['status' => 402,'msg' => 'wrong file format']);
             }
             $path = Storage::putFileAs('patent',$file,'Patent_'.$user.'_'.time().'.'.$ext);
@@ -77,6 +79,9 @@ class PatentController extends Controller
             return response()->json(['status' => 404,'msg' => 'patent not exists']);
         }
         if ($patent->delete()){
+            if ($patent->patent_path!='#'){
+                Storage::delete(substr($patent->patent_path,8));
+            }
             return response()->json(['status' => 200,'msg' => 'patent deleted successfully']);
         }
         else {
@@ -91,17 +96,16 @@ class PatentController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where('verify_level','=',1)->paginate(6);
+            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where('verify_level','=',1)->orderBy('updated_at','desc')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where(['user' => $user,'verify_level' => 1])->paginate(6);
+            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where(['user' => $user,'verify_level' => 1])->orderBy('updated_at','desc')->paginate(6);
         }
         if (!$patents){
             return response()->json(['status' => 402,'msg' => 'patents required failed']);
         }
         return response()->json(['status' => 200,'msg' => 'patents required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $patents]);
     }
-
 
     public function getNotVerifiedIndex(Request $request){//获取未审核的多个论文信息
         $user = $request->input('user');
@@ -110,10 +114,10 @@ class PatentController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where('verify_level','=',0)->paginate(6);
+            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where('verify_level','=',0)->orderBy('updated_at','desc')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where(['user' => $user,'verify_level' => 0])->paginate(6);
+            $patents = Patent::select('id','user','proposer','patent_name','apply_time','name','verify_level','patent_path')->where(['user' => $user,'verify_level' => 0])->orderBy('updated_at','desc')->paginate(6);
         }
         if (!$patents){
             return response()->json(['status' => 402,'msg' => 'patents required failed']);
@@ -121,7 +125,6 @@ class PatentController extends Controller
         return response()->json(['status' => 200,'msg' => 'patents required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $patents]);
     }
 
-    
     public function getDetail(Request $request){
         $user = $request->input('user');
         $id = $request->input('id');
