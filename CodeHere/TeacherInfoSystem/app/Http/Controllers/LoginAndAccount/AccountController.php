@@ -82,4 +82,5 @@ class AccountController extends Controller
         }
         return response()->json(['status' => 200,'msg' => 'file uploaded successfully','path' => $path]);
     }
+
 }

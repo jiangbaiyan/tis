@@ -49,8 +49,19 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
             Route::group(['middleware'=>'EnableCrossRequest'],function (){
                 Route::group(['middleware' => 'CheckLogin'],function () {
 
+                    Route::post('getScienceInfo','ThesisController@getScienceInfo');
                     //导出到Excel(待实现)
-                    Route::post('thesisExport','ExcelController@thesisExport');
+                    Route::get('thesisExport','ExcelController@thesisExport');
+                    Route::get('patentExport','ExcelController@patentExport');
+                    Route::get('literatureExport','ExcelController@literatureExport');
+                    Route::get('projectExport','ExcelController@projectExport');
+                    Route::get('scienceAwardExport','ExcelController@scienceAwardExport');
+                    Route::get('platformAndTeamExport','ExcelController@platformAndTeamExport');
+                    Route::get('joinMeetingExport','ExcelController@joinMeetingExport');
+                    Route::get('holdMeetingExport','ExcelController@holdMeetingExport');
+                    Route::get('holdCommunicationExport','ExcelController@holdCommunicationExport');
+                    Route::get('goAbroadExport','ExcelController@goAbroadExport');
+                    Route::get('academicPartTimeJobExport','ExcelController@academicPartTimeJobExport');
 
                     //论文类
                     Route::post('updateThesis', 'ThesisController@update');
@@ -116,6 +127,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('updateActivity','ActivityController@update');
                     Route::post('deleteActivity','ActivityController@delete');
                     Route::post('createActivity','ActivityController@create');
+
                 });
             });
         });

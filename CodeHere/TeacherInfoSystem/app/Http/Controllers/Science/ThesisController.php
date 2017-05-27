@@ -72,7 +72,6 @@ class ThesisController extends Controller
         }
     }
 
-
     public function delete(Request $request)
     {
         $id = $request->input('id');
@@ -141,5 +140,17 @@ class ThesisController extends Controller
             return response()->json(["status"=>404,"msg"=>"user not exists"]);
         }
         return response()->json(['status'=>200,"msg"=>"thesis required successfully",'name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data'=>$thesis]);
+    }
+
+    public function getScienceInfo(Request $request){
+        $user = $request->input('user');
+        if (!$user){
+            return response()->json(['status' => 404,'msg' => 'user not found']);
+        }
+        $account = Account::select('id','user','name','icon_path','science_level')->where('user','=',$user)->first();
+        if (!$account){
+            return response()->json(['status' => '402','msg' => 'account required failed']);
+        }
+        return response()->json(['status' => 200,'msg' => 'account required successfully','data' => $account]);
     }
 }
