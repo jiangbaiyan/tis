@@ -50,7 +50,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                 Route::group(['middleware' => 'CheckLogin'],function () {
 
                     Route::post('getScienceInfo','ThesisController@getScienceInfo');
-                    //导出到Excel(待实现)
+                    //导出到Excel
                     Route::get('thesisExport','ExcelController@thesisExport');
                     Route::get('patentExport','ExcelController@patentExport');
                     Route::get('literatureExport','ExcelController@literatureExport');
@@ -120,7 +120,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('deleteProject','ProjectController@delete');
                     Route::post('createProject','ProjectController@create');
 
-                    //学术活动类
+                    //学术活动类(包括四个小类)
                     Route::any('getVerifiedActivityIndex','ActivityController@getVerifiedIndex');
                     Route::any('getNotVerifiedActivityIndex','ActivityController@getNotVerifiedIndex');
                     Route::post('getActivityDetail','ActivityController@getDetail');

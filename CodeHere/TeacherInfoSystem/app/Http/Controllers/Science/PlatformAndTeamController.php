@@ -22,9 +22,6 @@ class PlatformAndTeamController extends Controller
         if (!$platformAndTeam) {
             return response()->json(['status' => 402, 'msg' => 'platformAndTeam created failed']);
         }
-        $platformAndTeam->name = $account->name;
-        $platformAndTeam->icon_path = $account->icon_path;
-        $platformAndTeam->save();
         return response()->json(['status' => 200,'msg' => 'platformAndTeam created successfully']);
     }
 
@@ -65,10 +62,10 @@ class PlatformAndTeamController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $platformAndTeams = PlatformAndTeam::select('id','user','name','group_name','verify_level','icon_path')->where('verify_level','=',1)->orderBy('group_name')->paginate(6);
+            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.user','=','platformAndTeams.user')->select('platformAndTeams.id','platformAndTeams.user','accounts.name','group_name','verify_level','accounts.icon_path')->where('verify_level','=',1)->orderBy('group_name')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $platformAndTeams = PlatformAndTeam::select('id','user','name','group_name','verify_level','icon_path')->where(['user' => $user,'verify_level' => 1])->orderBy('group_name')->paginate(6);
+            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.user','=','platformAndTeams.user')->select('platformAndTeams.id','platformAndTeams.user','accounts.name','group_name','verify_level','accounts.icon_path')->where(['platformAndTeams.user' => $user,'verify_level' => 1])->orderBy('group_name')->paginate(6);
         }
         if (!$platformAndTeams){
             return response()->json(['status' => 402,'msg' => 'platformAndTeams required failed']);
@@ -84,10 +81,10 @@ class PlatformAndTeamController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $platformAndTeams = PlatformAndTeam::select('id','user','name','group_name','verify_level','icon_path')->where('verify_level','=',0)->orderBy('group_name')->paginate(6);
+            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.user','=','platformAndTeams.user')->select('platformAndTeams.id','platformAndTeams.user','accounts.name','group_name','verify_level','accounts.icon_path')->where('verify_level','=',0)->orderBy('group_name')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $platformAndTeams = PlatformAndTeam::select('id','user','name','group_name','verify_level','icon_path')->where(['user' => $user,'verify_level' => 0])->orderBy('group_name')->paginate(6);
+            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.user','=','platformAndTeams.user')->select('platformAndTeams.id','platformAndTeams.user','accounts.name','group_name','verify_level','accounts.icon_path')->where(['platformAndTeams.user' => $user,'verify_level' => 0])->orderBy('group_name')->paginate(6);
         }
         if (!$platformAndTeams){
             return response()->json(['status' => 402,'msg' => 'platformAndTeams required failed']);
@@ -99,7 +96,7 @@ class PlatformAndTeamController extends Controller
     public function getDetail(Request $request){
         $user = $request->input('user');
         $id = $request->input('id');
-        $platformAndTeam = PlatformAndTeam::select('id','user','name','verify_level','group_name','author_rank','group_level','science_core_index','remark')->find($id);
+        $platformAndTeam = PlatformAndTeam::join('accounts','accounts.user','=','platformAndTeams.user')->select('platformAndTeams.id','platformAndTeams.user','accounts.name','verify_level','group_name','author_rank','group_level','science_core_index','remark')->find($id);
         if (!$platformAndTeam){
             return response()->json(['status' => 404,'msg' => 'platformAndTeam not exists']);
         }

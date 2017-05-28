@@ -22,9 +22,6 @@ class AcademicPartTimeJobController extends Controller
         if (!$academicPartTimeJob) {
             return response()->json(['status' => 402, 'msg' => 'academicPartTimeJob created failed']);
         }
-        $academicPartTimeJob->name = $account->name;
-        $academicPartTimeJob->icon_path = $account->icon_path;
-        $academicPartTimeJob->save();
         return response()->json(['status' => 200,'msg' => 'academicPartTimeJob created successfully']);
     }
 
@@ -65,10 +62,10 @@ class AcademicPartTimeJobController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where('verify_level','=',1)->orderBy('updated_at','desc')->paginate(6);
+            $academicPartTimeJobs = AcademicPartTimeJob::join('accounts','accounts.user','=','academicPartTimeJobs.user')->select('academicPartTimeJobs.id','academicPartTimeJobs.user','duty','accounts.name','verify_level','accounts.icon_path')->where('verify_level','=',1)->orderBy('academicPartTimeJobs.updated_at')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where(['user' => $user,'verify_level' => 1])->orderBy('updated_at','desc')->paginate(6);
+            $academicPartTimeJobs = AcademicPartTimeJob::join('accounts','accounts.user','=','academicPartTimeJobs.user')->select('academicPartTimeJobs.id','academicPartTimeJobs.user','duty','accounts.name','verify_level','accounts.icon_path')->where(['academicPartTimeJobs.user' => $user,'verify_level' => 1])->orderBy('academicPartTimeJobs.updated_at')->paginate(6);
         }
         if (!$academicPartTimeJobs){
             return response()->json(['status' => 402,'msg' => 'academicPartTimeJobs required failed']);
@@ -84,10 +81,10 @@ class AcademicPartTimeJobController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where('verify_level','=',0)->orderBy('updated_at','desc')->paginate(6);
+            $academicPartTimeJobs = AcademicPartTimeJob::join('accounts','accounts.user','=','academicPartTimeJobs.user')->select('academicPartTimeJobs.id','academicPartTimeJobs.user','duty','accounts.name','verify_level','accounts.icon_path')->where('verify_level','=',0)->orderBy('academicPartTimeJobs.updated_at')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $academicPartTimeJobs = AcademicPartTimeJob::select('id','user','duty','name','verify_level','icon_path')->where(['user' => $user,'verify_level' => 0])->orderBy('updated_at','desc')->paginate(6);
+            $academicPartTimeJobs = AcademicPartTimeJob::join('accounts','accounts.user','=','academicPartTimeJobs.user')->select('academicPartTimeJobs.id','academicPartTimeJobs.user','duty','accounts.name','verify_level','accounts.icon_path')->where(['academicPartTimeJobs.user' => $user,'verify_level' => 0])->orderBy('academicPartTimeJobs.updated_at')->paginate(6);
         }
         if (!$academicPartTimeJobs){
             return response()->json(['status' => 402,'msg' => 'academicPartTimeJobs required failed']);
@@ -99,7 +96,7 @@ class AcademicPartTimeJobController extends Controller
     public function getDetail(Request $request){
         $user = $request->input('user');
         $id = $request->input('id');
-        $academicPartTimeJob = AcademicPartTimeJob::select('id','user','name','verify_level','duty','start_time','stop_time','institution_name','science_core_index','remark','created_at','updated_at')->find($id);
+        $academicPartTimeJob =  AcademicPartTimeJob::join('accounts','accounts.user','=','academicPartTimeJobs.user')->select('academicPartTimeJobs.id','academicPartTimeJobs.user','accounts.name','verify_level','duty','start_time','stop_time','institution_name','science_core_index','remark')->find($id);
         if (!$academicPartTimeJob){
             return response()->json(['status' => 404,'msg' => 'academicPartTimeJob not exists']);
         }

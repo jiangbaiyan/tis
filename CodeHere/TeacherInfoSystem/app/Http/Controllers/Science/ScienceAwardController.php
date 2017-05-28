@@ -22,9 +22,6 @@ class ScienceAwardController extends Controller
         if (!$scienceAward) {
             return response()->json(['status' => 402, 'msg' => 'scienceAward created failed']);
         }
-        $scienceAward->name = $account->name;
-        $scienceAward->icon_path = $account->icon_path;
-        $scienceAward->save();
         return response()->json(['status' => 200,'msg' => 'scienceAward created successfully']);
     }
 
@@ -65,10 +62,10 @@ class ScienceAwardController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $scienceAwards = ScienceAward::select('id','user','name','award_name','verify_level','icon_path','updated_at')->where('verify_level','=',1)->orderBy('updated_at')->paginate(6);
+            $scienceAwards = ScienceAward::join('accounts','accounts.user','=','scienceAwards.user')->select('scienceAwards.id','scienceAwards.user','accounts.name','award_name','verify_level','accounts.icon_path','scienceAwards.updated_at')->where('verify_level','=',1)->orderBy('scienceAwards.updated_at')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $scienceAwards = ScienceAward::select('id','user','name','award_name','verify_level','icon_path','updated_at')->where(['user' => $user,'verify_level' => 1])->orderBy('updated_at')->paginate(6);
+            $scienceAwards = ScienceAward::join('accounts','accounts.user','=','scienceAwards.user')->select('scienceAwards.id','scienceAwards.user','accounts.name','award_name','verify_level','accounts.icon_path','scienceAwards.updated_at')->where(['scienceAwards.user' => $user,'verify_level' => 1])->orderBy('scienceAwards.updated_at')->paginate(6);
         }
         if (!$scienceAwards){
             return response()->json(['status' => 402,'msg' => 'scienceAwards required failed']);
@@ -84,10 +81,10 @@ class ScienceAwardController extends Controller
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $scienceAwards = ScienceAward::select('id','user','name','award_name','verify_level','icon_path','updated_at')->where('verify_level','=',0)->orderBy('updated_at')->paginate(6);
+            $scienceAwards = ScienceAward::join('accounts','accounts.user','=','scienceAwards.user')->select('scienceAwards.id','scienceAwards.user','accounts.name','award_name','verify_level','accounts.icon_path','scienceAwards.updated_at')->where('verify_level','=',0)->orderBy('scienceAwards.updated_at')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $scienceAwards = ScienceAward::select('id','user','name','award_name','verify_level','icon_path','updated_at')->where(['user' => $user,'verify_level' => 0])->orderBy('updated_at')->paginate(6);
+            $scienceAwards = ScienceAward::join('accounts','accounts.user','=','scienceAwards.user')->select('scienceAwards.id','scienceAwards.user','accounts.name','award_name','verify_level','accounts.icon_path','scienceAwards.updated_at')->where(['scienceAwards.user' => $user,'verify_level' => 0])->orderBy('scienceAwards.updated_at')->paginate(6);
         }
         if (!$scienceAwards){
             return response()->json(['status' => 402,'msg' => 'scienceAwards required failed']);
@@ -99,7 +96,7 @@ class ScienceAwardController extends Controller
     public function getDetail(Request $request){
         $user = $request->input('user');
         $id = $request->input('id');
-        $scienceAward = ScienceAward::select('id','user','name','verify_level','achievement_name','award_name','award_level','award_time','certificate_number','members_name','author_rank','science_core_index','remark')->find($id);
+        $scienceAward = ScienceAward::join('accounts','accounts.user','=','scienceAwards.user')->select('scienceAwards.id','scienceAwards.user','accounts.name','verify_level','achievement_name','award_name','award_level','award_time','certificate_number','members_name','author_rank','science_core_index','remark')->find($id);
         if (!$scienceAward){
             return response()->json(['status' => 404,'msg' => 'scienceAward not exists']);
         }

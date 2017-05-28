@@ -196,20 +196,20 @@ class ActivityController extends Controller
         }
         switch ($type) {
             case '参加学术会议':
-                if ($isDomestic == '国内') {//国内
+                if ($isDomestic == '国内') {
                     if ($account->science_level) {
                         $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
                     }
                     else {
-                        $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'user' => $user,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
+                        $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'join_meeting.user' => $user,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
                     }
                 }
-                else{//国外
+                else{
                     if ($account->science_level) {
                         $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
                     }
                     else {
-                        $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'user' => $user,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
+                        $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'join_meeting.user' => $user,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
                     }
                 }
                 if (!$joinMeetings) {
@@ -219,20 +219,20 @@ class ActivityController extends Controller
                 break;
 
             case '举办承办学术会议':
-                if ($isDomestic == '国内') {//国内
+                if ($isDomestic == '国内') {
                     if ($account->science_level) {
                         $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
                     }
                     else {
-                        $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'user' => $user,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
+                        $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'hold_meeting.user' => $user,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
                     }
                 }
-                else{//国外
+                else{
                     if ($account->science_level) {
                         $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
                     }
                     else {
-                        $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'user' => $user,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
+                        $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'hold_meeting.user' => $user,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
                     }
                 }
                 if (!$holdMeetings) {
@@ -246,7 +246,7 @@ class ActivityController extends Controller
                     $holdCommunications = Hold_Communication::join('accounts', 'accounts.user', '=', 'hold_communication.user')->select('hold_communication.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1])->orderBy('activity_name')->paginate(6);
                 }
                 else {
-                    $holdCommunications = Hold_Communication::join('accounts', 'accounts.user', '=', 'hold_communication.user')->select('hold_communication.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'user' => $user])->orderBy('activity_name')->paginate(6);
+                    $holdCommunications = Hold_Communication::join('accounts', 'accounts.user', '=', 'hold_communication.user')->select('hold_communication.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'hold_communication.user' => $user])->orderBy('activity_name')->paginate(6);
                 }
                 if (!$holdCommunications) {
                     return response()->json(['status' => 402, 'msg' => 'holdCommunication required failed']);
@@ -259,7 +259,7 @@ class ActivityController extends Controller
                     $goAbroads = Go_Abroad::join('accounts', 'accounts.user', '=', 'go_abroad.user')->select('go_abroad.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1])->orderBy('activity_name')->paginate(6);
                 }
                 else {
-                    $goAbroads = Go_Abroad::join('accounts', 'accounts.user', '=', 'go_abroad.user')->select('go_abroad.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'user' => $user])->orderBy('activity_name')->paginate(6);
+                    $goAbroads = Go_Abroad::join('accounts', 'accounts.user', '=', 'go_abroad.user')->select('go_abroad.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 1, 'go_abroad.user' => $user])->orderBy('activity_name')->paginate(6);
                 }
                 if (!$goAbroads) {
                     return response()->json(['status' => 402, 'msg' => 'goAbroad required failed']);
@@ -283,20 +283,20 @@ class ActivityController extends Controller
         }
         switch ($type) {
             case '参加学术会议':
-                if ($isDomestic == '国内') {//国内
+                if ($isDomestic == '国内') {
                     if ($account->science_level) {
                         $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
                     }
                     else {
-                        $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'user' => $user,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
+                        $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'join_meeting.user' => $user,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
                     }
                 }
-                else{//国外
+                else{
                     if ($account->science_level) {
                         $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
                     }
                     else {
-                        $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'user' => $user,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
+                        $joinMeetings = Join_Meeting::join('accounts', 'accounts.user', '=', 'join_meeting.user')->select('join_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'join_meeting.user' => $user,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
                     }
                 }
                 if (!$joinMeetings) {
@@ -306,20 +306,20 @@ class ActivityController extends Controller
                 break;
 
             case '举办承办学术会议':
-                if ($isDomestic == '国内') {//国内
+                if ($isDomestic == '国内') {
                     if ($account->science_level) {
                         $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
                     }
                     else {
-                        $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'user' => $user,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
+                        $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'hold_meeting.user' => $user,'is_Domestic' => '国内'])->orderBy('activity_name')->paginate(6);
                     }
                 }
-                else{//国外
+                else{
                     if ($account->science_level) {
                         $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
                     }
                     else {
-                        $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'user' => $user,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
+                        $holdMeetings = Hold_Meeting::join('accounts', 'accounts.user', '=', 'hold_meeting.user')->select('hold_meeting.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'hold_meeting.user' => $user,'is_Domestic' => '国外'])->orderBy('activity_name')->paginate(6);
                     }
                 }
                 if (!$holdMeetings) {
@@ -333,7 +333,7 @@ class ActivityController extends Controller
                     $holdCommunications = Hold_Communication::join('accounts', 'accounts.user', '=', 'hold_communication.user')->select('hold_communication.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0])->orderBy('activity_name')->paginate(6);
                 }
                 else {
-                    $holdCommunications = Hold_Communication::join('accounts', 'accounts.user', '=', 'hold_communication.user')->select('hold_communication.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'user' => $user])->orderBy('activity_name')->paginate(6);
+                    $holdCommunications = Hold_Communication::join('accounts', 'accounts.user', '=', 'hold_communication.user')->select('hold_communication.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'hold_communication.user' => $user])->orderBy('activity_name')->paginate(6);
                 }
                 if (!$holdCommunications) {
                     return response()->json(['status' => 402, 'msg' => 'holdCommunication required failed']);
@@ -346,7 +346,7 @@ class ActivityController extends Controller
                     $goAbroads = Go_Abroad::join('accounts', 'accounts.user', '=', 'go_abroad.user')->select('go_abroad.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0])->orderBy('activity_name')->paginate(6);
                 }
                 else {
-                    $goAbroads = Go_Abroad::join('accounts', 'accounts.user', '=', 'go_abroad.user')->select('go_abroad.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'user' => $user])->orderBy('activity_name')->paginate(6);
+                    $goAbroads = Go_Abroad::join('accounts', 'accounts.user', '=', 'go_abroad.user')->select('go_abroad.id', 'accounts.name', 'accounts.icon_path', 'activity_name')->where(['verify_level' => 0, 'go_abroad.user' => $user])->orderBy('activity_name')->paginate(6);
                 }
                 if (!$goAbroads) {
                     return response()->json(['status' => 402, 'msg' => 'goAbroad required failed']);
@@ -378,7 +378,7 @@ class ActivityController extends Controller
                 break;
 
             case '举办承办学术会议':
-                $holdMeeting = Hold_Meeting::join('accounts','accounts.user','=','hold_meeting.user')->select('hold_meeting.id','hold_meeting.user','accounts.name','verify_level','is_domestic','activity_name','total_people','meeting_place','meeting_time','abroad_people')->find($id);
+                $holdMeeting = Hold_Meeting::join('accounts','accounts.user','=','hold_meeting.user')->select('hold_meeting.id','hold_meeting.user','accounts.name','verify_level','is_domestic','activity_name','total_people','meeting_place','meeting_time','abroad_people','remark')->find($id);
                 if (!$holdMeeting){
                     return response()->json(['status' => 404,'msg' => 'holdMeeting not exists']);
                 }
