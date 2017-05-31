@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Model;
 
 class PhoneUser extends Model
