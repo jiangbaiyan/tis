@@ -184,9 +184,9 @@ class ActivityController extends Controller
     }
 
     public function getVerifiedIndex(Request $request){
-        $user = $request->input('user');
-        $type = $request->input('activity_type');
-        $isDomestic = $request->input('is_domestic');
+        $user = $request->header('user');
+        $type = $request->header('activity_type');
+        $isDomestic = $request->header('is_domestic');
         if (!$type) {
             return response()->json(['status' => 400, 'msg' => 'missing parameters']);
         }
@@ -271,9 +271,9 @@ class ActivityController extends Controller
 
 
     public function getNotVerifiedIndex(Request $request){//获取已审核的多个论文信息
-        $user = $request->input('user');
-        $type = $request->input('activity_type');
-        $isDomestic = $request->input('is_domestic');
+        $user = $request->header('user');
+        $type = $request->header('activity_type');
+        $isDomestic = $request->header('is_domestic');
         if (!$type) {
             return response()->json(['status' => 400, 'msg' => 'missing parameters']);
         }
@@ -358,9 +358,9 @@ class ActivityController extends Controller
 
 
     public function getDetail(Request $request){
-        $user = $request->input('user');
-        $type = $request->input('activity_type');
-        $id = $request->input('id');
+        $user = $request->header('user');
+        $type = $request->header('activity_type');
+        $id = $request->header('id');
         if (!$type||!$id){
             return response()->json(['status' => 400, 'msg' => 'missing parameters']);
         }

@@ -56,7 +56,7 @@ class AcademicPartTimeJobController extends Controller
     }
 
     public function getVerifiedIndex(Request $request){//获取已审核的多个论文信息
-        $user = $request->input('user');
+        $user = $request->header('user');
         $account = Account::where('user','=',$user)->first();
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
@@ -75,7 +75,7 @@ class AcademicPartTimeJobController extends Controller
 
 
     public function getNotVerifiedIndex(Request $request){//获取未审核的多个论文信息
-        $user = $request->input('user');
+        $user = $request->header('user');
         $account = Account::where('user','=',$user)->first();
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
@@ -94,8 +94,8 @@ class AcademicPartTimeJobController extends Controller
 
 
     public function getDetail(Request $request){
-        $user = $request->input('user');
-        $id = $request->input('id');
+        $user = $request->header('user');
+        $id = $request->header('id');
         $academicPartTimeJob =  AcademicPartTimeJob::join('accounts','accounts.user','=','academicPartTimeJobs.user')->select('academicPartTimeJobs.id','academicPartTimeJobs.user','accounts.name','verify_level','duty','start_time','stop_time','institution_name','science_core_index','remark')->find($id);
         if (!$academicPartTimeJob){
             return response()->json(['status' => 404,'msg' => 'academicPartTimeJob not exists']);

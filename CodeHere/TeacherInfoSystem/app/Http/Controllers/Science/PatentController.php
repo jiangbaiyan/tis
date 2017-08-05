@@ -90,7 +90,7 @@ class PatentController extends Controller
     }
 
     public function getVerifiedIndex(Request $request){//获取已审核的多个论文信息
-        $user = $request->input('user');
+        $user = $request->header('user');
         $account = Account::where('user','=',$user)->first();
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
@@ -108,7 +108,7 @@ class PatentController extends Controller
     }
 
     public function getNotVerifiedIndex(Request $request){//获取未审核的多个论文信息
-        $user = $request->input('user');
+        $user = $request->header('user');
         $account = Account::where('user','=',$user)->first();
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
@@ -126,8 +126,8 @@ class PatentController extends Controller
     }
 
     public function getDetail(Request $request){
-        $user = $request->input('user');
-        $id = $request->input('id');
+        $user = $request->header('user');
+        $id = $request->header('id');
         $patent = Patent::find($id);
         if (!$patent){
             return response()->json(['status' => 404,'msg' => 'patent not exists']);

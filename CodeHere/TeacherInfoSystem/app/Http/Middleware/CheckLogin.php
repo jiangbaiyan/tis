@@ -3,8 +3,11 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 use Response;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Hash;
@@ -19,28 +22,24 @@ class CheckLogin
      * @return mixed
      */
 
-    private $LoginTokenPrefix = 'loginToken_';
-
     public function handle($request, Closure $next)
     {
-        $user = $request->user;
-        $token = $request->token;
-        if (!$user||!$token){
-            return response()->json(['status' => '400','msg' => 'need user or token']);
+        if (!isset($_COOKIE['userid'])||!isset($_COOKIE['token'])){
+            return Response::json(['status' => 400,'msg' => 'need cookie']);
         }
-        $token_exists = Redis::exists($this->LoginTokenPrefix.$user);
-        if(!$token_exists)
-        {
-            return Response::json(array("status"=>404,"msg"=>"token not exists",));
+        $userid = $_COOKIE['userid'];
+        $token = $_COOKIE['token'];
+        $token_exists = Redis::exists($userid);
+        if(!$token_exists){
+            return Response::json(["status"=>404,"msg"=>"token not exists"]);
         }
-
-        $redisToken = Redis::get($this->LoginTokenPrefix.$user);
-
-        if(strcmp($redisToken,$token)!=0)
-        {
-            return Response::json(array("status"=>402,"msg"=>"wrong login token"));
+        $redisToken = Redis::get($userid);
+        if(strcmp($redisToken,$token)!=0){
+            return Response::json(["status"=>402,"msg"=>"wrong userid token"]);
         }
-
+        if (!Cache::has('userid')){
+            Cache::put('userid',Crypt::decrypt($userid),1440);
+        }
         return $next($request);
     }
 }

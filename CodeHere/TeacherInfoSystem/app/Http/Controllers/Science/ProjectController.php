@@ -56,8 +56,8 @@ class ProjectController extends Controller
     }
 
     public function getVerifiedIndex(Request $request){//获取已审核的多个论文信息
-        $user = $request->input('user');
-        $direction = $request->input('project_direction');//判断纵向还是横向
+        $user = $request->header('user');
+        $direction = $request->header('project_direction');//判断纵向还是横向
         if (!$direction){
             return response()->json(['status' => 400,'msg' => 'need project_direction']);
         }
@@ -92,8 +92,8 @@ class ProjectController extends Controller
 
 
     public function getNotVerifiedIndex(Request $request){//获取未审核的多个论文信息
-        $user = $request->input('user');
-        $direction = $request->input('project_direction');//判断纵向还是横向
+        $user = $request->header('user');
+        $direction = $request->header('project_direction');//判断纵向还是横向
         if (!$direction){
             return response()->json(['status' => 400,'msg' => 'need project_direction']);
         }
@@ -128,8 +128,8 @@ class ProjectController extends Controller
 
 
     public function getDetail(Request $request){
-        $user = $request->input('user');
-        $id = $request->input('id');
+        $user = $request->header('user');
+        $id = $request->header('id');
         $project = Project::join('accounts','accounts.user','=','projects.user')->select('projects.id','projects.user','accounts.name','verify_level','project_direction','project_name','project_members','project_number','project_type','project_level','project_build_time','start_stop_time','total_money','current_money','year_money','author_rank','author_task','science_core_index','remark')->find($id);
         if (!$project){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
