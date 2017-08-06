@@ -8,5 +8,5 @@ class Account extends Model
 {
     protected $table = 'accounts';
 
-    protected $guarded = [];
+    protected $guarded = ['id'];
 }

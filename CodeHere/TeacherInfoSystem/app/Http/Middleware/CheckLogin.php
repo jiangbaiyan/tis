@@ -4,13 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Session;
 use Response;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Hash;
 
 class CheckLogin
 {
@@ -37,8 +33,8 @@ class CheckLogin
         if(strcmp($redisToken,$token)!=0){
             return Response::json(["status"=>402,"msg"=>"wrong userid token"]);
         }
-        if (!Cache::has('userid')){
-            Cache::put('userid',Crypt::decrypt($userid),1440);
+        if (!Cache::has($userid)){
+            Cache::put($userid,Crypt::decrypt($userid),1440);
         }
         return $next($request);
     }

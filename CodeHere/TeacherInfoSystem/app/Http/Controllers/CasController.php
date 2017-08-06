@@ -67,7 +67,6 @@ class CasController extends LoginAndAccount\Controller
                     $i = $i + 1;
                 }
 
-
                 $successnode = ''.$validateXML->authenticationSuccess[0];
 
                 if (!empty($successnode)) {

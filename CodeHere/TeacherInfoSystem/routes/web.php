@@ -21,11 +21,11 @@ Route::group(['prefix'=>'api','namespace' => 'LoginAndAccount'],function (){
     Route::group(['prefix'=>'v1.0'],function(){
         Route::group(['middleware'=>'EnableCrossRequest'],function (){
           Route::group(['middleware'=>'CheckLogin'],function () {
-                Route::post('updateAccount','AccountController@update');
+                Route::put('account','AccountController@update');
                 Route::get('account','AccountController@get');
-                Route::get('getOthersIndex','AccountController@getOthersIndex');
-                Route::get('getOthersDetail','AccountController@getOthersDetail');
-                Route::post('uploadHead','AccountController@uploadHead');
+                Route::get('othersIndex','AccountController@getOthersIndex');
+                Route::get('othersDetail','AccountController@getOthersDetail');
+                Route::post('head','AccountController@uploadHead');
             });
         });
     });

@@ -14,17 +14,27 @@ class AccountController extends Controller
     public function update(Request $request)
     {
         $data = $request->all();
-        $user = Cache::get('userid');
-        $account = Account::where('userid',$user)->first();
-        if(!$account) {
-            return Response::json(['status' => 431,'msg' => 'account not found']);
+        if ($request->has('id')) {
+            $idAccount = Account::find($request->input('id'));
+            if (!$idAccount) {
+                return Response::json(['status' => 431, 'msg' => 'account not found']);
+            }
+            $idAccount->update($data);
+            return Response::json(['status' => 200,'msg' => 'account updated successfully']);
         }
-        $account->update($data);
-        return Response::json(['status' => 200,'msg' => 'account updated successfully']);
+        else{
+            $user = Cache::get($_COOKIE['userid']);
+            $account = Account::where('userid',$user)->first();
+            if(!$account) {
+                return Response::json(['status' => 431,'msg' => 'account not found']);
+            }
+            $account->update($data);
+            return Response::json(['status' => 200,'msg' => 'account updated successfully']);
+        }
     }
 
     public function get(){
-        $user = Cache::get('userid');
+        $user = Cache::get($_COOKIE['userid']);
         $account = Account::where('userid',$user)->first();
         if(!$account) {
             return Response::json(['status' => 431,'msg' => 'account not found']);
@@ -33,7 +43,7 @@ class AccountController extends Controller
     }
 
     public function getOthersIndex(){
-        $user = Cache::get('userid');
+        $user = Cache::get($_COOKIE['userid']);
         $account = Account::where('userid',$user)->first();
         if (!$account->account_level){
             return response()->json(['status' => 500,'msg' => 'permission denied']);
@@ -62,7 +72,7 @@ class AccountController extends Controller
             return response()->json(['status' => 402, 'msg' => 'need file']);
         }
         $file = $request->file('head');
-        $inputUser = Cache::get('userid');
+        $inputUser = Cache::get($_COOKIE['userid']);
         $ext = $file->getClientOriginalExtension();//获取扩展名
         if($ext!='jpg' && $ext!='png' && $ext!='jpeg'&& $ext!='JPG'&&$ext!='PNG'&&$ext!='JPEG'){
             return response()->json(['status' =>461,'msg' => 'wrong file format']);
