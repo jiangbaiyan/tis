@@ -37,7 +37,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
     Route::group(['prefix' => 'v1.0'],function(){
         Route::group(['prefix' => 'science'],function (){
             Route::group(['middleware'=>'EnableCrossRequest'],function (){
-                //Route::group(['middleware' => 'CheckLogin'],function () {
+                Route::group(['middleware' => 'CheckLogin'],function () {
 
                     //获取科研模块首页的个人信息
                     Route::get('getScienceInfo','ThesisController@getScienceInfo');
@@ -105,12 +105,12 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('createScienceAward','ScienceAwardController@create');
 
                     //项目类
-                    Route::get('getVerifiedProjectIndex','ProjectController@getVerifiedIndex');
-                    Route::get('getNotVerifiedProjectIndex','ProjectController@getNotVerifiedIndex');
-                    Route::get('getProjectDetail','ProjectController@getDetail');
-                    Route::post('updateProject','ProjectController@update');
-                    Route::delete('deleteProject','ProjectController@delete');
-                    Route::post('createProject','ProjectController@create');
+                    Route::get('verifiedProjectIndex','ProjectController@getVerifiedIndex');
+                    Route::get('notVerifiedProjectIndex','ProjectController@getNotVerifiedIndex');
+                    Route::get('projectDetail','ProjectController@getDetail');
+                    Route::put('project','ProjectController@update');
+                    Route::delete('project','ProjectController@delete');
+                    Route::post('project','ProjectController@create');
 
                     //学术活动类(包括四个小类)
                     Route::get('getVerifiedActivityIndex','ActivityController@getVerifiedIndex');
@@ -120,7 +120,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::delete('deleteActivity','ActivityController@delete');
                     Route::post('createActivity','ActivityController@create');
 
-               // });
+                });
             });
         });
     });

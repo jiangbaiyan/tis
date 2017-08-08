@@ -31,7 +31,7 @@ class CheckLogin
         }
         $redisToken = Redis::get($userid);
         if(strcmp($redisToken,$token)!=0){
-            return Response::json(["status"=>402,"msg"=>"wrong userid token"]);
+            return Response::json(["status"=>402,"msg"=>"wrong token"]);
         }
         if (!Cache::has($userid)){
             Cache::put($userid,Crypt::decrypt($userid),1440);

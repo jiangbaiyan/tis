@@ -17,7 +17,7 @@ class EnableCrossRequestMiddleware
     {
 
         header('Access-Control-Allow-Origin: http://teacher.cloudshm.com');
-        header('Access-Control-Allow-Headers: Origin, Content-Type, Cookie, Accept, Authorization, multipart/form-data, application/json, X-Requested-With');
+        header('Access-Control-Allow-Headers: Origin, Content-Type, Cookie, Accept, Authorization, multipart/form-data, application/json, X-Requested-With, id , para');
         header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
         header('Access-Control-Allow-Credentials: true');
         return $next($request);
