@@ -97,12 +97,12 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('createAcademicPartTimeJob', 'AcademicPartTimeJobController@create');
 
                     //科研奖励类
-                    Route::get('getVerifiedScienceAwardIndex','ScienceAwardController@getVerifiedIndex');
-                    Route::get('getNotVerifiedScienceAwardIndex','ScienceAwardController@getNotVerifiedIndex');
-                    Route::get('getScienceAwardDetail','ScienceAwardController@getDetail');
-                    Route::post('updateScienceAward','ScienceAwardController@update');
-                    Route::delete('deleteScienceAward','ScienceAwardController@delete');
-                    Route::post('createScienceAward','ScienceAwardController@create');
+                    Route::get('verifiedScienceAwardIndex','ScienceAwardController@getVerifiedIndex');
+                    Route::get('notVerifiedScienceAwardIndex','ScienceAwardController@getNotVerifiedIndex');
+                    Route::get('scienceAwardDetail','ScienceAwardController@getDetail');
+                    Route::put('scienceAward','ScienceAwardController@update');
+                    Route::delete('scienceAward','ScienceAwardController@delete');
+                    Route::post('scienceAward','ScienceAwardController@create');
 
                     //项目类
                     Route::get('verifiedProjectIndex','ProjectController@getVerifiedIndex');

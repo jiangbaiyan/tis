@@ -276,7 +276,7 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $scienceAwards = ScienceAward::join('accounts','accounts.userid','=','scienceAwards.user')->select('scienceAwards.id','scienceAwards.user','accounts.name','verify_level','achievement_name','award_name','award_level','award_time','certificate_number','members_name','author_rank','science_core_index','remark','scienceAwards.created_at','scienceAwards.updated_at')->get();
+        $scienceAwards = ScienceAward::join('accounts','accounts.userid','=','scienceAwards.userid')->select('scienceAwards.id','scienceAwards.userid','accounts.name','verify_level','achievement_name','award_name','award_level','award_time','certificate_number','members_name','author_rank','science_core_index','remark','scienceAwards.created_at','scienceAwards.updated_at')->get();
         if (!$scienceAwards){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
@@ -331,7 +331,7 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $platformAndTeam = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.user')->select('platformAndTeams.id','platformAndTeams.user','accounts.name','verify_level','group_name','author_rank','group_level','science_core_index','remark','platformAndTeams.created_at','platformAndTeams.updated_at')->get();
+        $platformAndTeam = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','verify_level','group_name','author_rank','group_level','science_core_index','remark','platformAndTeams.created_at','platformAndTeams.updated_at')->get();
         if (!$platformAndTeam){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
