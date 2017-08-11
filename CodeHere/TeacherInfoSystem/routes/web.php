@@ -80,12 +80,12 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('createLiterature', 'LiteratureController@create');
 
                     //平台和团队类
-                    Route::get('getVerifiedPlatformAndTeamIndex','PlatformAndTeamController@getVerifiedIndex');
-                    Route::get('getNotVerifiedPlatformAndTeamIndex','PlatformAndTeamController@getNotVerifiedIndex');
-                    Route::get('getPlatformAndTeamDetail','PlatformAndTeamController@getDetail');
-                    Route::post('updatePlatformAndTeam','PlatformAndTeamController@update');
-                    Route::delete('deletePlatformAndTeam','PlatformAndTeamController@delete');
-                    Route::post('createPlatformAndTeam','PlatformAndTeamController@create');
+                    Route::get('verifiedPlatformAndTeamIndex','PlatformAndTeamController@getVerifiedIndex');
+                    Route::get('notVerifiedPlatformAndTeamIndex','PlatformAndTeamController@getNotVerifiedIndex');
+                    Route::get('platformAndTeamDetail','PlatformAndTeamController@getDetail');
+                    Route::post('platformAndTeam','PlatformAndTeamController@update');
+                    Route::delete('platformAndTeam','PlatformAndTeamController@delete');
+                    Route::post('platformAndTeam','PlatformAndTeamController@create');
 
 
                     //学术兼职类

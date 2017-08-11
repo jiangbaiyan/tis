@@ -325,7 +325,7 @@ class ExcelController extends Controller
         return response()->json(['status' => 200,'msg' => 'Excel exported successfully']);
     }
 
-    public function platformAndTeamExport(Request $request){
+    public function platformAndTeamExport(){
         $user = Cache::get($_COOKIE['userid']);
         $account = Account::where('userid','=',$user)->first();
         if (!$account){
