@@ -40,7 +40,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                 Route::group(['middleware' => 'CheckLogin'],function () {
 
                     //获取科研模块首页的个人信息
-                    Route::get('getScienceInfo','ThesisController@getScienceInfo');
+                    Route::get('scienceInfo','ThesisController@getScienceInfo');
 
                     //导出到Excel
                     Route::get('thesisExport','ExcelController@thesisExport');
@@ -56,20 +56,20 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::get('academicPartTimeJobExport','ExcelController@academicPartTimeJobExport');
 
                     //论文类
-                    Route::post('updateThesis', 'ThesisController@update');
-                    Route::get('getNotVerifiedThesisIndex', 'ThesisController@getNotVerifiedIndex');
-                    Route::get('getVerifiedThesisIndex','ThesisController@getVerifiedIndex');
-                    Route::get('getThesisDetail','ThesisController@getDetail');
-                    Route::delete('deleteThesis', 'ThesisController@delete');
-                    Route::post('createThesis','ThesisController@create');
+                    Route::put('thesis', 'ThesisController@update');
+                    Route::get('notVerifiedThesisIndex', 'ThesisController@getNotVerifiedIndex');
+                    Route::get('verifiedThesisIndex','ThesisController@getVerifiedIndex');
+                    Route::get('thesisDetail','ThesisController@getDetail');
+                    Route::delete('thesis', 'ThesisController@delete');
+                    Route::post('thesis','ThesisController@create');
 
                     //专利类
-                    Route::post('updatePatent','PatentController@update');
-                    Route::get('getNotVerifiedPatentIndex', 'PatentController@getNotVerifiedIndex');
-                    Route::get('getVerifiedPatentIndex', 'PatentController@getVerifiedIndex');
-                    Route::get('getPatentDetail', 'PatentController@getDetail');
-                    Route::delete('deletePatent',  'PatentController@delete');
-                    Route::post('createPatent','PatentController@create');
+                    Route::put('patent','PatentController@update');
+                    Route::get('notVerifiedPatentIndex', 'PatentController@getNotVerifiedIndex');
+                    Route::get('verifiedPatentIndex', 'PatentController@getVerifiedIndex');
+                    Route::get('patentDetail', 'PatentController@getDetail');
+                    Route::delete('patent',  'PatentController@delete');
+                    Route::post('patent','PatentController@create');
 
                     //著作和教材类
                     Route::post('updateLiterature', 'LiteratureController@update');

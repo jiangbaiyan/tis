@@ -85,7 +85,7 @@ class AccountController extends Controller
         $path = 'storage/'.$path;
         $user->icon_path = $path;//将路径写入数据库
         if(!$user->save()){
-            return response()->json(['status' => 463,'msg' => 'path database written failed']);
+            return response()->json(['status' => 463,'msg' => 'database path written failed']);
         }
         return response()->json(['status' => 200,'msg' => 'file uploaded successfully','path' => $path]);
     }

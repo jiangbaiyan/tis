@@ -22,6 +22,7 @@ class ProjectController extends Controller
         }
         $project = Project::create($data);
         $project->userid = $user;
+        $project->name = $account->name;
         $project->save();
         return response()->json(['status' => 200,'msg' => 'project created successfully']);
     }
@@ -41,7 +42,7 @@ class ProjectController extends Controller
             return response()->json(["status"=>200,"msg"=>"project update successfully"]);
         }
         else {
-            return response()->json(["status"=>463,"msg"=>"project update failed"]);
+            return response()->json(["status"=>464,"msg"=>"project update failed"]);
         }
     }
 
@@ -58,7 +59,7 @@ class ProjectController extends Controller
             return response()->json(['status' => 200,'msg' => 'project deleted successfully']);
         }
         else {
-            return response()->json(['status' => 464,'msg' => 'project deleted failed']);
+            return response()->json(['status' => 465,'msg' => 'project deleted failed']);
         }
     }
 
@@ -86,6 +87,14 @@ class ProjectController extends Controller
             }
             else{//如果是普通用户，只能看自己的信息
                 $projects = Project::join('accounts','accounts.userid','=','projects.userid')->select('projects.id','accounts.name','project_name','verify_level','accounts.icon_path')->where(['projects.userid' => $user,'verify_level' => 1,'project_direction' => 2])->orderBy('project_name')->paginate(6);
+            }
+        }
+        foreach ($projects as $project){
+            if ($project->project_direction == 1){
+                $project->project_direction = '横向项目';
+            }
+            else{
+                $project->project_direction = '纵向项目';
             }
         }
         return response()->json(['status' => 200,'msg' => 'projects required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $projects]);
@@ -118,6 +127,14 @@ class ProjectController extends Controller
                 $projects = Project::join('accounts','accounts.userid','=','projects.userid')->select('projects.id','accounts.name','project_name','verify_level','accounts.icon_path')->where(['projects.userid' => $user,'verify_level' => 0,'project_direction' => 2])->orderBy('project_name')->paginate(6);;
             }
         }
+        foreach ($projects as $project){
+            if ($project->project_direction == 1){
+                $project->project_direction = '横向项目';
+            }
+            else{
+                $project->project_direction = '纵向项目';
+            }
+        }
         return response()->json(['status' => 200,'msg' => 'projects required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $projects]);
     }
 
@@ -132,6 +149,12 @@ class ProjectController extends Controller
         $account = Account::where('userid','=',$user)->first();
         if(!$account) {
             return response()->json(["status"=>431,"msg"=>"account not found"]);
+        }
+        if ($project->project_direction == 1){
+            $project->project_direction = '横向项目';
+        }
+        else{
+            $project->project_direction = '纵向项目';
         }
         return response()->json(['status' => 200,'msg' => 'project required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $project]);
     }

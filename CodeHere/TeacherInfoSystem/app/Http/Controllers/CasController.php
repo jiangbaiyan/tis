@@ -15,9 +15,13 @@ class CasController extends LoginAndAccount\Controller
         //CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
         $Rurl = "http://teacher.cloudshm.com/pages/personalInformation.html";
+        //如果已经认证完毕且token也匹配，那么直接跳到系统首页
         if (isset($_COOKIE['userid']) && isset($_COOKIE['token'])){
-            header("Location: " . $Rurl);
-            exit();
+            $redisToken = Redis::get($_COOKIE['userid']);
+            if (strcmp($redisToken,$_COOKIE['token'])==0){
+                header("Location: " . $Rurl);
+                exit();
+            }
         }
         //当前集成系统所在的服务器和端口号，服务器可以是机器名、域名或ip，建议使用域名。端口不指定的话默认是80
         //以及新增加的集成登录入口
@@ -93,6 +97,7 @@ class CasController extends LoginAndAccount\Controller
                         $Rurl = $_REQUEST["redirectUrl"];
 
                     }
+                    //将从杭电获取到的数据写入数据库
                     $sex = $sex = '1' ? '男' : '女';
                     $user = Account::where('userid',$userid)->first();
                     if (!$user){
