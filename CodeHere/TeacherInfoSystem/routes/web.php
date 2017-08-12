@@ -72,29 +72,29 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('patent','PatentController@create');
 
                     //著作和教材类
-                    Route::post('updateLiterature', 'LiteratureController@update');
-                    Route::get('getLiteratureDetail', 'LiteratureController@getDetail');
-                    Route::get('getVerifiedLiteratureIndex', 'LiteratureController@getVerifiedIndex');
-                    Route::get('getNotVerifiedLiteratureIndex', 'LiteratureController@getNotVerifiedIndex');
-                    Route::delete('deleteLiterature', 'LiteratureController@delete');
-                    Route::post('createLiterature', 'LiteratureController@create');
+                    Route::put('literature', 'LiteratureController@update');
+                    Route::get('literatureDetail', 'LiteratureController@getDetail');
+                    Route::get('verifiedLiteratureIndex', 'LiteratureController@getVerifiedIndex');
+                    Route::get('notVerifiedLiteratureIndex', 'LiteratureController@getNotVerifiedIndex');
+                    Route::delete('literature', 'LiteratureController@delete');
+                    Route::post('literature', 'LiteratureController@create');
 
                     //平台和团队类
                     Route::get('verifiedPlatformAndTeamIndex','PlatformAndTeamController@getVerifiedIndex');
                     Route::get('notVerifiedPlatformAndTeamIndex','PlatformAndTeamController@getNotVerifiedIndex');
                     Route::get('platformAndTeamDetail','PlatformAndTeamController@getDetail');
-                    Route::post('platformAndTeam','PlatformAndTeamController@update');
+                    Route::put('platformAndTeam','PlatformAndTeamController@update');
                     Route::delete('platformAndTeam','PlatformAndTeamController@delete');
                     Route::post('platformAndTeam','PlatformAndTeamController@create');
 
 
                     //学术兼职类
-                    Route::get('getVerifiedAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getVerifiedIndex');
-                    Route::get('getNotVerifiedAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getNotVerifiedIndex');
-                    Route::get('getAcademicPartTimeJobDetail', 'AcademicPartTimeJobController@getDetail');
-                    Route::post('updateAcademicPartTimeJob', 'AcademicPartTimeJobController@update');
-                    Route::delete('deleteAcademicPartTimeJob', 'AcademicPartTimeJobController@delete');
-                    Route::post('createAcademicPartTimeJob', 'AcademicPartTimeJobController@create');
+                    Route::get('verifiedAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getVerifiedIndex');
+                    Route::get('notVerifiedAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getNotVerifiedIndex');
+                    Route::get('academicPartTimeJobDetail', 'AcademicPartTimeJobController@getDetail');
+                    Route::post('academicPartTimeJob', 'AcademicPartTimeJobController@update');
+                    Route::delete('academicPartTimeJob', 'AcademicPartTimeJobController@delete');
+                    Route::post('academicPartTimeJob', 'AcademicPartTimeJobController@create');
 
                     //科研奖励类
                     Route::get('verifiedScienceAwardIndex','ScienceAwardController@getVerifiedIndex');
@@ -113,12 +113,12 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::post('project','ProjectController@create');
 
                     //学术活动类(包括四个小类)
-                    Route::get('getVerifiedActivityIndex','ActivityController@getVerifiedIndex');
-                    Route::get('getNotVerifiedActivityIndex','ActivityController@getNotVerifiedIndex');
-                    Route::get('getActivityDetail','ActivityController@getDetail');
-                    Route::post('updateActivity','ActivityController@update');
-                    Route::delete('deleteActivity','ActivityController@delete');
-                    Route::post('createActivity','ActivityController@create');
+                    Route::get('verifiedActivityIndex','ActivityController@getVerifiedIndex');
+                    Route::get('notVerifiedActivityIndex','ActivityController@getNotVerifiedIndex');
+                    Route::get('activityDetail','ActivityController@getDetail');
+                    Route::post('activity','ActivityController@update');
+                    Route::delete('activity','ActivityController@delete');
+                    Route::post('activity','ActivityController@create');
 
                 });
             });

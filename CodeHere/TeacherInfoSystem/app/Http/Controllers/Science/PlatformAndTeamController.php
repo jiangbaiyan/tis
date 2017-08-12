@@ -22,6 +22,7 @@ class PlatformAndTeamController extends Controller
         }
         $platformAndTeam = PlatformAndTeam::create($data);
         $platformAndTeam->userid = $userid;
+        $platformAndTeam->name = $account->name;
         $platformAndTeam->save();
         return response()->json(['status' => 200,'msg' => 'platformAndTeam created successfully']);
     }

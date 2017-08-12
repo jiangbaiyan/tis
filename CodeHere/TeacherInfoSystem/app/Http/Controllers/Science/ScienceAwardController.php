@@ -22,6 +22,7 @@ class ScienceAwardController extends Controller
         }
         $scienceAward = ScienceAward::create($data);
         $scienceAward->userid = $user;
+        $scienceAward->name = $account->name;
         $scienceAward->save();
         return response()->json(['status' => 200,'msg' => 'scienceAward created successfully']);
     }
@@ -82,7 +83,7 @@ class ScienceAwardController extends Controller
         $user = Cache::get($_COOKIE['userid']);
         $account = Account::where('userid','=',$user)->first();
         if (!$account){
-            return response()->json(['status' => 404,'msg' => 'user not exists']);
+            return response()->json(['status' => 431,'msg' => 'account not found']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
             $scienceAwards = ScienceAward::join('accounts','accounts.userid','=','scienceAwards.userid')->select('scienceAwards.id','scienceAwards.userid','accounts.name','award_name','verify_level','accounts.icon_path','scienceAwards.updated_at')->where('verify_level','=',0)->orderBy('scienceAwards.updated_at')->paginate(6);

@@ -602,11 +602,11 @@ class ExcelController extends Controller
 
     public function academicPartTimeJobExport(Request $request){
         $user = Cache::get($_COOKIE['userid']);
-        $account = Account::where('user','=',$user)->first();
+        $account = Account::where('userid','=',$user)->first();
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $academicPartTimeJob = AcademicPartTimeJob::join('accounts','accounts.user','=','academicPartTimeJobs.user')->select('academicPartTimeJobs.id','academicPartTimeJobs.user','accounts.name','verify_level','duty','start_time','stop_time','institution_name','science_core_index','remark','academicPartTimeJobs.created_at','academicPartTimeJobs.updated_at')->get();
+        $academicPartTimeJob = AcademicPartTimeJob::join('accounts','accounts.userid','=','academicPartTimeJobs.userid')->select('academicPartTimeJobs.id','academicPartTimeJobs.userid','accounts.name','verify_level','duty','start_time','stop_time','institution_name','science_core_index','remark','academicPartTimeJobs.created_at','academicPartTimeJobs.updated_at')->get();
         if (!$academicPartTimeJob){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
