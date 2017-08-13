@@ -8,5 +8,5 @@ class Go_Abroad extends Model
 {
     protected $table = 'go_abroad';
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id','activity_type','name'];
 }

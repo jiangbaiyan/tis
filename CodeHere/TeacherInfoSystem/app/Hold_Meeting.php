@@ -8,5 +8,5 @@ class Hold_Meeting extends Model
 {
     protected $table = 'hold_meeting';
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id','activity_type','name'];
 }

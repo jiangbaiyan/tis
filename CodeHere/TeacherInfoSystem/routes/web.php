@@ -92,7 +92,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::get('verifiedAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getVerifiedIndex');
                     Route::get('notVerifiedAcademicPartTimeJobIndex', 'AcademicPartTimeJobController@getNotVerifiedIndex');
                     Route::get('academicPartTimeJobDetail', 'AcademicPartTimeJobController@getDetail');
-                    Route::post('academicPartTimeJob', 'AcademicPartTimeJobController@update');
+                    Route::put('academicPartTimeJob', 'AcademicPartTimeJobController@update');
                     Route::delete('academicPartTimeJob', 'AcademicPartTimeJobController@delete');
                     Route::post('academicPartTimeJob', 'AcademicPartTimeJobController@create');
 
@@ -116,7 +116,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::get('verifiedActivityIndex','ActivityController@getVerifiedIndex');
                     Route::get('notVerifiedActivityIndex','ActivityController@getNotVerifiedIndex');
                     Route::get('activityDetail','ActivityController@getDetail');
-                    Route::post('activity','ActivityController@update');
+                    Route::put('activity','ActivityController@update');
                     Route::delete('activity','ActivityController@delete');
                     Route::post('activity','ActivityController@create');
 

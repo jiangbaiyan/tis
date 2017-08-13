@@ -8,5 +8,5 @@ class Hold_Communication extends Model
 {
     protected $table = 'hold_communication';
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id','activity_type','name'];
 }

@@ -8,5 +8,5 @@ class AcademicPartTimeJob extends Model
 {
     protected $table = 'academicPartTimeJobs';
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id','name'];
 }

@@ -380,13 +380,13 @@ class ExcelController extends Controller
         return response()->json(['status' => 200,'msg' => 'Excel exported successfully']);
     }
 
-    public  function joinMeetingExport(Request $request){
+    public  function joinMeetingExport(){
         $user = Cache::get($_COOKIE['userid']);
-        $account = Account::where('user','=',$user)->first();
+        $account = Account::where('userid','=',$user)->first();
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $joinMeeting = Join_Meeting::join('accounts','accounts.user','=','join_meeting.user')->select('join_meeting.id','join_meeting.user','accounts.name','verify_level','is_domestic','activity_name','meeting_place','meeting_time','remark','join_meeting.created_at','join_meeting.updated_at')->get();
+        $joinMeeting = Join_Meeting::join('accounts','accounts.userid','=','join_meeting.userid')->select('join_meeting.id','join_meeting.userid','accounts.name','verify_level','is_domestic','activity_name','meeting_place','meeting_time','remark','join_meeting.created_at','join_meeting.updated_at')->get();
         if (!$joinMeeting){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
@@ -435,13 +435,13 @@ class ExcelController extends Controller
         return response()->json(['status' => 200,'msg' => 'Excel exported successfully']);
     }
 
-    public function holdMeetingExport(Request $request){
+    public function holdMeetingExport(){
         $user = Cache::get($_COOKIE['userid']);
         $account = Account::where('userid','=',$user)->first();
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $holdMeeting = Hold_Meeting::join('accounts','accounts.user','=','hold_meeting.user')->select('hold_meeting.id','hold_meeting.user','accounts.name','verify_level','is_domestic','activity_name','total_people','meeting_place','meeting_time','abroad_people','remark','hold_meeting.created_at','hold_meeting.updated_at')->get();
+        $holdMeeting = Hold_Meeting::join('accounts','accounts.userid','=','hold_meeting.userid')->select('hold_meeting.id','hold_meeting.userid','accounts.name','verify_level','is_domestic','activity_name','total_people','meeting_place','meeting_time','abroad_people','remark','hold_meeting.created_at','hold_meeting.updated_at')->get();
         if (!$holdMeeting){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
@@ -490,13 +490,13 @@ class ExcelController extends Controller
         return response()->json(['status' => 200,'msg' => 'Excel exported successfully']);
     }
 
-    public function holdCommunicationExport(Request $request){
+    public function holdCommunicationExport(){
         $user = Cache::get($_COOKIE['userid']);
-        $account = Account::where('user','=',$user)->first();
+        $account = Account::where('userid','=',$user)->first();
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $holdCommunication = Hold_Communication::join('accounts','accounts.user','=','hold_communication.user')->select('hold_communication.id','hold_communication.user','accounts.name','verify_level','activity_name','start_stop_time','work_object','remark','hold_communication.created_at','hold_communication.updated_at')->get();
+        $holdCommunication = Hold_Communication::join('accounts','accounts.userid','=','hold_communication.userid')->select('hold_communication.id','hold_communication.userid','accounts.name','verify_level','activity_name','start_stop_time','work_object','remark','hold_communication.created_at','hold_communication.updated_at')->get();
         if (!$holdCommunication){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
@@ -545,13 +545,13 @@ class ExcelController extends Controller
         return response()->json(['status' => 200,'msg' => 'Excel exported successfully']);
     }
 
-    public  function goAbroadExport(Request $request){
+    public  function goAbroadExport(){
         $user = Cache::get($_COOKIE['userid']);
-        $account = Account::where('user','=',$user)->first();
+        $account = Account::where('userid','=',$user)->first();
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $goAbroad =  Go_Abroad::join('accounts','accounts.user','=','go_abroad.user')->select('go_abroad.id','go_abroad.user','accounts.name','verify_level','type','destination','activity_name','start_stop_time','remark','go_abroad.created_at','go_abroad.updated_at')->get();
+        $goAbroad =  Go_Abroad::join('accounts','accounts.userid','=','go_abroad.userid')->select('go_abroad.id','go_abroad.userid','accounts.name','verify_level','type','destination','activity_name','start_stop_time','remark','go_abroad.created_at','go_abroad.updated_at')->get();
         if (!$goAbroad){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }

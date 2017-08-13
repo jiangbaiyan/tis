@@ -16,7 +16,7 @@ class EnableCrossRequestMiddleware
     public function handle($request, Closure $next)
     {
 
-        header('Access-Control-Allow-Origin: http://teacher.cloudshm.com');
+        header('Access-Control-Allow-Origin: https://cbsjs.hdu.edu.cn');
         header('Access-Control-Allow-Headers: Origin, Content-Type, Cookie, Accept, Authorization, multipart/form-data, application/json, X-Requested-With, id , para , para1');
         header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
         header('Access-Control-Allow-Credentials: true');

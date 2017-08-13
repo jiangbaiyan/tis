@@ -8,5 +8,5 @@ class Join_Meeting extends Model
 {
     protected $table = 'join_meeting';
 
-    protected $guarded = ['id','activity_type'];
+    protected $guarded = ['id','activity_type','name'];
 }
