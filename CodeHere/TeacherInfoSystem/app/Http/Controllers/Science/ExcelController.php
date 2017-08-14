@@ -156,6 +156,14 @@ class ExcelController extends Controller
         if (!$literatures){
             return response()->json(['status' => 404,'msg' => 'literature not exists']);
         }
+        foreach ($literatures as $literature){
+            if ($literature->verify_level == 1){
+                $literature->verify_level = '审核通过';
+            }
+            else{
+                $literature->verify_level = '审核中';
+            }
+        }
         if ($account->science_level){
             Excel::create('著作和教材信息表',function ($excel) use ($literatures){
                 $excel->sheet('著作和教材信息表',function ($sheet) use ($literatures){
@@ -280,6 +288,14 @@ class ExcelController extends Controller
         if (!$scienceAwards){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
+        foreach ($scienceAwards as $scienceAward){
+            if ($scienceAward->verify_level == 1){
+                $scienceAward->verify_level = '审核通过';
+            }
+            else{
+                $scienceAward->verify_level = '审核中';
+            }
+        }
         if ($account->science_level){
             Excel::create('科研奖励信息表',function ($excel) use ($scienceAwards){
                 $excel->sheet('科研奖励信息表',function ($sheet) use ($scienceAwards){
@@ -331,14 +347,22 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $platformAndTeam = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','verify_level','group_name','author_rank','group_level','science_core_index','remark','platformAndTeams.created_at','platformAndTeams.updated_at')->get();
-        if (!$platformAndTeam){
+        $platformAndTeams = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','verify_level','group_name','author_rank','group_level','science_core_index','remark','platformAndTeams.created_at','platformAndTeams.updated_at')->get();
+        if (!$platformAndTeams){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
+        foreach ($platformAndTeams as $platformAndTeam){
+            if ($platformAndTeam->verify_level == 1){
+                $platformAndTeam->verify_level = '审核通过';
+            }
+            else{
+                $platformAndTeam->verify_level = '审核中';
+            }
+        }
         if ($account->science_level){
-            Excel::create('平台和团队信息表',function ($excel) use ($platformAndTeam){
-                $excel->sheet('平台和团队信息表',function ($sheet) use ($platformAndTeam){
-                    $sheet->fromModel($platformAndTeam,null,'A1',true,false);
+            Excel::create('平台和团队信息表',function ($excel) use ($platformAndTeams){
+                $excel->sheet('平台和团队信息表',function ($sheet) use ($platformAndTeams){
+                    $sheet->fromModel($platformAndTeams,null,'A1',true,false);
                     $sheet->prependRow(1,['id','学号或工号','上传者','审核状态','团队名称','本人排序','团队级别','杭州电子科技大学科研业绩核心指标','备注','上传时间','更新时间']);
                     $sheet->setWidth([
                         'A'     =>  20,
@@ -386,14 +410,28 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $joinMeeting = Join_Meeting::join('accounts','accounts.userid','=','join_meeting.userid')->select('join_meeting.id','join_meeting.userid','accounts.name','verify_level','is_domestic','activity_name','meeting_place','meeting_time','remark','join_meeting.created_at','join_meeting.updated_at')->get();
-        if (!$joinMeeting){
+        $joinMeetings = Join_Meeting::join('accounts','accounts.userid','=','join_meeting.userid')->select('join_meeting.id','join_meeting.userid','accounts.name','verify_level','is_domestic','activity_name','meeting_place','meeting_time','remark','join_meeting.created_at','join_meeting.updated_at')->get();
+        if (!$joinMeetings){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
+        foreach ($joinMeetings as $joinMeeting){
+            if ($joinMeeting->verify_level == 1){
+                $joinMeeting->verify_level = '审核通过';
+            }
+            else{
+                $joinMeeting->verify_level = '审核中';
+            }
+            if ($joinMeeting->is_domestic==1){
+                $joinMeeting->is_domestic = '国内';
+            }
+            else{
+                $joinMeeting->is_domestic = '国外';
+            }
+        }
         if ($account->science_level){
-            Excel::create('参加学术会议信息表',function ($excel) use ($joinMeeting){
-                $excel->sheet('参加学术会议信息表',function ($sheet) use ($joinMeeting){
-                    $sheet->fromModel($joinMeeting,null,'A1',true,false);
+            Excel::create('参加学术会议信息表',function ($excel) use ($joinMeetings){
+                $excel->sheet('参加学术会议信息表',function ($sheet) use ($joinMeetings){
+                    $sheet->fromModel($joinMeetings,null,'A1',true,false);
                     $sheet->prependRow(1,['id','学号或工号','上传者','审核状态','国内（外）','会议名称','会议举办地','会议举办时间','备注','上传时间','更新时间']);
                     $sheet->setWidth([
                         'A'     =>  20,
@@ -441,14 +479,28 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $holdMeeting = Hold_Meeting::join('accounts','accounts.userid','=','hold_meeting.userid')->select('hold_meeting.id','hold_meeting.userid','accounts.name','verify_level','is_domestic','activity_name','total_people','meeting_place','meeting_time','abroad_people','remark','hold_meeting.created_at','hold_meeting.updated_at')->get();
-        if (!$holdMeeting){
+        $holdMeetings = Hold_Meeting::join('accounts','accounts.userid','=','hold_meeting.userid')->select('hold_meeting.id','hold_meeting.userid','accounts.name','verify_level','is_domestic','activity_name','total_people','meeting_place','meeting_time','abroad_people','remark','hold_meeting.created_at','hold_meeting.updated_at')->get();
+        if (!$holdMeetings){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
+        foreach ($holdMeetings as $holdMeeting){
+            if ($holdMeeting->verify_level == 1){
+                $holdMeeting->verify_level = '审核通过';
+            }
+            else{
+                $holdMeeting->verify_level = '审核中';
+            }
+            if ($holdMeeting->is_domestic==1){
+                $holdMeeting->is_domestic = '国内';
+            }
+            else{
+                $holdMeeting->is_domestic = '国外';
+            }
+        }
         if ($account->science_level){
-            Excel::create('举办承办学术会议信息表',function ($excel) use ($holdMeeting){
-                $excel->sheet('举办承办学术会议信息表',function ($sheet) use ($holdMeeting){
-                    $sheet->fromModel($holdMeeting,null,'A1',true,false);
+            Excel::create('举办承办学术会议信息表',function ($excel) use ($holdMeetings){
+                $excel->sheet('举办承办学术会议信息表',function ($sheet) use ($holdMeetings){
+                    $sheet->fromModel($holdMeetings,null,'A1',true,false);
                     $sheet->prependRow(1,['id','学号或工号','上传者','审核状态','国内（外）','会议名称','参会总人数','会议举办地','会议举办时间','参会国（境）外人数','备注','上传时间','更新时间']);
                     $sheet->setWidth([
                         'A'     =>  20,
@@ -496,14 +548,22 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $holdCommunication = Hold_Communication::join('accounts','accounts.userid','=','hold_communication.userid')->select('hold_communication.id','hold_communication.userid','accounts.name','verify_level','activity_name','start_stop_time','work_object','remark','hold_communication.created_at','hold_communication.updated_at')->get();
-        if (!$holdCommunication){
+        $holdCommunications = Hold_Communication::join('accounts','accounts.userid','=','hold_communication.userid')->select('hold_communication.id','hold_communication.userid','accounts.name','verify_level','activity_name','start_stop_time','work_object','remark','hold_communication.created_at','hold_communication.updated_at')->get();
+        if (!$holdCommunications){
             return response()->json(['status' => 404,'msg' => 'project not exists']);
         }
+        foreach ($holdCommunications as $holdCommunication){
+            if ($holdCommunication->verify_level == 1){
+                $holdCommunication->verify_level = '审核通过';
+            }
+            else{
+                $holdCommunication->verify_level = '审核中';
+            }
+        }
         if ($account->science_level){
-            Excel::create('举办承办学术交流信息表',function ($excel) use ($holdCommunication){
-                $excel->sheet('举办承办学术交流信息表',function ($sheet) use ($holdCommunication){
-                    $sheet->fromModel($holdCommunication,null,'A1',true,false);
+            Excel::create('举办承办学术交流信息表',function ($excel) use ($holdCommunications){
+                $excel->sheet('举办承办学术交流信息表',function ($sheet) use ($holdCommunications){
+                    $sheet->fromModel($holdCommunications,null,'A1',true,false);
                     $sheet->prependRow(1,['id','学号或工号','上传者','审核状态','交流合作项目名称','起止时间','合作对象','备注','上传时间','更新时间']);
                     $sheet->setWidth([
                         'A'     =>  20,
@@ -551,14 +611,22 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $goAbroad =  Go_Abroad::join('accounts','accounts.userid','=','go_abroad.userid')->select('go_abroad.id','go_abroad.userid','accounts.name','verify_level','type','destination','activity_name','start_stop_time','remark','go_abroad.created_at','go_abroad.updated_at')->get();
-        if (!$goAbroad){
-            return response()->json(['status' => 404,'msg' => 'project not exists']);
+        $goAbroads =  Go_Abroad::join('accounts','accounts.userid','=','go_abroad.userid')->select('go_abroad.id','go_abroad.userid','accounts.name','verify_level','type','destination','activity_name','start_stop_time','remark','go_abroad.created_at','go_abroad.updated_at')->get();
+        if (!$goAbroads){
+            return response()->json(['status' => 404,'msg' => 'goAbroad not exists']);
+        }
+        foreach ($goAbroads as $goAbroad){
+            if ($goAbroad->verify_level == 1){
+                $goAbroad->verify_level = '审核通过';
+            }
+            else{
+                $goAbroad->verify_level = '审核中';
+            }
         }
         if ($account->science_level){
-            Excel::create('出国进修信息表',function ($excel) use ($goAbroad){
-                $excel->sheet('出国进修信息表',function ($sheet) use ($goAbroad){
-                    $sheet->fromModel($goAbroad,null,'A1',true,false);
+            Excel::create('出国进修信息表',function ($excel) use ($goAbroads){
+                $excel->sheet('出国进修信息表',function ($sheet) use ($goAbroads){
+                    $sheet->fromModel($goAbroads,null,'A1',true,false);
                     $sheet->prependRow(1,['id','学号或工号','上传者','审核状态','出国境类型','出国（境）目的地','访学或研修机构名称','访学或研修起止时间','备注','上传时间','更新时间']);
                     $sheet->setWidth([
                         'A'     =>  20,
@@ -606,14 +674,22 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $academicPartTimeJob = AcademicPartTimeJob::join('accounts','accounts.userid','=','academicPartTimeJobs.userid')->select('academicPartTimeJobs.id','academicPartTimeJobs.userid','accounts.name','verify_level','duty','start_time','stop_time','institution_name','science_core_index','remark','academicPartTimeJobs.created_at','academicPartTimeJobs.updated_at')->get();
-        if (!$academicPartTimeJob){
-            return response()->json(['status' => 404,'msg' => 'project not exists']);
+        $academicPartTimeJobs = AcademicPartTimeJob::join('accounts','accounts.userid','=','academicPartTimeJobs.userid')->select('academicPartTimeJobs.id','academicPartTimeJobs.userid','accounts.name','verify_level','duty','start_time','stop_time','institution_name','science_core_index','remark','academicPartTimeJobs.created_at','academicPartTimeJobs.updated_at')->get();
+        if (!$academicPartTimeJobs){
+            return response()->json(['status' => 404,'msg' => 'academicPartTimeJob not exists']);
+        }
+        foreach ($academicPartTimeJobs as $academicPartTimeJob){
+            if ($academicPartTimeJob->verify_level == 1){
+                $academicPartTimeJob->verify_level = '审核通过';
+            }
+            else{
+                $academicPartTimeJob->verify_level = '审核中';
+            }
         }
         if ($account->science_level){
-            Excel::create('学术兼职信息表',function ($excel) use ($academicPartTimeJob){
-                $excel->sheet('学术兼职信息表',function ($sheet) use ($academicPartTimeJob){
-                    $sheet->fromModel($academicPartTimeJob,null,'A1',true,false);
+            Excel::create('学术兼职信息表',function ($excel) use ($academicPartTimeJobs){
+                $excel->sheet('学术兼职信息表',function ($sheet) use ($academicPartTimeJobs){
+                    $sheet->fromModel($academicPartTimeJobs,null,'A1',true,false);
                     $sheet->prependRow(1,['id','学号或工号','上传者','审核状态','兼职职务','起始时间','结束时间','兼职学术机构名称','杭州电子科技大学科研业绩核心指标','备注','上传时间','更新时间']);
                     $sheet->setWidth([
                         'A'     =>  20,
