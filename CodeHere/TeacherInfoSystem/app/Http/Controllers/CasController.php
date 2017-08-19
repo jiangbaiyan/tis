@@ -98,7 +98,12 @@ class CasController extends LoginAndAccount\Controller
 
                     }
                     //将从杭电获取到的数据写入数据库
-                    $sex = $sex = '1' ? '男' : '女';
+                    if ($sex == '1'){
+                        $sex = '男';
+                    }
+                    else{
+                        $sex = '女';
+                    }
                     $user = Account::where('userid',$userid)->first();
                     if (!$user){
                         Account::create(['userid' => $userid,'name' => $username,'sex' => $sex,'academy' => $unit]);

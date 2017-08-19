@@ -119,7 +119,6 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::put('activity','ActivityController@update');
                     Route::delete('activity','ActivityController@delete');
                     Route::post('activity','ActivityController@create');
-
                 });
             });
         });
