@@ -42,7 +42,7 @@ class ExcelController extends Controller
             Excel::create('论文信息表',function ($excel) use ($theses){
                 $excel->sheet('论文信息表',function ($sheet) use ($theses){
                     $sheet->fromModel($theses,null,'A1',true,false);
-                    $sheet->prependRow(1,['id','学号或工号','上传者','审核状态','论文名称','本人排序','论文类型','作者','期刊名称或会议名称','ISSN或ISBN号','期号','卷号','起止页码','发表时间','SCI分区','EI','CCF','国内期刊等级','SCI或EI收录检索号','杭州电子科技大学科研业绩核心指标','备注','论文路径','封面路径','上传时间','更新时间']);
+                    $sheet->prependRow(1,['id','学号或工号','上传者','审核状态','论文名称','本人排序','论文类型','第一单位','第一作者','通信作者','其余作者','期刊名称或会议名称','ISSN或ISBN号','期号','卷号','起止页码','发表时间','SCI分区','EI','CCF','国内期刊等级','SCI或EI收录检索号','杭州电子科技大学科研业绩核心指标','备注','论文路径','封面路径','上传时间','更新时间']);
                     $sheet->setWidth(array(
                         'A'     =>  20,
                         'B'     =>  20,

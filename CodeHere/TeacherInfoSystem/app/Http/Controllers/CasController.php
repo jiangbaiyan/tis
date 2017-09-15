@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use App\Student;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Session;
 
 class CasController extends LoginAndAccount\Controller
 {
     public function cas()
     {
+        $openid = Session::get('openid');
         $loginServer = "http://cas.hdu.edu.cn/cas/login";
         //CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
@@ -25,7 +28,7 @@ class CasController extends LoginAndAccount\Controller
         }
         //当前集成系统所在的服务器和端口号，服务器可以是机器名、域名或ip，建议使用域名。端口不指定的话默认是80
         //以及新增加的集成登录入口
-        $thisURL = "http://tis.cloudshm.com/api/v1.0/cas";
+        $thisURL = "https://tis.cloudshm.com/api/v1.0/cas";
 
         //判断是否有验证成功后需要跳转页面，如果有，增加跳转参数
         if (isset($_REQUEST["redirectUrl"]) && !empty($_REQUEST["redirectUrl"])) {
@@ -56,22 +59,25 @@ class CasController extends LoginAndAccount\Controller
                 while ($i < count($validateXML->authenticationSuccess[0]->attributes[0])) {
 
                     $successnode0 = $validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["name"];
-                    if ($successnode0 == "userName") {
+
+                    if ($successnode0 == "userName") {//学号
                         $userid = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
                     }
-                    if ($successnode0 == "user_name") {
+                    if ($successnode0 == "user_name") {//姓名
                         $username = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
                     }
-                    /*if ($successnode0 == "id_type") {
+                    if ($successnode0 == "id_type") {
                         $idtype = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
-                    }*/
-                    if ($successnode0 == "user_sex") {
+                    }
+                    if ($successnode0 == "user_sex") {//性别
                         $sex = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
                     }
-                    if ($successnode0 == "unit_name") {
+                    if ($successnode0 == "unit_name") {//学院全称
                         $unit = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
                     }
-
+                    if ($successnode0 == "classid") {//班级号
+                        $classid = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
+                    }
                     $i = $i + 1;
                 }
 
@@ -86,27 +92,30 @@ class CasController extends LoginAndAccount\Controller
                     //echo ("<br>user_name:".$_SESSION["hducns"]);
 
 
-                    //实现集成系统的登录（需要集成系统开发人员完成）
-                    //............实现代码...................
-                    //实现登录完毕！
-
                     //如果登录成功，执行下面代码，否则按集成系统业务逻辑处理
                     //集成系统的首页URL
                     if (isset($_REQUEST["redirectUrl"]) && !empty($_REQUEST["redirectUrl"])) {
-
                         $Rurl = $_REQUEST["redirectUrl"];
-
                     }
-                    //将从杭电获取到的数据写入数据库
+
+                    //将从杭电CAS获取到的数据写入数据库
                     if ($sex == '1'){
                         $sex = '男';
                     }
                     else{
                         $sex = '女';
                     }
-                    $user = Account::where('userid',$userid)->first();
-                    if (!$user){
-                        Account::create(['userid' => $userid,'name' => $username,'sex' => $sex,'academy' => $unit]);
+                    if ( $idtype == '0'){//是老师
+                        $teacher = Account::where('userid',$userid)->first();
+                        if (!$teacher){
+                            Account::create(['userid' => $userid,'name' => $username,'sex' => $sex,'academy' => $unit,'openid' => $openid]);
+                        }
+                    }
+                    if ($idtype == '1'){//是学生
+                        $student = Student::where('userid',$userid)->first();
+                        if (!$student){
+                            Student::create(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
+                        }
                     }
                     //************************
                     $userid = Crypt::encrypt($userid);
@@ -115,10 +124,6 @@ class CasController extends LoginAndAccount\Controller
                     setcookie('token',$token, time()+3600*24);
                     Redis::set($userid,$token);
                     Redis::expire($userid,100000);
-                    //session_start();
-                    //$_SESSION["userid"]=$userid;
-                    //session_commit();
-
 
                     header("Location: " . $Rurl);
 

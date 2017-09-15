@@ -6,6 +6,9 @@ Route::group(['prefix' => 'api'],function (){
     });
 });
 
+Route::any('wechat','WeChatController@serve');
+Route::any('profile','WeChatController@profile');
+Route::any('callback','WeChatController@callback');
 /*
 |--------------------------------------------------------------------------
 | Web Routes

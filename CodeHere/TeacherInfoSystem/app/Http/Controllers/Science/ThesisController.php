@@ -14,7 +14,7 @@ class ThesisController extends Controller
     public function create(Request $request){
         $data = $request->all();
         $user = Cache::get($_COOKIE['userid']);
-        if (!$request->input('thesis_name')||!$request->input('author')||!$request->input('periodical_or_conference')||!$request->input('ISSN_or_ISBN')||!$request->input('issue')||!$request->input('volume')||!$request->input('page_number')||!$request->input('publication_time')){
+        if (!$request->input('thesis_name')||!$request->input('other_author')||!$request->input('periodical_or_conference')||!$request->input('ISSN_or_ISBN')||!$request->input('issue')||!$request->input('volume')||!$request->input('page_number')||!$request->input('publication_time')||!$request->input('first_unit')||!$request->input('first_author')||!$request->input('communication_author')){
             return response()->json(['status' => 404,'msg' => 'missing parameters']);
         }
         $thesis = Thesis::create($data);
@@ -104,10 +104,10 @@ class ThesisController extends Controller
             return response()->json(['status' => 431,'msg' => 'account not found']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $theses = Thesis::select('id','userid','thesis_name','author','periodical_or_conference','name','verify_level','thesis_path')->where('verify_level','=',1)->orderBy('updated_at','desc')->paginate(6);
+            $theses = Thesis::select('id','userid','thesis_name','first_unit','first_author','communication_author','other_author','periodical_or_conference','name','verify_level','thesis_path')->where('verify_level','=',1)->orderBy('updated_at','desc')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $theses = Thesis::select('id','userid','thesis_name','author','periodical_or_conference','name','verify_level','thesis_path')->where(['userid' => $user,'verify_level' => 1])->orderBy('updated_at','desc')->paginate(6);
+            $theses = Thesis::select('id','userid','thesis_name','first_unit','first_author','communication_author','other_author','periodical_or_conference','name','verify_level','thesis_path')->where(['userid' => $user,'verify_level' => 1])->orderBy('updated_at','desc')->paginate(6);
         }
         return response()->json(['status' => 200,'msg' => 'theses required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $theses]);
     }
@@ -120,10 +120,10 @@ class ThesisController extends Controller
             return response()->json(['status' => 431,'msg' => 'account not found']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $theses = Thesis::select('id','userid','thesis_name','author','periodical_or_conference','name','verify_level','thesis_path')->where('verify_level','=',0)->orderBy('updated_at','desc')->paginate(6);
+            $theses = Thesis::select('id','userid','thesis_name','first_unit','first_author','communication_author','other_author','periodical_or_conference','name','verify_level','thesis_path')->where('verify_level','=',0)->orderBy('updated_at','desc')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $theses = Thesis::select('id','userid','thesis_name','author','periodical_or_conference','name','verify_level','thesis_path')->where(['userid' => $user,'verify_level' => 0])->orderBy('updated_at','desc')->paginate(6);
+            $theses = Thesis::select('id','userid','thesis_name','first_unit','first_author','communication_author','other_author','periodical_or_conference','name','verify_level','thesis_path')->where(['userid' => $user,'verify_level' => 0])->orderBy('updated_at','desc')->paginate(6);
         }
         return response()->json(['status' => 200,'msg' => 'theses required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $theses]);
     }
