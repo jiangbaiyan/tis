@@ -1,24 +1,24 @@
 <?php
 
+//杭电CAS认证
 Route::group(['prefix' => 'api'],function (){
     Route::group(['prefix' => 'v1.0'],function (){
-        Route::get('cas','CasController@cas');
+        Route::get('teachercas','TeacherCasController@cas');
+        Route::get('studentcas','StudentCasController@cas');
     });
 });
 
+Route::get('/',function (){
+    return redirect('https://cbsjs.hdu.edu.cn');
+});
+//微信相关
 Route::any('wechat','WeChatController@serve');
-Route::any('profile','WeChatController@profile');
+Route::any('bind','WeChatController@bind');
 Route::any('callback','WeChatController@callback');
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+Route::any('getOpenid','WeChatController@getOpenid');
+Route::any('openidCallback','WeChatController@openidCallback');
+Route::any('send','WeChatController@sendMessage');
+
  //登录注册、个人信息模块
 Route::group(['prefix'=>'api','namespace' => 'LoginAndAccount'],function (){
     Route::group(['prefix'=>'v1.0'],function(){
@@ -123,6 +123,28 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                     Route::delete('activity','ActivityController@delete');
                     Route::post('activity','ActivityController@create');
                 });
+            });
+        });
+    });
+});
+
+Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师信息
+    Route::group(['middleware'=>'EnableCrossRequest'],function (){
+        Route::group(['prefix' => 'v1.0'],function (){
+            Route::group(['middleware'=>'CheckLogin'],function (){
+                Route::get('notVerifiedLeaves','DailyLeaveController@getNotVerifiedLeaves');
+                Route::put('dailyleave','DailyLeaveController@update');
+            });
+        });
+    });
+});
+
+Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//学生
+    Route::group(['middleware'=>'EnableCrossRequest'],function (){
+        Route::group(['prefix' => 'v1.0'],function (){
+            Route::group(['middleware'=>'LeaveCheckLogin'],function (){
+                Route::post('createdailyleave','DailyLeaveController@create');
+                Route::post('updatedailyleave','DailyLeaveController@update');
             });
         });
     });

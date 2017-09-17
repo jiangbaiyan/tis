@@ -11,6 +11,6 @@ class Account extends Model
     protected $guarded = ['id'];
 
     public function students(){
-        return $this->hasMany('App\Student','account_id');
+        return $this->hasMany('App\Student','account_id','userid');
     }
 }
