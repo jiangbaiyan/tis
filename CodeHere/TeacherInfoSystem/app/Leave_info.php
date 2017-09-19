@@ -9,6 +9,6 @@ class Leave_info extends Model
     protected $guarded = ['id'];
 
     public function holiday_leaves(){
-        return $this->hasMany('App\Holiday_leave','leave_info_id');
+        return $this->hasMany('App\Holiday_leave');
     }
 }

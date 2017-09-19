@@ -17,7 +17,6 @@ Route::any('bind','WeChatController@bind');
 Route::any('callback','WeChatController@callback');
 Route::any('getOpenid','WeChatController@getOpenid');
 Route::any('openidCallback','WeChatController@openidCallback');
-Route::any('send','WeChatController@sendMessage');
 
  //登录注册、个人信息模块
 Route::group(['prefix'=>'api','namespace' => 'LoginAndAccount'],function (){
@@ -133,7 +132,10 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师信�
         Route::group(['prefix' => 'v1.0'],function (){
             Route::group(['middleware'=>'CheckLogin'],function (){
                 Route::get('notVerifiedLeaves','DailyLeaveController@getNotVerifiedLeaves');
-                Route::put('dailyleave','DailyLeaveController@update');
+                Route::put('dailyleave','DailyLeaveController@teacherupdate');
+                Route::post('dailyleave','DailyLeaveController@teachercreate');
+                Route::post('leaveinfo','LeaveInfoController@create');
+                Route::get('dailyleave','DailyLeaveController@get');
             });
         });
     });
@@ -142,10 +144,10 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师信�
 Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//学生
     Route::group(['middleware'=>'EnableCrossRequest'],function (){
         Route::group(['prefix' => 'v1.0'],function (){
-            Route::group(['middleware'=>'LeaveCheckLogin'],function (){
-                Route::post('createdailyleave','DailyLeaveController@create');
-                Route::post('updatedailyleave','DailyLeaveController@update');
-            });
+            //Route::group(['middleware'=>'LeaveCheckLogin'],function (){
+                Route::post('createdailyleave','DailyLeaveController@studentcreate');
+                Route::post('updatedailyleave','DailyLeaveController@studentupdate');
+            //});
         });
     });
 });
