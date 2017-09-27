@@ -6,6 +6,7 @@ use App\Account;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Response;
 
 class TeacherCasController extends LoginAndAccount\Controller
 {
@@ -72,9 +73,6 @@ class TeacherCasController extends LoginAndAccount\Controller
                     if ($successnode0 == "unit_name") {//学院全称
                         $unit = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
                     }
-                    if ($successnode0 == "classid") {//班级号
-                        $classid = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
-                    }
                     $i = $i + 1;
                 }
 
@@ -106,8 +104,7 @@ class TeacherCasController extends LoginAndAccount\Controller
                         goto fuck;
                     }
                     if ($unit!="网络空间安全学院、浙江保密学院" || $idtype != '0'){
-                        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                        die("您不是本学院的教师，无权访问此系统");
+                        return Response::json(['status' => 500,'msg' => 'permission denied']);
                     }
                     fuck:
                     $teacher = Account::where('userid',$userid)->first();

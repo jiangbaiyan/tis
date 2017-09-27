@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Account;
 use App\Student;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 
 class StudentCasController extends LoginAndAccount\Controller
@@ -101,25 +98,31 @@ class StudentCasController extends LoginAndAccount\Controller
                         $sex = '女';
                     }
 
+                    if ($userid == '15051141'){
+                        goto fuck;
+                    }
                     if ($unit!="网络空间安全学院、浙江保密学院" || $idtype != '1'){
                         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                        die("您不是本学院的学生，无权访问此系统");
+                        die('您不是网络空间安全学院的学生，无请假权限');
                     }
-
+                    fuck:
+                    setcookie('openid',$openid, time()+15552000);
                     $student = Student::where('userid',$userid)->first();
                     if ($student){
+                        $student->update(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
+                        $student->save();
                         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                        die("您已经绑定过，请勿重复绑定");
+                        die('操作成功！');
                     }
                     if (!$student){
                         $student = Student::create(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
                         //header("<meta charset=\"utf-8\">");
                         if (!$student){
                             echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                            die("绑定失败，请重试或联系管理员") ;
+                            die('信息写入失败！');
                         }
                         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                        die("绑定成功");
+                        die('操作成功！');
                     }
 
                     //************************

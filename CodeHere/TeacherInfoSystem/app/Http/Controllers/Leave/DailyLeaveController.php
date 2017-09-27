@@ -14,43 +14,44 @@ class DailyLeaveController extends Controller
 {
     private $appid = 'wx8dea8299c5f828a0';
     private $secret = '72d9d3202bb9fff24e9376ab03218f77';
+
 //-------------------------学生端--------------------------------------
-    public function studentCreate(Request $request){//学生端
+    public function studentCreate(Request $request){//创建请假信息
         $data = $request->all();
         $openid = $_COOKIE['openid'];
         $dailyLeave = new Daily_leave($data);
-        $user = Student::where('openid',$openid)->first();
-        $user->daily_leaves()->save($dailyLeave);
-        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-        die('提交成功！');
+        $student = Student::where('openid',$openid)->first();
+        $student->daily_leaves()->save($dailyLeave);
+        return Response::json(['status' => 200,'msg' => 'create successfully']);
     }
 
-    public function studentUpdate(Request $request){
-        $data = $request->all();
-        $id = $request->input('id');
+
+    public function studentGet(){//获取所有未销假的信息
+        $openid = $_COOKIE['openid'];
+        $student = Student::where('openid',$openid)->first();
+        $datas = $student->daily_leaves()
+            ->where('cancel_time','=',null)
+            ->where('is_leave','=',1)
+            ->where('is_pass','=',1)
+            ->orderByDesc('created_at')
+            ->get();
+        return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
+    }
+
+    public function studentDelete($id){//销假
         $daily_leave = Daily_leave::find($id);
         if (!$daily_leave){
-            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-            die('该条请假数据不存在！');
+            return Response::json(['status' => 404,'msg' => 'daily_leave not found']);
         }
-        $result = $daily_leave->update($data);
-        if (!$result){
-            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-            die('数据库更新失败');
+        $now = date('Y-m-d');
+        $daily_leave->cancel_time = $now;
+        if (!$daily_leave->save()){
+            return Response::json(['status' => 402,'msg' => 'cancel failed']);
         }
-        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-        die('数据更新成功！');
+        return Response::json(['status' => 200,'msg' => 'cancel successfully']);
     }
 //-------------------------教师端--------------------------------------
 
-    public function teacherCreate(Request $request){
-        $data = $request->all();
-        $openid = $_COOKIE['openid'];
-        $dailyLeave = new Daily_leave($data);
-        $user = Student::where('openid',$openid)->first();
-        $user->daily_leaves()->save($dailyLeave);
-        return Response::json(['status' => 200,'msg' => 'created successfully']);
-    }
 
     public function teacherUpdate(Request $request){//同意或者拒绝并发送微信模板消息
         $data = $request->all();
@@ -137,13 +138,13 @@ class DailyLeaveController extends Controller
         if (!$user->leave_level){//如果不是超级管理员
             return Response::json(['status' => 402,'msg' => '您无权操作此模块']);
         }
-        $data = Daily_leave::join('students','daily_leaves.student_id','=','students.id')->select('daily_leaves.*','students.userid','students.name','students.phone','students.class','students.major')->where('students.account_id','=', $userid)->where('daily_leaves.updated_at','>',strtotime(time()-604800))->where('daily_leaves.is_pass','=',0)->orderByDesc('daily_leaves.updated_at')->get();
+        $data = Daily_leave::join('students','daily_leaves.student_id','=','students.id')->select('daily_leaves.*','students.userid','students.name','students.phone','students.class','students.major')->where('students.account_id','=', $userid)->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-604800))->where('daily_leaves.is_pass','=',0)->orderByDesc('daily_leaves.updated_at')->get();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
 
-    public function get(){
+    public function teacherGet(){
         $userid = Cache::get($_COOKIE['userid']);
-        $data = Daily_leave::join('students','daily_leaves.student_id','=','students.id')->select('students.userid','students.name','students.phone','students.class_num','daily_leaves.begin_time','daily_leaves.end_time','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_date')->where('students.account_id','15051141')->orderByDesc('class_num')->get();
-        return Response::json(['status' => 200,'msg' => 'daily_leave required successfully','data' => $data]);
+        $datas = Daily_leave::join('students','daily_leaves.student_id','=','students.id')->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','daily_leaves.begin_time','daily_leaves.end_time','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time')->where('students.account_id',$userid)->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-2592000))->orderByDesc('class_num')->orderByDesc('daily_leaves.begin_time')->get();
+        return Response::json(['status' => 200,'msg' => 'daily_leave required successfully','data' => $datas->groupBy('class_num')]);
     }
 }

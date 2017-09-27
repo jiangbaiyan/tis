@@ -1,6 +1,5 @@
 <?php
-
-//杭电CAS认证
+//杭电CAS认证模块
 Route::group(['prefix' => 'api'],function (){
     Route::group(['prefix' => 'v1.0'],function (){
         Route::get('teachercas','TeacherCasController@cas');
@@ -11,6 +10,7 @@ Route::group(['prefix' => 'api'],function (){
 Route::get('/',function (){
     return redirect('https://cbsjs.hdu.edu.cn');
 });
+
 //微信相关
 Route::any('wechat','WeChatController@serve');
 Route::any('bind','WeChatController@bind');
@@ -127,27 +127,39 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
     });
 });
 
-Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师信息
+
+//请假系统模块
+Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
     Route::group(['middleware'=>'EnableCrossRequest'],function (){
         Route::group(['prefix' => 'v1.0'],function (){
             Route::group(['middleware'=>'CheckLogin'],function (){
                 Route::get('notVerifiedLeaves','DailyLeaveController@getNotVerifiedLeaves');
-                Route::put('dailyleave','DailyLeaveController@teacherupdate');
-                Route::post('dailyleave','DailyLeaveController@teachercreate');
+                Route::put('dailyleave','DailyLeaveController@teacherUpdate');
+                Route::get('holidayleave','HolidayLeaveController@teacherGet');
                 Route::post('leaveinfo','LeaveInfoController@create');
-                Route::get('dailyleave','DailyLeaveController@get');
+                Route::get('dailyleave','DailyLeaveController@teacherGet');
+                Route::get('dailyleaveexport','ExcelController@dailyLeaveExport');
+                Route::get('holidayleaveexport','ExcelController@holidayLeaveExport');
             });
         });
     });
 });
 
-Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//学生
+Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//学生端
     Route::group(['middleware'=>'EnableCrossRequest'],function (){
-        Route::group(['prefix' => 'v1.0'],function (){
-            //Route::group(['middleware'=>'LeaveCheckLogin'],function (){
-                Route::post('createdailyleave','DailyLeaveController@studentcreate');
-                Route::post('updatedailyleave','DailyLeaveController@studentupdate');
-            //});
+        Route::group(['middleware' => 'LeaveCheckLogin'],function(){
+            Route::group(['prefix' => 'v1.0'],function (){
+                Route::post('createdailyleave','DailyLeaveController@studentCreate');
+                Route::get('getdailyleave','DailyLeaveController@studentGet');
+                Route::get('deletedailyleave/{id}','DailyLeaveController@studentDelete');
+
+                Route::post('createholidayleave','HolidayLeaveController@studentCreate');
+                Route::get('getholidayleave','HolidayLeaveController@studentGet');
+                Route::get('deleteholidayleave/{id}','HolidayLeaveController@studentDelete');
+
+                Route::get('getleaveinfo','LeaveInfoController@get');
+
+            });
         });
     });
 });

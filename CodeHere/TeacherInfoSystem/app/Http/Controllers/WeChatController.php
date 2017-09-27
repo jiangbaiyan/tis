@@ -32,7 +32,6 @@ class WeChatController extends LoginAndAccount\Controller
         $openid = $arr['openid'];
         Session::put('openid',$openid);
         curl_close($ch);
-        setcookie('openid',$openid, time()+3600*24);
         return redirect('https://tis.cloudshm.com/api/v1.0/studentcas');
     }
 
@@ -52,11 +51,13 @@ class WeChatController extends LoginAndAccount\Controller
         $openid = $arr['openid'];
         $student = Student::where('openid',$openid)->first();
         if (!$student){
+            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
             die('请先绑定您的个人信息');
         }
         else{
             setcookie('openid',$openid, time()+3600*24);
-            return redirect("https://cbsjs.hdu.edu.cn/qingjia_mobile");
+            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+            die('获取身份信息成功');
         }
     }
 
