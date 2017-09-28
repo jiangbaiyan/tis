@@ -23,7 +23,7 @@ class HolidayLeaveController extends Controller
         $datas = $leaveInfo->holiday_leaves()
             ->join('leave_infos','leave_infos.id','=','holiday_leaves.leave_info_id')
             ->join('students','holiday_leaves.student_id','=','students.id')
-            ->select('students.*','holiday_leaves.*','leave_infos.*')
+            ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','holiday_leaves.begin_time','holiday_leaves.end_time','holiday_leaves.is_leave','holiday_leaves.where','holiday_leaves.cancel_time')
             ->orderByDesc('holiday_leaves.updated_at')
             ->get();
         foreach ($datas as $data){
