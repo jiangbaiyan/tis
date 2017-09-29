@@ -13,7 +13,11 @@ Route::get('/',function (){
 
 //微信相关
 Route::any('wechat','WeChatController@serve');
-Route::any('bind','WeChatController@bind');
+Route::any('openid','WeChatController@bind');
+Route::any('bind',function (){
+    return view('WeChat/getMessage');//渲染输入信息页面模板
+});
+Route::any('submit','WeChatController@submit');
 Route::any('callback','WeChatController@callback');
 Route::any('getOpenid','WeChatController@getOpenid');
 Route::any('openidCallback','WeChatController@openidCallback');

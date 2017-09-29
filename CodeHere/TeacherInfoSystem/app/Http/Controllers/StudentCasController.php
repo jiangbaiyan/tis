@@ -11,6 +11,20 @@ class StudentCasController extends LoginAndAccount\Controller
     public function cas()
     {
         $openid = Session::get('openid');
+        $teacher = Session::get('teacher');
+        $phone = Session::get('phone');
+        switch ($teacher){
+            case "苏晶":
+                $account_id = "40365";
+                break;
+            case "卞广旭":
+                $account_id = "";
+                break;
+            case "冯尉瑾":
+                $account_id = "";
+                break;
+        }
+
         $loginServer = "http://cas.hdu.edu.cn/cas/login";
         //CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
@@ -98,7 +112,7 @@ class StudentCasController extends LoginAndAccount\Controller
                         $sex = '女';
                     }
 
-                    if ($userid == '15051141'){
+                    if ($userid == '15051141'){//开发者跳过验证
                         goto fuck;
                     }
                     if ($unit!="网络空间安全学院、浙江保密学院" || $idtype != '1'){
@@ -106,23 +120,25 @@ class StudentCasController extends LoginAndAccount\Controller
                         die('您不是网络空间安全学院的学生，无请假权限');
                     }
                     fuck:
-                    $major = '';
                     if (substr($classid,4,2) == '24'){
                         $major = '网络工程';
                     }
-                    if (substr($classid,4,2) == '36'){
+                    else if (substr($classid,4,2) == '36'){
                         $major = '信息安全';
+                    }
+                    else{
+                        $major = '其他学院专业';
                     }
                     setcookie('openid',$openid, time()+15552000);
                     $student = Student::where('userid',$userid)->first();
                     if ($student){
-                        $student->update(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
+                        $student->update(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'phone' => $phone,'account_id' => $account_id,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
                         $student->save();
                         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
                         die('操作成功！');
                     }
                     if (!$student){
-                        $student = Student::create(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
+                        $student = Student::create(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'phone' => $phone,'account_id' => $account_id,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
                         //header("<meta charset=\"utf-8\">");
                         if (!$student){
                             echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";

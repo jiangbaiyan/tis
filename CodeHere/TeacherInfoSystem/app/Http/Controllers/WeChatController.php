@@ -16,6 +16,14 @@ class WeChatController extends LoginAndAccount\Controller
         //微信消息处理
     }
 
+    public function submit(Request $request){
+        $teacher = $request->input('teacher');
+        $phone = $request->input('phone');
+        Session::put('teacher',$teacher);
+        Session::put('phone',$phone);
+        return redirect('https://tis.cloudshm.com/openid');
+    }
+
     public function bind(){
         $callback = urlencode('https://tis.cloudshm.com/callback');
         return redirect("https://open.weixin.qq.com/connect/oauth2/authorize?appid=$this->appid&redirect_uri=$callback&response_type=code&scope=snsapi_base&state=123#wechat_redirect");
