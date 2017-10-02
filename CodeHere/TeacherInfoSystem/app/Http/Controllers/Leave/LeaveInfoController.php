@@ -22,6 +22,7 @@ class LeaveInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'created successfully']);
     }
 
+
     public function get(){
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
@@ -30,4 +31,5 @@ class LeaveInfoController extends Controller
         $datas = $datas->where('from','<=',date('Y-m-d'))->where('to','>=',date('Y-m-d'));
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
     }
+
 }

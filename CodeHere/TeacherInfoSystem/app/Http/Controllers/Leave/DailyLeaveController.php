@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\WeChatController;
 
 class DailyLeaveController extends Controller
 {
@@ -70,44 +71,35 @@ class DailyLeaveController extends Controller
         }
         $account = $daily_leave->student->account_id;
         $openid = $daily_leave->student->openid;
+        $name = $daily_leave->student->name;
         $teacher = Account::where('userid',$account)->first();
         $result = $daily_leave->update($data);
         if (!$result){
             return Response::json(['status' => 402,'msg' => 'update failed']);
         }
-        $ch = curl_init();//第一个curl获取access_token
-        curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$this->appid&secret=$this->secret");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        $result = curl_exec($ch);
-        $arr = json_decode($result,true);
-        $access_token = $arr['access_token'];
-        curl_close($ch);
-
-        $ch = curl_init();//第二个curl发送微信模板消息
+        $wechat = new WeChatController();
+        $access_token = $wechat->getAccessToken();
+        $ch = curl_init();//发送微信模板消息
         curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token");
         $post_data = [
             'touser' => $openid,
-            'template_id' => 'dXRffgG4i3Q4G8QGhvHo1V4XL8y2DC1AKDmL5z5a0m0',
+            'template_id' => 'dO7-mMJPBJzG4O3ibkvNNK8jS3ebQ64nNQZtiZnFRsE',
             'data' => [
                 'first' => [
-                    'value' => '您的请假申请'.$is_pass,
+                    'value' => '您的日常请假申请审核'.$is_pass,
                     'color' => $is_pass == '通过'?'#00B642':'#FF0000'
                 ],
                 'keyword1' => [
-                    'value' => '日常请假'
+                    'value' => $name
                 ],
                 'keyword2' => [
                     'value' => "$daily_leave->begin_time"." ~ "."$daily_leave->end_time"
                 ],
                 'keyword3' => [
-                    'value' => "$daily_leave->leave_reason"
+                    'value' => $is_pass == '通过' ? '审批通过' :'审批不通过'
                 ],
                 'keyword4' => [
                     'value' => "$teacher->name"
-                ],
-                'keyword5' => [
-                    'value' => $is_pass == '通过' ? '审批通过' :'审批不通过'
                 ],
                 'remark' => [
                     'value' => "$pass_reason"
@@ -138,13 +130,25 @@ class DailyLeaveController extends Controller
         if (!$user->leave_level){//如果不是超级管理员
             return Response::json(['status' => 402,'msg' => '您无权操作此模块']);
         }
-        $data = Daily_leave::join('students','daily_leaves.student_id','=','students.id')->select('daily_leaves.*','students.userid','students.name','students.phone','students.class','students.major')->where('students.account_id','=', $userid)->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-604800))->where('daily_leaves.is_pass','=',0)->orderByDesc('daily_leaves.updated_at')->get();
+        $data = Daily_leave::join('students','daily_leaves.student_id','=','students.id')
+            ->select('daily_leaves.*','students.userid','students.name','students.phone','students.class','students.major')
+            ->where('students.account_id','=', $userid)
+            ->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-604800))
+            ->where('daily_leaves.is_pass','=',0)
+            ->orderByDesc('daily_leaves.updated_at')
+            ->get();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
 
     public function teacherGet(){
         $userid = Cache::get($_COOKIE['userid']);
-        $datas = Daily_leave::join('students','daily_leaves.student_id','=','students.id')->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','daily_leaves.begin_time','daily_leaves.end_time','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time')->where('students.account_id',$userid)->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-2592000))->orderByDesc('class_num')->orderByDesc('daily_leaves.begin_time')->get();
+        $datas = Daily_leave::join('students','daily_leaves.student_id','=','students.id')
+            ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','daily_leaves.begin_time','daily_leaves.end_time','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time')
+            ->where('students.account_id',$userid)
+            ->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+            ->orderByDesc('class_num')
+            ->orderByDesc('daily_leaves.begin_time')
+            ->get();
         return Response::json(['status' => 200,'msg' => 'daily_leave required successfully','data' => $datas->groupBy('class_num')]);
     }
 }

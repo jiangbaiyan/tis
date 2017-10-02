@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Student;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 
 class StudentCasController extends LoginAndAccount\Controller
@@ -13,6 +12,7 @@ class StudentCasController extends LoginAndAccount\Controller
         $openid = Session::get('openid');
         $teacher = Session::get('teacher');
         $phone = Session::get('phone');
+        $email = Session::get('email');
         switch ($teacher){
             case "苏晶":
                 $account_id = "40365";
@@ -132,13 +132,13 @@ class StudentCasController extends LoginAndAccount\Controller
                     setcookie('openid',$openid, time()+15552000);
                     $student = Student::where('userid',$userid)->first();
                     if ($student){
-                        $student->update(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'phone' => $phone,'account_id' => $account_id,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
+                        $student->update(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'phone' => $phone,'email' => $email,'account_id' => $account_id,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
                         $student->save();
                         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
                         die('操作成功！');
                     }
                     if (!$student){
-                        $student = Student::create(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'phone' => $phone,'account_id' => $account_id,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
+                        $student = Student::create(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'phone' => $phone,'email' => $email,'account_id' => $account_id,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
                         //header("<meta charset=\"utf-8\">");
                         if (!$student){
                             echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";

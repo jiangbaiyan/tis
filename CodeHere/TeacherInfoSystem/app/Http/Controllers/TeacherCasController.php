@@ -15,7 +15,8 @@ class TeacherCasController extends LoginAndAccount\Controller
         $loginServer = "http://cas.hdu.edu.cn/cas/login";
         //CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
-        $Rurl = "https://cbsjs.hdu.edu.cn/pages/personalInformation.html";
+        //$Rurl = "https://cbsjs.hdu.edu.cn/pages/personalInformation.html";服务器关闭无法使用
+        $Rurl = "https://teacher.cloudshm.com/pages/personalInformation.html";
         //如果已经认证完毕且token也匹配，那么直接跳到系统首页
         if (isset($_COOKIE['userid']) && isset($_COOKIE['token'])){
             $redisToken = Redis::get($_COOKIE['userid']);

@@ -13,4 +13,8 @@ class Account extends Model
     public function students(){
         return $this->hasMany('App\Student','account_id','userid');
     }
+
+    public function info_contents(){
+        return $this->hasMany('App\Info_Content','account_id','userid');
+    }
 }

@@ -23,8 +23,9 @@ class HolidayLeaveController extends Controller
         $datas = $leaveInfo->holiday_leaves()
             ->join('leave_infos','leave_infos.id','=','holiday_leaves.leave_info_id')
             ->join('students','holiday_leaves.student_id','=','students.id')
-            ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','holiday_leaves.begin_time','holiday_leaves.end_time','holiday_leaves.is_leave','holiday_leaves.where','holiday_leaves.cancel_time')
+            ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','holiday_leaves.begin_time','holiday_leaves.end_time','holiday_leaves.is_leave','holiday_leaves.where','holiday_leaves.cancel_time','leave_infos.title')
             ->orderByDesc('holiday_leaves.updated_at')
+            ->where('students.account_id','=',$userid)
             ->get();
         foreach ($datas as $data){
             if ($data->begin_time == null){
@@ -45,7 +46,11 @@ class HolidayLeaveController extends Controller
         $openid = $_COOKIE['openid'];
         $holidayLeave = new Holiday_leave($data);
         $student = Student::where('openid',$openid)->first();
+        $student_id = $student->id;
         $leave_info = Leave_info::find($id);
+        if ($student->holiday_leaves()){
+            $leave_info->holiday_leaves()->where('student_id','=',$student_id)->delete();
+        }//如果该学生已经请假过,那么删除该模板下该学生之前的请假信息
         $student->holiday_leaves()->save($holidayLeave);
         $leave_info->holiday_leaves()->save($holidayLeave);
         return Response::json(['status' => 200,'msg' => 'create successfully']);

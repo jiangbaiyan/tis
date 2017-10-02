@@ -16,11 +16,37 @@ class WeChatController extends LoginAndAccount\Controller
         //微信消息处理
     }
 
-    public function submit(Request $request){
+    public function getAccessToken(){
+        $ch = curl_init();//第一个curl获取access_token
+        curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$this->appid&secret=$this->secret");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        $result = curl_exec($ch);
+        $arr = json_decode($result,true);
+        $access_token = $arr['access_token'];
+        curl_close($ch);
+        return $access_token;
+    }
+
+
+    public function submit(Request $request){//表单验证
         $teacher = $request->input('teacher');
         $phone = $request->input('phone');
+        $email = $request->input('email');
+        $this->validate($request,[
+            'phone' => 'required|numeric',
+            'email' => 'required|email'
+        ],[
+            'required' => ':attribute不能为空',
+            'numeric' => ':attribute格式不正确',
+            'email' => ':attribute格式不正确'
+        ],[
+            'phone' => '联系电话',
+            'email' => '邮箱'
+        ]);
         Session::put('teacher',$teacher);
         Session::put('phone',$phone);
+        Session::put('email',$email);
         return redirect('https://tis.cloudshm.com/openid');
     }
 

@@ -8,19 +8,22 @@ Route::group(['prefix' => 'api'],function (){
 });
 
 Route::get('/',function (){
-    return redirect('https://cbsjs.hdu.edu.cn');
+    return redirect('https://teacher.cloudshm.com');
 });
 
 //微信相关
-Route::any('wechat','WeChatController@serve');
-Route::any('openid','WeChatController@bind');
-Route::any('bind',function (){
-    return view('WeChat/getMessage');//渲染输入信息页面模板
+Route::group(['middleware' => 'web'],function (){
+    Route::any('wechat','WeChatController@serve');
+    Route::any('openid','WeChatController@bind');
+    Route::any('bind',function (){
+        return view('WeChat/getMessage');//渲染输入信息页面模板
+    });
+    Route::any('submit','WeChatController@submit');
+    Route::any('callback','WeChatController@callback');
+    Route::any('getOpenid','WeChatController@getOpenid');
+    Route::any('openidCallback','WeChatController@openidCallback');
 });
-Route::any('submit','WeChatController@submit');
-Route::any('callback','WeChatController@callback');
-Route::any('getOpenid','WeChatController@getOpenid');
-Route::any('openidCallback','WeChatController@openidCallback');
+
 
  //登录注册、个人信息模块
 Route::group(['prefix'=>'api','namespace' => 'LoginAndAccount'],function (){
@@ -163,6 +166,19 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//学生端
 
                 Route::get('getleaveinfo','LeaveInfoController@get');
 
+            });
+        });
+    });
+});
+
+
+//通知系统模块
+Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
+    Route::group(['middleware'=>'EnableCrossRequest'],function (){
+        Route::group(['prefix' => 'v1.0'],function (){
+            Route::group(['middleware'=>'CheckLogin'],function (){
+                Route::get('teacherinfo','InfoContentController@getStudentInfo');
+                Route::post('send','InfoContentController@send');
             });
         });
     });
