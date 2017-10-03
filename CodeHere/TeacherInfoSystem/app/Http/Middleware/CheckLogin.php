@@ -21,7 +21,7 @@ class CheckLogin
     public function handle($request, Closure $next)
     {
         if (!isset($_COOKIE['userid'])||!isset($_COOKIE['token'])){
-            return Response::json(['status' => 400,'msg' => 'need cookie']);
+            return Response::json(['status' => 401,'msg' => 'need cookie']);
         }
         $userid = $_COOKIE['userid'];
         $token = $_COOKIE['token'];

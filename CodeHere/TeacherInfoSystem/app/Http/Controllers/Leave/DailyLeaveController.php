@@ -128,7 +128,7 @@ class DailyLeaveController extends Controller
             return Response::json(['status' => 404,'msg' => 'user not exists']);
         }
         if (!$user->leave_level){//如果不是超级管理员
-            return Response::json(['status' => 402,'msg' => '您无权操作此模块']);
+            return Response::json(['status' => 500,'msg' => '您无权操作此模块']);
         }
         $data = Daily_leave::join('students','daily_leaves.student_id','=','students.id')
             ->select('daily_leaves.*','students.userid','students.name','students.phone','students.class','students.major')

@@ -115,9 +115,9 @@ class TeacherCasController extends LoginAndAccount\Controller
 
                     //************************
                     $userid = Crypt::encrypt($userid);
-                    setcookie('userid',$userid, time()+3600*24);
+                    setcookie('userid',$userid, time()+604800);
                     $token = Hash::make($userid.date(DATE_W3C));
-                    setcookie('token',$token, time()+3600*24);
+                    setcookie('token',$token, time()+604800);
                     Redis::set($userid,$token);
                     Redis::expire($userid,100000);
 

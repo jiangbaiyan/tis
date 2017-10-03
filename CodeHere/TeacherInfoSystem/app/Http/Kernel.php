@@ -58,6 +58,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'CheckLogin' =>\App\Http\Middleware\CheckLogin::class,
         'EnableCrossRequest'=>\App\Http\Middleware\EnableCrossRequestMiddleware::class,
-        'LeaveCheckLogin' => \App\Http\Middleware\LeaveCheckLogin::class
+        'StudentCheckLogin' => \App\Http\Middleware\StudentCheckLogin::class
     ];
 }

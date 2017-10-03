@@ -139,6 +139,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
 Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
     Route::group(['middleware'=>'EnableCrossRequest'],function (){
         Route::group(['prefix' => 'v1.0'],function (){
+            //教师端
             Route::group(['middleware'=>'CheckLogin'],function (){
                 Route::get('notVerifiedLeaves','DailyLeaveController@getNotVerifiedLeaves');
                 Route::put('dailyleave','DailyLeaveController@teacherUpdate');
@@ -148,24 +149,16 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
                 Route::get('dailyleaveexport','ExcelController@dailyLeaveExport');
                 Route::get('holidayleaveexport','ExcelController@holidayLeaveExport');
             });
-        });
-    });
-});
 
-Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//学生端
-    Route::group(['middleware'=>'EnableCrossRequest'],function (){
-        Route::group(['middleware' => 'LeaveCheckLogin'],function(){
-            Route::group(['prefix' => 'v1.0'],function (){
+            //学生端
+            Route::group(['middleware' => 'StudentCheckLogin'],function (){
                 Route::post('createdailyleave','DailyLeaveController@studentCreate');
                 Route::get('getdailyleave','DailyLeaveController@studentGet');
                 Route::get('deletedailyleave/{id}','DailyLeaveController@studentDelete');
-
                 Route::post('createholidayleave','HolidayLeaveController@studentCreate');
                 Route::get('getholidayleave','HolidayLeaveController@studentGet');
                 Route::get('deleteholidayleave/{id}','HolidayLeaveController@studentDelete');
-
                 Route::get('getleaveinfo','LeaveInfoController@get');
-
             });
         });
     });
@@ -176,9 +169,18 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//学生端
 Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
     Route::group(['middleware'=>'EnableCrossRequest'],function (){
         Route::group(['prefix' => 'v1.0'],function (){
+            //教师端
             Route::group(['middleware'=>'CheckLogin'],function (){
-                Route::get('teacherinfo','InfoContentController@getStudentInfo');
-                Route::post('send','InfoContentController@send');
+                Route::get('teacherinfo','TeacherInfoContentController@getStudentInfo');
+                Route::post('send','TeacherInfoContentController@send');
+                Route::get('infocontent','TeacherInfoContentController@getInfoContent');
+                Route::get('infofeedback/{id}','TeacherInfoContentController@getFeedback');
+            });
+
+            //学生端
+            Route::group(['middleware' => 'StudentCheckLogin'],function (){
+                Route::get('studentindex','StudentInfoController@getIndex');
+                Route::get('studentdetail/{id}','StudentInfoController@getDetail');
             });
         });
     });

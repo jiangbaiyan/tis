@@ -6,7 +6,7 @@ use App\Student;
 use Closure;
 use Illuminate\Support\Facades\Response;
 
-class LeaveCheckLogin
+class StudentCheckLogin
 {
     /**
      * Handle an incoming request.
