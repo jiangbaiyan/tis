@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class TeacherInfoController extends Controller
 {
-
+    private $url = 'http://cbs-service.b0.upaiyun.com/';
     public function sendModelInfo($type,$receivers,$title,$content,$info){//公用发送模板消息方法
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
@@ -33,7 +33,7 @@ class TeacherInfoController extends Controller
                 'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
                 'data' => [
                     'first' => [
-                        'value' => "标题：$title",
+                        'value' => "$title",
                         'color' => '#FF0000'
                     ],
                     'keyword1' => [
@@ -105,7 +105,7 @@ class TeacherInfoController extends Controller
                     if (!$path){
                         return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                     }
-                    $url = Storage::disk('upyun')->url($path);
+                    $url = $this->url."$path";
                     $info->attach_url = $url;
                     $info->save();
                 }
@@ -120,7 +120,7 @@ class TeacherInfoController extends Controller
                     if (!$path){
                         return response()->json(['status' => 402,'msg' => '文件上传失败']);
                     }
-                    $url = Storage::disk('upyun')->url($path);
+                    $url = $this->url."$path";
                     $info->attach_url = $url;
                     $info->save();
                 }
@@ -135,7 +135,7 @@ class TeacherInfoController extends Controller
                     if (!$path){
                         return response()->json(['status' => 402,'msg' => '文件上传失败']);
                     }
-                    $url = Storage::disk('upyun')->url($path);
+                    $url = $this->url."$path";
                     $info->attach_url = $url;
                     $info->save();
                 }
@@ -152,7 +152,7 @@ class TeacherInfoController extends Controller
                     if (!$path){
                         return response()->json(['status' => 462,'msg' => '文件上传失败']);
                     }
-                    $url = Storage::disk('upyun')->url($path);
+                    $url = $this->url."$path";
                     $info->attach_url = $url;
                     $info->save();
                 }
@@ -172,7 +172,7 @@ class TeacherInfoController extends Controller
                         'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
                         'data' => [
                             'first' => [
-                                'value' => "标题：$title",
+                                'value' => "$title",
                                 'color' => '#FF0000'
                             ],
                             'keyword1' => [

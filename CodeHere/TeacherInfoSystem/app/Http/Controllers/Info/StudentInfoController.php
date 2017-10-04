@@ -6,7 +6,7 @@ use App\Info_Content;
 use App\Info_Feedback;
 use App\Student;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
+use Mail;
 use Illuminate\Support\Facades\Response;
 
 class StudentInfoController extends Controller
@@ -46,13 +46,17 @@ class StudentInfoController extends Controller
         $student = Student::where('openid',$openid)->first();
         $name = $student->name;
         $email = $student->email;
-        Mail::send('email',['name' => $name],function ($message) use ($email,$id){
-            $info = Info_Content::find($id);
-            $fileUrl = $info->attach_url;
-            $message->to($email)->subject('测试邮件');
-            //在邮件中上传附件
-            $message->attach($fileUrl);
+        if (!$email){
+            return Response::json(['status' => 404,'msg' => '请先绑定您的邮箱信息']);
+        }
+        $info = Info_Content::find($id);
+        $fileUrl = $info->attach_url;
+        Mail::send('email',['name' => $name,'fileUrl' => $fileUrl],function ($message) use ($email){
+            $message->to($email)->subject('学院通知');
         });
+        if (count(Mail::failures())>0){
+            return Response::json(['status' => 463,'msg' => 'send email failed']);
+        }
         return Response::json(['status' => 200,'msg' => 'send email successfully']);
     }
 }
