@@ -70,10 +70,10 @@ class PlatformAndTeamController extends Controller
             return response()->json(['status' => 431,'msg' => 'account not found']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','group_name','verify_level','accounts.icon_path')->where('verify_level','=',1)->orderBy('group_name')->paginate(6);
+            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','group_name','verify_level','accounts.icon_path')->where('verify_level','=',1)->orderByDesc('platformAndTeams.created_at')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','group_name','verify_level','accounts.icon_path')->where(['platformAndTeams.userid' => $userid,'verify_level' => 1])->orderBy('group_name')->paginate(6);
+            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','group_name','verify_level','accounts.icon_path')->where(['platformAndTeams.userid' => $userid,'verify_level' => 1])->orderByDesc('platformAndTeams.created_at')->paginate(6);
         }
         return response()->json(['status' => 200,'msg' => 'platformAndTeams required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $platformAndTeams]);
     }
@@ -86,10 +86,10 @@ class PlatformAndTeamController extends Controller
             return response()->json(['status' => 431,'msg' => 'account not found']);
         }
         if ($account->science_level){//如果是超级用户，可以看所有表中的信息
-            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','group_name','verify_level','accounts.icon_path')->where('verify_level','=',0)->orderBy('group_name')->paginate(6);
+            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','group_name','verify_level','accounts.icon_path')->where('verify_level','=',0)->orderByDesc('platformAndTeams.created_at')->paginate(6);
         }
         else{//如果是普通用户，只能看自己的信息
-            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','group_name','verify_level','accounts.icon_path')->where(['platformAndTeams.userid' => $userid,'verify_level' => 0])->orderBy('group_name')->paginate(6);
+            $platformAndTeams = PlatformAndTeam::join('accounts','accounts.userid','=','platformAndTeams.userid')->select('platformAndTeams.id','platformAndTeams.userid','accounts.name','group_name','verify_level','accounts.icon_path')->where(['platformAndTeams.userid' => $userid,'verify_level' => 0])->orderByDesc('platformAndTeams.created_at')->paginate(6);
         }
         return response()->json(['status' => 200,'msg' => 'platformAndTeams required successfully','name' => $account->name,'icon_path' => $account->icon_path,'science_level' => $account->science_level,'data' => $platformAndTeams]);
     }

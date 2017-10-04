@@ -6,11 +6,12 @@ use App\Info_Content;
 use App\Info_Feedback;
 use App\Student;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 
 class StudentInfoController extends Controller
 {
-    public function getIndex(){
+    public function getIndex(){//通知系统首页
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
         $student_id = $student->id;
@@ -24,7 +25,7 @@ class StudentInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
 
-    public function getDetail($id){
+    public function getDetail($id){//通知系统详情页
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
         $student_id = $student->id;
@@ -38,5 +39,20 @@ class StudentInfoController extends Controller
         $feedback->status = 1;
         $feedback->save();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $content]);
+    }
+
+    public function sendEmail($id){//把附件发送到学生邮箱
+        $openid = $_COOKIE['openid'];
+        $student = Student::where('openid',$openid)->first();
+        $name = $student->name;
+        $email = $student->email;
+        Mail::send('email',['name' => $name],function ($message) use ($email,$id){
+            $info = Info_Content::find($id);
+            $fileUrl = $info->attach_url;
+            $message->to($email)->subject('测试邮件');
+            //在邮件中上传附件
+            $message->attach($fileUrl);
+        });
+        return Response::json(['status' => 200,'msg' => 'send email successfully']);
     }
 }

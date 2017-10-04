@@ -4,8 +4,49 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c43485dba7f4da3c212bb02b0df6b2b",
+    "content-hash": "b11eb407a41dcfbb8c4a76f26a55d869",
     "packages": [
+        {
+            "name": "aliyuncs/oss-sdk-php",
+            "version": "v2.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aliyun/aliyun-oss-php-sdk.git",
+                "reference": "0b9b85b6c5c38cfc4ef3b0205a5a62d1e36acf2e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/aliyun/aliyun-oss-php-sdk/0b9b85b6c5c38cfc4ef3b0205a5a62d1e36acf2e.zip",
+                "reference": "0b9b85b6c5c38cfc4ef3b0205a5a62d1e36acf2e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0",
+                "satooshi/php-coveralls": "~1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OSS\\": "src/OSS"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aliyuncs",
+                    "homepage": "http://www.aliyun.com"
+                }
+            ],
+            "description": "Aliyun OSS SDK for PHP",
+            "homepage": "http://www.aliyun.com/product/oss/",
+            "time": "2017-04-25T09:15:12+00:00"
+        },
         {
             "name": "barryvdh/laravel-ide-helper",
             "version": "v2.4.1",
@@ -883,16 +924,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.5.13",
+            "version": "v5.5.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "bfbe20d32ee9f98c89df852847827407a5127be4"
+                "reference": "26c700eb79e5bb55b59df2c495c9c71f16f43302"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/laravel/framework/bfbe20d32ee9f98c89df852847827407a5127be4.zip",
-                "reference": "bfbe20d32ee9f98c89df852847827407a5127be4",
+                "url": "https://files.phpcomposer.com/files/laravel/framework/26c700eb79e5bb55b59df2c495c9c71f16f43302.zip",
+                "reference": "26c700eb79e5bb55b59df2c495c9c71f16f43302",
                 "shasum": ""
             },
             "require": {
@@ -1011,7 +1052,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2017-09-24T19:09:38+00:00"
+            "time": "2017-10-03T17:41:03+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -1834,6 +1875,57 @@
                 "shell"
             ],
             "time": "2017-07-29T19:30:02+00:00"
+        },
+        {
+            "name": "qiniu/php-sdk",
+            "version": "v7.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/qiniu/php-sdk.git",
+                "reference": "d1bca450b56d85beb7ba21f374a47bfeb59c288b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/qiniu/php-sdk/d1bca450b56d85beb7ba21f374a47bfeb59c288b.zip",
+                "reference": "d1bca450b56d85beb7ba21f374a47bfeb59c288b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "~2.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Qiniu\\": "src/Qiniu"
+                },
+                "files": [
+                    "src/Qiniu/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Qiniu",
+                    "email": "sdk@qiniu.com",
+                    "homepage": "http://www.qiniu.com"
+                }
+            ],
+            "description": "Qiniu Resource (Cloud) Storage SDK for PHP",
+            "homepage": "http://developer.qiniu.com/",
+            "keywords": [
+                "cloud",
+                "qiniu",
+                "sdk",
+                "storage"
+            ],
+            "time": "2016-07-19T06:18:08+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -2979,6 +3071,135 @@
                 "environment"
             ],
             "time": "2016-09-01T10:05:43+00:00"
+        },
+        {
+            "name": "yangyifan/config-helper",
+            "version": "v0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tyua07/config-helper.git",
+                "reference": "1ddee95b12fe3821be38e00a5727d7951e0ffb53"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/tyua07/config-helper/1ddee95b12fe3821be38e00a5727d7951e0ffb53.zip",
+                "reference": "1ddee95b12fe3821be38e00a5727d7951e0ffb53",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Yangyifan\\Config\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "yangyifan",
+                    "email": "yangyifanphp@gmail.com"
+                }
+            ],
+            "time": "2016-12-24T12:07:01+00:00"
+        },
+        {
+            "name": "yangyifan/library-helper",
+            "version": "v0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tyua07/library-helper.git",
+                "reference": "a4a0c6a872286dae5fcd327499a603e6716575ff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/tyua07/library-helper/a4a0c6a872286dae5fcd327499a603e6716575ff.zip",
+                "reference": "a4a0c6a872286dae5fcd327499a603e6716575ff",
+                "shasum": ""
+            },
+            "require": {
+                "monolog/monolog": "^1.21"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Yangyifan\\Library\\": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "yangyifan",
+                    "email": "yangyifanphp@gmail.com"
+                }
+            ],
+            "time": "2016-12-31T06:35:08+00:00"
+        },
+        {
+            "name": "yangyifan/upload",
+            "version": "v0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tyua07/laravel-upload.git",
+                "reference": "d54bad8987c09cc8106e3959c38c1ef975e39013"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/tyua07/laravel-upload/d54bad8987c09cc8106e3959c38c1ef975e39013.zip",
+                "reference": "d54bad8987c09cc8106e3959c38c1ef975e39013",
+                "shasum": ""
+            },
+            "require": {
+                "aliyuncs/oss-sdk-php": "*",
+                "league/flysystem": "^1.0",
+                "qiniu/php-sdk": "v7.0.*",
+                "yangyifan/config-helper": "0.1",
+                "yangyifan/library-helper": "v0.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Yangyifan\\Upload\\UploadServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Yangyifan\\Upload\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "yangyifan",
+                    "email": "yangyifanphp@gmail.com"
+                }
+            ],
+            "description": "上传 SDK for Laravel",
+            "keywords": [
+                "laravel",
+                "oss",
+                "qiniu",
+                "sdk",
+                "tyua07",
+                "upload",
+                "upyun"
+            ],
+            "time": "2017-09-01T13:08:36+00:00"
         }
     ],
     "packages-dev": [

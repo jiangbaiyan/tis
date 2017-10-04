@@ -171,16 +171,17 @@ Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
         Route::group(['prefix' => 'v1.0'],function (){
             //教师端
             Route::group(['middleware'=>'CheckLogin'],function (){
-                Route::get('teacherinfo','TeacherInfoContentController@getStudentInfo');
-                Route::post('send','TeacherInfoContentController@send');
-                Route::get('infocontent','TeacherInfoContentController@getInfoContent');
-                Route::get('infofeedback/{id}','TeacherInfoContentController@getFeedback');
+                Route::get('teacherinfo','TeacherInfoController@getStudentInfo');
+                Route::post('send','TeacherInfoController@send');
+                Route::get('infocontent','TeacherInfoController@getInfoContent');
+                Route::get('infofeedback/{id}','TeacherInfoController@getFeedback');
             });
 
             //学生端
             Route::group(['middleware' => 'StudentCheckLogin'],function (){
                 Route::get('studentindex','StudentInfoController@getIndex');
                 Route::get('studentdetail/{id}','StudentInfoController@getDetail');
+                Route::get('sendemail/{id}','StudentInfoController@sendEmail');
             });
         });
     });

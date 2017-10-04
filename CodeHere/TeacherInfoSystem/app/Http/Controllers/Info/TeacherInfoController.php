@@ -11,9 +11,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
-class TeacherInfoContentController extends Controller
+class TeacherInfoController extends Controller
 {
+
     public function sendModelInfo($type,$receivers,$title,$content,$info){//公用发送模板消息方法
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
@@ -44,10 +46,11 @@ class TeacherInfoContentController extends Controller
                         'value' => date('Y-m-d H:i:s')
                     ],
                     'keyword4' => [
-                        'value' => $content
+                        'value' => $content,
+                        'color' => '#FF0000'
                     ],
                     'remark' => [
-                        'value' => '请点击进入消息详情页查看详情'
+                        'value' => '点击查看详情'
                     ]
                 ]
             ];
@@ -76,6 +79,7 @@ class TeacherInfoContentController extends Controller
 
     public function send(Request $request){//教师创建模板消息，并针对不同群体发送不同的微信模板消息
         $userid = Cache::get($_COOKIE['userid']);
+        $teacher = Account::where('userid', $userid)->first();
         $data = $request->all();
         $title = $request->input('title');
         $content = $request->input('content');
@@ -87,41 +91,77 @@ class TeacherInfoContentController extends Controller
         }
         if ($request->hasFile('file')){
             $ext = $file->getClientOriginalExtension();
-            if ($ext!='pdf'&&$ext!='doc'&&$ext!='docx'&&$ext!='PDF'&&$ext!='DOC'&&$ext!='DOCX'){
+            if ($ext!='pdf'&&$ext!='doc'&&$ext!='docx'&&$ext!='PDF'&&$ext!='DOC'&&$ext!='DOCX'&&$ext!='rar'&&ext!='zip'&&ext!='RAR'&&$ext!='ZIP'){
                 return response()->json(['status' => 402,'msg' => 'wrong file format']);
             }
         }
-        switch ($type){
+        switch ($type) {
             case 1://年级
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $this->sendModelInfo('grade',$receivers,$title,$content,$info);
+                if ($request->hasFile('file')){
+                    $path = Storage::disk('upyun')->putFileAs('info/grade',$file,"$teacher->userid".'_'.$info->id.'.'.$ext,'public');
+                    if (!$path){
+                        return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
+                    }
+                    $url = Storage::disk('upyun')->url($path);
+                    $info->attach_url = $url;
+                    $info->save();
+                }
+                $this->sendModelInfo('grade', $receivers, $title, $content, $info);
                 break;
             case 2://班级
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $this->sendModelInfo('class_num',$receivers,$title,$content,$info);
+                if ($request->hasFile('file')){
+                    $path = Storage::disk('upyun')->putFileAs('info/class',$file,"$teacher->userid".'_'.$info->id.'.'.$ext,'public');
+                    if (!$path){
+                        return response()->json(['status' => 402,'msg' => '文件上传失败']);
+                    }
+                    $url = Storage::disk('upyun')->url($path);
+                    $info->attach_url = $url;
+                    $info->save();
+                }
+                $this->sendModelInfo('class_num', $receivers, $title, $content, $info);
                 break;
             case 3://专业
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $this->sendModelInfo('major',$receivers,$title,$content,$info);
+                if ($request->hasFile('file')){
+                    $path = Storage::disk('upyun')->putFileAs('info/major',$file,"$teacher->userid".'_'.$info->id.'.'.$ext,'public');
+                    if (!$path){
+                        return response()->json(['status' => 402,'msg' => '文件上传失败']);
+                    }
+                    $url = Storage::disk('upyun')->url($path);
+                    $info->attach_url = $url;
+                    $info->save();
+                }
+                $this->sendModelInfo('major', $receivers, $title, $content, $info);
                 break;
             case 4://特定学生
-                $teacher = Account::where('userid',$userid)->first();
+                $teacher = Account::where('userid', $userid)->first();
                 $receivers = explode(' ', $receivers);//将发送者分离
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
+                if ($request->hasFile('file')){
+                    $path = Storage::disk('upyun')->putFileAs('info/student',$file,"$teacher->userid".'_'.$info->id.'.'.$ext,'public');
+                    if (!$path){
+                        return response()->json(['status' => 462,'msg' => '文件上传失败']);
+                    }
+                    $url = Storage::disk('upyun')->url($path);
+                    $info->attach_url = $url;
+                    $info->save();
+                }
                 foreach ($receivers as $receiver) {
                     $wechat = new WeChatController();
                     $access_token = $wechat->getAccessToken();
-                    $student = Student::where('userid',$receiver)->first();
-                    if (!$student){
-                        return Response::json(['status' => 404,'msg' => "$receiver"." 不存在"]);
+                    $student = Student::where('userid', $receiver)->first();
+                    if (!$student) {
+                        return Response::json(['status' => 404, 'msg' => "$receiver" . " 不存在"]);
                     }
                     $openid = $student->openid;
                     $ch = curl_init();//发送微信模板消息
@@ -145,10 +185,11 @@ class TeacherInfoContentController extends Controller
                                 'value' => date('Y-m-d H:i:s')
                             ],
                             'keyword4' => [
-                                'value' => $content
+                                'value' => $content,
+                                'color' => '#FF0000'
                             ],
                             'remark' => [
-                                'value' => '请点击进入消息详情页查看详情'
+                                'value' => '点击查看详情'
                             ]
                         ]
                     ];
@@ -161,15 +202,14 @@ class TeacherInfoContentController extends Controller
                             'Content-Length: ' . strlen($jsonData))
                     );
                     curl_exec($ch);
-                    Info_Feedback::create(['student_id' => $student->id,'info_content_id' => $info->id]);
+                    Info_Feedback::create(['student_id' => $student->id, 'info_content_id' => $info->id]);
                 }
                 break;
         }
-
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
     }
 
-    public function getInfoContent(){
+    public function getInfoContent(){//查看最近一个月通知内容
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
         $data = $teacher->info_contents()
@@ -179,7 +219,7 @@ class TeacherInfoContentController extends Controller
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
 
-    public function getFeedback($id){
+    public function getFeedback($id){//查看学生反馈情况
         //$userid = Cache::get($_COOKIE['userid']);
         $content = Info_Content::find($id);
         if (!$content){
