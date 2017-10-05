@@ -91,7 +91,7 @@ class TeacherInfoController extends Controller
         }
         if ($request->hasFile('file')){
             $ext = $file->getClientOriginalExtension();
-            if ($ext!='pdf'&&$ext!='doc'&&$ext!='docx'&&$ext!='PDF'&&$ext!='DOC'&&$ext!='DOCX'&&$ext!='rar'&&ext!='zip'&&ext!='RAR'&&$ext!='ZIP'){
+            if ($ext!='pdf'&&$ext!='doc'&&$ext!='docx'&&$ext!='PDF'&&$ext!='DOC'&&$ext!='DOCX'&&$ext!='rar'&&$ext!='zip'&&$ext!='RAR'&&$ext!='ZIP'){
                 return response()->json(['status' => 402,'msg' => 'wrong file format']);
             }
         }
@@ -161,7 +161,7 @@ class TeacherInfoController extends Controller
                     $access_token = $wechat->getAccessToken();
                     $student = Student::where('userid', $receiver)->first();
                     if (!$student) {
-                        return Response::json(['status' => 404, 'msg' => "$receiver" . " 不存在"]);
+                        return Response::json(['status' => 404, 'msg' => '学生'."$receiver" . "不存在"]);
                     }
                     $openid = $student->openid;
                     $ch = curl_init();//发送微信模板消息

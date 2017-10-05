@@ -9,8 +9,8 @@
     </style>
 </head>
 <body>
-<h1>{{$name}}，您好</h1>
+<h2>{{$name}}，您好</h2>
 <p>此邮件由通知系统自动发出</p>
-<p>点击下载附件: {{$fileUrl}}</p>
+<p>点击查看或下载附件: {{$fileUrl}}</p>
 </body>
 </html>
