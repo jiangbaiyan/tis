@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 
 class WeChatController extends LoginAndAccount\Controller
 {
@@ -33,7 +34,20 @@ class WeChatController extends LoginAndAccount\Controller
         $teacher = $request->input('teacher');
         $phone = $request->input('phone');
         $email = $request->input('email');
-        $this->validate($request,[
+        /*$this->validate($request,[
+            'phone' => 'required|numeric',
+            'email' => 'required|email'
+        ],[
+            'required' => ':attribute不能为空',
+            'numeric' => ':attribute格式不正确',
+            'email' => ':attribute格式不正确'
+        ],[
+            'phone' => '联系电话',
+            'email' => '邮箱'
+        ]);*/
+
+        //表单数据持久化
+        $validator = Validator::make($request->all(),[
             'phone' => 'required|numeric',
             'email' => 'required|email'
         ],[
@@ -44,6 +58,9 @@ class WeChatController extends LoginAndAccount\Controller
             'phone' => '联系电话',
             'email' => '邮箱'
         ]);
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
         Session::put('teacher',$teacher);
         Session::put('phone',$phone);
         Session::put('email',$email);
