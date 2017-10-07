@@ -165,6 +165,7 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Yangyifan\Upload\UploadServiceProvider::class,
+        //Unoconv\UnoconvServiceProvider::class,
         /*
          * Package Service Providers...
          */

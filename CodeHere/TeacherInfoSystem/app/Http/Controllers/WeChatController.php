@@ -32,8 +32,8 @@ class WeChatController extends LoginAndAccount\Controller
 
     public function submit(Request $request){//表单验证
         $teacher = $request->input('teacher');
-        $phone = $request->input('phone');
-        $email = $request->input('email');
+        $phone = trim($request->input('phone'));
+        $email = trim($request->input('email'));
         /*$this->validate($request,[
             'phone' => 'required|numeric',
             'email' => 'required|email'

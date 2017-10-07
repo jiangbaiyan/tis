@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Unoconv\Unoconv;
 
 class TeacherInfoController extends Controller
 {
@@ -77,7 +78,7 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major]]);
     }
 
-    public function send(Request $request){//教师创建模板消息，并针对不同群体发送不同的微信模板消息
+    public function send(Request $request){//教师创建一条通知并携带附件，针对不同群体发送不同的微信模板消息
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid', $userid)->first();
         $data = $request->all();
@@ -91,8 +92,17 @@ class TeacherInfoController extends Controller
         }
         if ($request->hasFile('file')){
             $ext = $file->getClientOriginalExtension();
+            $nameArray = explode('.',$file->getClientOriginalName());//取出不带后缀的文件名
+            $name = $nameArray[0];
             if ($ext!='pdf'&&$ext!='doc'&&$ext!='docx'&&$ext!='PDF'&&$ext!='DOC'&&$ext!='DOCX'&&$ext!='rar'&&$ext!='zip'&&$ext!='RAR'&&$ext!='ZIP'){
                 return response()->json(['status' => 402,'msg' => 'wrong file format']);
+            }
+            if ($ext == 'doc'||$ext =='docx'||$ext =='DOC'||$ext == 'DOCX'){
+                $unoconv = Unoconv::create([//如果是word文件格式，那么转码成pdf格式，这里利用了unoconv转码库
+                    'timeout'          => 42,
+                    'unoconv.binaries' => '/usr/bin/unoconv',
+                ]);
+                $unoconv->transcode($file,'pdf',$file);
             }
         }
         switch ($type) {
@@ -101,7 +111,7 @@ class TeacherInfoController extends Controller
                 $info->account_id = $userid;
                 $info->save();
                 if ($request->hasFile('file')){
-                    $path = Storage::disk('upyun')->putFileAs('info/grade',$file,"$teacher->userid".'_'.$info->id.'.'.$ext,'public');
+                    $path = Storage::disk('upyun')->putFileAs('info/grade',$file,"$name".'.pdf','public');
                     if (!$path){
                         return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                     }
@@ -116,7 +126,7 @@ class TeacherInfoController extends Controller
                 $info->account_id = $userid;
                 $info->save();
                 if ($request->hasFile('file')){
-                    $path = Storage::disk('upyun')->putFileAs('info/class',$file,"$teacher->userid".'_'.$info->id.'.'.$ext,'public');
+                    $path = Storage::disk('upyun')->putFileAs('info/class',$file,"$name".'.pdf','public');
                     if (!$path){
                         return response()->json(['status' => 402,'msg' => '文件上传失败']);
                     }
@@ -131,7 +141,7 @@ class TeacherInfoController extends Controller
                 $info->account_id = $userid;
                 $info->save();
                 if ($request->hasFile('file')){
-                    $path = Storage::disk('upyun')->putFileAs('info/major',$file,"$teacher->userid".'_'.$info->id.'.'.$ext,'public');
+                    $path = Storage::disk('upyun')->putFileAs('info/major',$file,"$name".'.pdf','public');
                     if (!$path){
                         return response()->json(['status' => 402,'msg' => '文件上传失败']);
                     }
@@ -148,7 +158,7 @@ class TeacherInfoController extends Controller
                 $info->account_id = $userid;
                 $info->save();
                 if ($request->hasFile('file')){
-                    $path = Storage::disk('upyun')->putFileAs('info/student',$file,"$teacher->userid".'_'.$info->id.'.'.$ext,'public');
+                    $path = Storage::disk('upyun')->putFileAs('info/student',$file,"$name".'.pdf','public');
                     if (!$path){
                         return response()->json(['status' => 462,'msg' => '文件上传失败']);
                     }
