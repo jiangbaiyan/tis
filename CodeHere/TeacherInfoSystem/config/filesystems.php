@@ -66,7 +66,7 @@ return [
 
         'upyun' => [
             'driver'        => 'upyun',
-            'domain'        => 'cbs-service.b0.aicdn.com',//你的upyun域名
+            'domain'        => 'http://cloudfiles.cloudshm.com/',//你的upyun域名
             'username'      => 'baiyan',//UserName
             'password'      => 'qlc_2017-#*m',//Password
             'bucket'        => 'cbs-service',//Bucket名字

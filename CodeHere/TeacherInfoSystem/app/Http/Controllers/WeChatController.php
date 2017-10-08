@@ -18,7 +18,7 @@ class WeChatController extends LoginAndAccount\Controller
     }
 
     public function getAccessToken(){
-        $ch = curl_init();//第一个curl获取access_token
+        $ch = curl_init();
         curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$this->appid&secret=$this->secret");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HEADER, 0);

@@ -54,6 +54,9 @@
             left: 50%;
             margin-left: -50px;
         }
+        input{
+            margin-top: 7px;
+        }
     </style>
     <script type="text/javascript">
 
@@ -62,7 +65,6 @@
 <body>
 <div class="content">
     <form action="https://tis.cloudshm.com/submit" method="post" name="form">
-
         <label for="phone" class="bold">请输入你的联系电话：</label><br><input type="text" name="phone" id="phone" value="{{old('phone')}}"><br><br>
         <label for="email" class="bold">请输入你的邮箱：</label><br><input type="text" name="email" id="email" value="{{old('email')}}"><br><br>
         <p class="bold">请选择你的辅导员：</p>

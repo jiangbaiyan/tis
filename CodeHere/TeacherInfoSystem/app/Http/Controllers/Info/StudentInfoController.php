@@ -50,8 +50,8 @@ class StudentInfoController extends Controller
             return Response::json(['status' => 404,'msg' => '请先绑定您的邮箱信息']);
         }
         $info = Info_Content::find($id);
-        $fileUrl = $info->attach_url;
-        Mail::send('email',['name' => $name,'fileUrl' => $fileUrl],function ($message) use ($email){
+        $fileUrls = explode(',',$info->attach_url);
+        Mail::send('email',['name' => $name,'fileUrls' => $fileUrls],function ($message) use ($email){
             $message->to($email)->subject('学院通知');
         });
         if (count(Mail::failures())>0){
