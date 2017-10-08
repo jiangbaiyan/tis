@@ -17,7 +17,7 @@ use Unoconv\Unoconv;
 class TeacherInfoController extends Controller
 {
     private $access_token = '';
-    private $url = 'http://cloudfiles.cloudshm.com/';//又拍云存储地址
+    private $url = 'https://cloudfiles.cloudshm.com/';//又拍云存储地址
     private $allowedFormat = ['doc','docx','pdf','DOC','DOCX','PDF'];//允许上传的文件格式
 
     public function sendModelInfo($type,$receivers,$title,$content,$info){//公用发送模板消息方法(年级、班级、专业)

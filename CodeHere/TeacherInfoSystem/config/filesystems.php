@@ -66,13 +66,13 @@ return [
 
         'upyun' => [
             'driver'        => 'upyun',
-            'domain'        => 'http://cloudfiles.cloudshm.com/',//你的upyun域名
+            'domain'        => 'https://cloudfiles.cloudshm.com/',//你的upyun域名
             'username'      => 'baiyan',//UserName
             'password'      => 'qlc_2017-#*m',//Password
             'bucket'        => 'cbs-service',//Bucket名字
             'timeout'       => 130,//超时时间
             'endpoint'      => null,//线路
-            'transport'     => 'http',//如果支持https，请填写https，如果不支持请填写http
+            'transport'     => 'https',//如果支持https，请填写https，如果不支持请填写http
         ],
 
     ],
