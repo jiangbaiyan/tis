@@ -25,7 +25,6 @@ class TeacherInfoController extends Controller
         $teacher = Account::where('userid',$userid)->first();
         $receivers = explode(' ', $receivers);//将发送对象分离
         foreach ($receivers as $receiver){//传递过来如果类似2015 2016这样
-//获取access_token
             $students = Student::where("$type",$receiver)->get();
             foreach($students as $student){//遍历该年级/班级/专业的所有学生
                 $openid = $student->openid;
@@ -133,7 +132,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('grade', $receivers, $title, $content, $info);
+                $this->sendModelInfo('grade', $receivers, $title, $content, $info);//调用发送模板消息方法
                 break;
             case 2://班级
                 $info = Info_Content::create($data);
@@ -171,7 +170,7 @@ class TeacherInfoController extends Controller
                         if (!$path){
                             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                         }
-                        $url = $this->url."$path";
+                        $url = $this->url."$path";//将路径写入数据库
                         if (!$info->attach_url){
                             $info->attach_url = $url;
                         }
@@ -258,7 +257,7 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
     }
 
-    public function getInfoContent(){//查看最近一个月通知内容
+    public function getInfoContent(){//教师查看最近一个月通知内容
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
         $data = $teacher->info_contents()
@@ -268,7 +267,7 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
 
-    public function getFeedback($id){//查看学生反馈情况
+    public function getFeedback($id){//教师查看学生反馈情况
         //$userid = Cache::get($_COOKIE['userid']);
         $content = Info_Content::find($id);
         if (!$content){
