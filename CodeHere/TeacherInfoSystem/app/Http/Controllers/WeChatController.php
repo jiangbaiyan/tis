@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Validator;
 class WeChatController extends LoginAndAccount\Controller
 {
 
-    private $appid = 'wx8dea8299c5f828a0';
-    private $secret = '72d9d3202bb9fff24e9376ab03218f77';
+    private $appid = 'wxbbd0b9b15ff23c86';
+    private $secret = 'd4a807b95572208e2a6b761e79c22ee4';
 
     public function serve(){
         //微信消息处理

@@ -13,8 +13,6 @@ use App\Http\Controllers\WeChatController;
 
 class DailyLeaveController extends Controller
 {
-    private $appid = 'wx8dea8299c5f828a0';
-    private $secret = '72d9d3202bb9fff24e9376ab03218f77';
 
 //-------------------------学生端--------------------------------------
     public function studentCreate(Request $request){//创建请假信息

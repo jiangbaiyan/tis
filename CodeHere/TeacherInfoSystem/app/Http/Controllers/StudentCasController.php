@@ -28,7 +28,7 @@ class StudentCasController extends LoginAndAccount\Controller
         $loginServer = "http://cas.hdu.edu.cn/cas/login";
         //CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
-        $Rurl = "https://cbsjs.hdu.edu.cn/qingjia_mobile";
+        //$Rurl = "https://cbsjs.hdu.edu.cn/qingjia_mobile";
         //如果已经认证完毕且token也匹配，那么直接跳到系统首页
 
 
@@ -117,7 +117,7 @@ class StudentCasController extends LoginAndAccount\Controller
                     }
                     if ($unit!="网络空间安全学院、浙江保密学院" || $idtype != '1'){
                         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                        die('您不是网络空间安全学院的学生，无请假权限');
+                        die('您不是网络空间安全学院的学生，无操作权限！');
                     }
                     fuck:
                     if (substr($classid,4,2) == '24'){
@@ -131,30 +131,28 @@ class StudentCasController extends LoginAndAccount\Controller
                     }
                     setcookie('openid',$openid, time()+15552000);
                     $student = Student::where('userid',$userid)->first();
-                    if ($student){
+                    if ($student){//如果学生已经绑定过信息，那么更新记录
                         $student->update(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'phone' => $phone,'email' => $email,'account_id' => $account_id,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
                         $student->save();
                         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                        die('操作成功！');
+                        die('信息绑定成功！');
                     }
-                    if (!$student){
+                    if (!$student){//如果学生没有绑定信息，那么创建一条新记录
                         $student = Student::create(['userid' => $userid,'name' => $username,'sex' => $sex,'openid' => $openid,'unit' => $unit,'major' => $major,'phone' => $phone,'email' => $email,'account_id' => $account_id,'class_num' => $classid,'class' => substr($classid,-1),'grade' => '20'.substr($classid,0,2)]);
                         //header("<meta charset=\"utf-8\">");
                         if (!$student){
                             echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                            die('信息写入失败！');
+                            die('信息绑定失败！');
                         }
-                        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                        die('操作成功！');
                     }
 
                     //************************
 
-                    header("Location: " . $Rurl);
+                    //header("Location: " . $Rurl);
 
                     //header("Location: http://cas.hdu.edu.cn/cas/logout");
                     //echo $Rurl;
-                    exit();
+                    //exit();
                 } else {
                     //重定向浏览器
                     header("Location: " . $loginServer . "?service=" . $thisURL);
