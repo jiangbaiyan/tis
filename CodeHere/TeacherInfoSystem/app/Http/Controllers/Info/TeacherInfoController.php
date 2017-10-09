@@ -32,7 +32,7 @@ class TeacherInfoController extends Controller
                 curl_setopt($ch, CURLOPT_URL, "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");
                 $post_data = [
                     'touser' => $openid,
-                    'template_id' => 'Yzfda7EeYtSVEgfACpzrgcANQVtvyjUSs9VqdW5cunU',
+                    'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
                     'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
                     'data' => [
                         'first' => [
@@ -216,7 +216,7 @@ class TeacherInfoController extends Controller
                     curl_setopt($ch, CURLOPT_URL, "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");
                     $post_data = [
                         'touser' => $openid,
-                        'template_id' => 'Yzfda7EeYtSVEgfACpzrgcANQVtvyjUSs9VqdW5cunU',
+                        'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
                         'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
                         'data' => [
                             'first' => [
@@ -260,6 +260,9 @@ class TeacherInfoController extends Controller
     public function getInfoContent(){//教师查看最近一个月通知内容
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
+        if (!$teacher->info_level){
+            return Response::json(['status' => 500,'msg' => '您无权访问此模块，请联系管理员获取权限']);
+        }
         $data = $teacher->info_contents()
             ->where('created_at','>',date('Y-m-d H:i:s',time()-2592000))
             ->orderByDesc('created_at')

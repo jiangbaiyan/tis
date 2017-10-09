@@ -81,7 +81,7 @@ class DailyLeaveController extends Controller
         curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token");
         $post_data = [
             'touser' => $openid,
-            'template_id' => 'dO7-mMJPBJzG4O3ibkvNNK8jS3ebQ64nNQZtiZnFRsE',
+            'template_id' => 'dO7-Nm1LRjfvdeB_c9MAhM4fQOXl-r8YSXzI_U63t2DQCXM',
             'data' => [
                 'first' => [
                     'value' => '您的日常请假申请审核'.$is_pass,
@@ -121,12 +121,12 @@ class DailyLeaveController extends Controller
 
     public function getNotVerifiedLeaves(){//获取未审核的请假信息
         $userid = Cache::get($_COOKIE['userid']);
-        $user = Account::where('userid',$userid)->first();
-        if (!$user){
+        $teacher = Account::where('userid',$userid)->first();
+        if (!$teacher){
             return Response::json(['status' => 404,'msg' => 'user not exists']);
         }
-        if (!$user->leave_level){//如果不是超级管理员
-            return Response::json(['status' => 500,'msg' => '您无权操作此模块']);
+        if (!$teacher->leave_level){//如果不是超级管理员
+            return Response::json(['status' => 500,'msg' => '您无权访问此模块，请联系管理员获取权限']);
         }
         $data = Daily_leave::join('students','daily_leaves.student_id','=','students.id')
             ->select('daily_leaves.*','students.userid','students.name','students.phone','students.class','students.major')
