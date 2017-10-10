@@ -144,6 +144,8 @@ class StudentCasController extends LoginAndAccount\Controller
                             echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
                             die('信息绑定失败！');
                         }
+                        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+                        die('信息绑定成功！');
                     }
 
                     //************************
