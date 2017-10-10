@@ -70,6 +70,7 @@ class DailyLeaveController extends Controller
         $account = $daily_leave->student->account_id;
         $openid = $daily_leave->student->openid;
         $name = $daily_leave->student->name;
+        $userid = $daily_leave->student->userid;
         $teacher = Account::where('userid',$account)->first();
         $result = $daily_leave->update($data);
         if (!$result){
@@ -81,14 +82,14 @@ class DailyLeaveController extends Controller
         curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token");
         $post_data = [
             'touser' => $openid,
-            'template_id' => 'dO7-Nm1LRjfvdeB_c9MAhM4fQOXl-r8YSXzI_U63t2DQCXM',
+            'template_id' => 'Nm1LRjfvdeB_c9MAhM4fQOXl-r8YSXzI_U63t2DQCXM',
             'data' => [
                 'first' => [
-                    'value' => '您的日常请假申请审核'.$is_pass,
+                    'value' => '您的请假申请审核'.$is_pass,
                     'color' => $is_pass == '通过'?'#00B642':'#FF0000'
                 ],
                 'keyword1' => [
-                    'value' => $name
+                    'value' => $userid.$name
                 ],
                 'keyword2' => [
                     'value' => "$daily_leave->begin_time"." ~ "."$daily_leave->end_time"
@@ -115,7 +116,10 @@ class DailyLeaveController extends Controller
         $result = curl_exec($ch);
         $arr = json_decode($result,true);
         if ($arr['errcode'] == 0){
-            return Response::json(['status' => 200,'msg' => 'model sent successfully']);
+            return Response::json(['status' => 200,'msg' => 'message sent successfully']);
+        }
+        else{
+            return Response::json(['status' => 402,'msg' => 'message sent failed']);
         }
     }
 

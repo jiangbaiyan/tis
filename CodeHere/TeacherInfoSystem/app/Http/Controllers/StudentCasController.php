@@ -18,10 +18,10 @@ class StudentCasController extends LoginAndAccount\Controller
                 $account_id = "40365";
                 break;
             case "卞广旭":
-                $account_id = "";
+                $account_id = "41451";
                 break;
             case "冯尉瑾":
-                $account_id = "";
+                $account_id = "41906";
                 break;
         }
 
