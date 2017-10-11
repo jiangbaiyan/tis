@@ -281,8 +281,9 @@ class TeacherInfoController extends Controller
             ->join('info_contents','info_feedbacks.info_content_id','=','info_contents.id')
             ->select('students.userid','students.name','students.phone','students.grade','students.class','students.class_num','students.major','info_feedbacks.status','info_contents.title','info_contents.content','info_contents.send_to')
             //->where('students.account_id','=',$userid)
-            ->orderByDesc('info_feedbacks.created_at')
-            ->orderByDesc('class_num')
+            ->orderBy('major')
+            ->orderBy('class')
+            //->orderByDesc('info_feedbacks.created_at')
             ->get();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }

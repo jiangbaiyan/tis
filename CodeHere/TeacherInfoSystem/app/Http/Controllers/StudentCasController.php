@@ -120,12 +120,16 @@ class StudentCasController extends LoginAndAccount\Controller
                         die('您不是网络空间安全学院的学生，无操作权限！');
                     }
                     fuck:
-                    if (substr($classid,4,2) == '24'){
+                    $classnameid = substr($classid,4,2);//如15083611中的'36'，用来判断专业
+                    if ($classnameid == '24'){
                         $major = '网络工程';
                     }
-                    else if (substr($classid,4,2) == '36'){
+                    else if ($classnameid == '36'){
                         $major = '信息安全';
                     }
+                    else if ($classnameid == '02'){
+                        $major = '信息安全（卓越工程师计划）';
+                    }//如果增加了新专业，那么在这里添加即可
                     else{
                         $major = '其他学院专业';
                     }

@@ -18,7 +18,7 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $datas = Daily_leave::join('students','daily_leaves.student_id','=','students.id')->select('students.userid','students.name','students.phone','students.class','students.class_num','daily_leaves.begin_time','daily_leaves.end_time','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time')->where('students.account_id',$userid)->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-2592000))->orderByDesc('class_num')->orderByDesc('daily_leaves.begin_time')->get();
+        $datas = Daily_leave::join('students','daily_leaves.student_id','=','students.id')->select('students.userid','students.name','students.phone','students.class','daily_leaves.leave_reason','daily_leaves.begin_time','daily_leaves.end_time','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time')->where('students.account_id',$userid)->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-2592000))->orderByDesc('class_num')->orderByDesc('daily_leaves.begin_time')->get();
         foreach($datas as $data){
             if ($data->is_leave == 1){
                 $data->is_leave = '是';
@@ -26,24 +26,28 @@ class ExcelController extends Controller
             else{
                 $data->is_leave = '否';
             }
-            if (substr($data->class_num,4,2) == '24'){
+            $classnameid = substr($data->class_num,4,2);
+            if ($classnameid == '24'){
                 $data->class = '网络工程'.$data->class.'班';
             }
-            if (substr($data->class_num,4,2) == '36'){
+            if ($classnameid == '36'){
                 $data->class = '信息安全'.$data->class.'班';
+            }
+            if ($classnameid == '02'){
+                $data->class = '信息安全（卓越工程师计划）';
             }
         }
         if ($account->leave_level){
             Excel::create('daily_leave',function ($excel) use ($datas){
                 $excel->sheet('daily_leave',function ($sheet) use ($datas){
                     $sheet->fromModel($datas,null,'A1',true,false);
-                    $sheet->prependRow(1,['学号','姓名','手机号','班级','班号','专业','开始时间','结束时间','是否离杭','去往何处','销假时间']);
+                    $sheet->prependRow(1,['学号','姓名','手机号','班级','请假原因','开始时间','结束时间','是否离杭','去往何处','销假时间']);
                     $sheet->setWidth(array(
                         'A'     =>  20,
                         'B'     =>  20,
                         'C'     =>  20,
                         'D'     =>  20,
-                        'E'     =>  20,
+                        'E'     =>  30,
                         'F'     =>  20,
                         'G'     =>  20,
                         'H'     =>  20,
@@ -86,12 +90,12 @@ class ExcelController extends Controller
         }
         $leaveInfo = Leave_info::where('userid',$userid)->orderByDesc('updated_at')->first();
         if (!$leaveInfo){
-            return Response::json(['status' => 200,'msg' => 'no model','data' => []]);
+            return Response::json(['status' => 404,'msg' => 'no leave data']);
         }
         $datas = $leaveInfo->holiday_leaves()
             ->join('leave_infos','leave_infos.id','=','holiday_leaves.leave_info_id')
             ->join('students','holiday_leaves.student_id','=','students.id')
-            ->select('students.userid','students.name','students.phone','students.class','students.class_num','holiday_leaves.begin_time','holiday_leaves.end_time','holiday_leaves.is_leave','holiday_leaves.where','holiday_leaves.cancel_time')
+            ->select('students.userid','students.name','students.phone','students.class','holiday_leaves.begin_time','holiday_leaves.end_time','holiday_leaves.is_leave','holiday_leaves.where','holiday_leaves.cancel_time')
             ->orderByDesc('holiday_leaves.updated_at')
             ->get();
         foreach($datas as $data){
@@ -101,18 +105,22 @@ class ExcelController extends Controller
             else{
                 $data->is_leave = '否';
             }
-            if (substr($data->class_num,4,2) == '24'){
+            $classnameid = substr($data->class_num,4,2);
+            if ($classnameid == '24'){
                 $data->class = '网络工程'.$data->class.'班';
             }
-            if (substr($data->class_num,4,2) == '36'){
+            if ($classnameid == '36'){
                 $data->class = '信息安全'.$data->class.'班';
+            }
+            if ($classnameid == '02'){
+                $data->class = '信息安全（卓越工程师计划）';
             }
         }
         if ($account->leave_level){
             Excel::create('holiday_leave',function ($excel) use ($datas){
                 $excel->sheet('holiday_leave',function ($sheet) use ($datas){
                     $sheet->fromModel($datas,null,'A1',true,false);
-                    $sheet->prependRow(1,['学号','姓名','手机号','班级','班号','开始时间','结束时间','是否离杭','去往何处','销假时间']);
+                    $sheet->prependRow(1,['学号','姓名','手机号','班级','开始时间','结束时间','是否离杭','去往何处','销假时间']);
                     $sheet->setWidth(array(
                         'A'     =>  20,
                         'B'     =>  20,
