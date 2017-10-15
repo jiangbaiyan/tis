@@ -17,7 +17,7 @@ class StudentCheckLogin
      */
     public function handle($request, Closure $next)
     {
-        //$_COOKIE['openid'] = 'oen4B0neDpxBlbG6l3d4VNktMKZE';
+        //$_COOKIE['openid'] = 'oTkqI0XMZFPldSWRrKvnOUpLYN9o';
         if (!isset($_COOKIE['openid'])){//如果cookie没有openid
             return Response::json(['status' => 401,'msg' => 'cookie openid not found']);
         }

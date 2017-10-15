@@ -23,10 +23,10 @@ class TeacherInfoController extends Controller
     public function sendModelInfo($type,$receivers,$title,$content,$info){//公用发送模板消息方法(年级、班级、专业)
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
-        $receivers = explode(' ', $receivers);//将发送对象分离
-        foreach ($receivers as $receiver){//传递过来如果类似2015 2016这样
-            $students = Student::where("$type",$receiver)->get();
-            foreach($students as $student){//遍历该年级/班级/专业的所有学生
+        if ($type == 'all'){//如果给全体学生发信息
+            //$students = Student::all();
+            $students = Student::where('id','<','3')->get();
+            foreach ($students as $student){
                 $openid = $student->openid;
                 $ch = curl_init();//给这些学生发送微信模板消息
                 curl_setopt($ch, CURLOPT_URL, "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");
@@ -69,12 +69,60 @@ class TeacherInfoController extends Controller
                 Info_Feedback::create(['student_id' => $student->id,'info_content_id' => $info->id]);
             }
         }
+
+        else{
+            $receivers = explode(' ', $receivers);
+            foreach ($receivers as $receiver){//传递过来如果类似2015 2016这样
+                $students = Student::where("$type",$receiver)->get();
+                foreach($students as $student){//遍历该年级/班级/专业的所有学生
+                    $openid = $student->openid;
+                    $ch = curl_init();//给这些学生发送微信模板消息
+                    curl_setopt($ch, CURLOPT_URL, "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");
+                    $post_data = [
+                        'touser' => $openid,
+                        'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
+                        'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
+                        'data' => [
+                            'first' => [
+                                'value' => "$title",
+                                'color' => '#FF0000'
+                            ],
+                            'keyword1' => [
+                                'value' => '杭州电子科技大学网络空间安全学院'
+                            ],
+                            'keyword2' => [
+                                'value' => $teacher->name
+                            ],
+                            'keyword3' => [
+                                'value' => date('Y-m-d H:i:s')
+                            ],
+                            'keyword4' => [
+                                'value' => $content,
+                                'color' => '#FF0000'
+                            ],
+                            'remark' => [
+                                'value' => '点击查看详情'
+                            ]
+                        ]
+                    ];
+                    $jsonData = json_encode($post_data);
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'Content-Type: application/json',
+                            'Content-Length: ' . strlen($jsonData))
+                    );
+                    curl_exec($ch);
+                    Info_Feedback::create(['student_id' => $student->id,'info_content_id' => $info->id]);
+                }
+            }
+        }
     }
 
     public function getStudentInfo(){//教师获取所能管理学生的信息
         $userid = Cache::get($_COOKIE['userid']);
-        $teacher = Account::where('userid',$userid)->first();
-        $data = $teacher->students()->get();
+        $data = Student::all();
         $grade = $data->groupBy('grade');
         $class = $data->groupBy('class_num');
         $major = $data->groupBy('major');
@@ -253,6 +301,29 @@ class TeacherInfoController extends Controller
                     Info_Feedback::create(['student_id' => $student->id, 'info_content_id' => $info->id]);
                 }
                 break;
+            case 5: //发给全体学生
+                $info = Info_Content::create($data);
+                $info->account_id = $userid;
+                $info->save();
+                if ($request->hasFile('file')){
+                    foreach ($files as $file){
+                        $nameArray = explode('.',$file->getClientOriginalName());
+                        $name = $nameArray[0];//取出不带后缀的文件名
+                        $path = Storage::disk('upyun')->putFileAs('info/grade',$file,"$name".'.pdf','public');
+                        if (!$path){
+                            return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
+                        }
+                        $url = $this->url."$path";
+                        if (!$info->attach_url){
+                            $info->attach_url = $url;
+                        }
+                        else{
+                            $info->attach_url .= ','.$url;
+                        }
+                        $info->save();
+                    }
+                }
+                $this->sendModelInfo('all', $receivers, $title, $content, $info);//调用发送模板消息方法
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
     }
@@ -263,9 +334,10 @@ class TeacherInfoController extends Controller
         if (!$teacher->info_level){
             return Response::json(['status' => 500,'msg' => '您无权访问此模块，请联系管理员获取权限']);
         }
-        $data = $teacher->info_contents()
-            ->where('created_at','>',date('Y-m-d H:i:s',time()-2592000))
-            ->orderByDesc('created_at')
+        $data = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
+            ->select('info_contents.*','accounts.name')
+            ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+            ->orderByDesc('info_contents.created_at')
             ->get();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }

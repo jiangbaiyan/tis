@@ -186,3 +186,15 @@ Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
         });
     });
 });
+
+//教师工作手册
+Route::group(['prefix' => 'api','namespace' => 'WorkBook'],function (){//教师端
+    Route::group(['middleware'=>'EnableCrossRequest'],function (){
+        Route::group(['prefix' => 'v1.0'],function (){
+            //教师端
+            //Route::group(['middleware'=>'CheckLogin'],function (){
+                    Route::post('write','WorkBookController@write');
+            //});
+        });
+    });
+});

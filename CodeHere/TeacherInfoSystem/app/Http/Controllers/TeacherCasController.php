@@ -119,7 +119,7 @@ class TeacherCasController extends LoginAndAccount\Controller
                     $token = Hash::make($userid.date(DATE_W3C));
                     setcookie('token',$token, time()+604800);
                     Redis::set($userid,$token);
-                    Redis::expire($userid,100000);
+                    Redis::expire($userid,604800);
 
                     header("Location: " . $Rurl);
 

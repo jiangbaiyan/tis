@@ -92,7 +92,8 @@ class DailyLeaveController extends Controller
                     'value' => $userid.$name
                 ],
                 'keyword2' => [
-                    'value' => "$daily_leave->begin_time"." ~ "."$daily_leave->end_time"
+                    'value' => $daily_leave->begin_time ."第$daily_leave->begin_course".'节课'.' ~ '."$daily_leave->end_time"
+ ."第$daily_leave->end_course".'节课'
                 ],
                 'keyword3' => [
                     'value' => $is_pass == '通过' ? '审批通过' :'审批不通过'
@@ -145,7 +146,7 @@ class DailyLeaveController extends Controller
     public function teacherGet(){
         $userid = Cache::get($_COOKIE['userid']);
         $datas = Daily_leave::join('students','daily_leaves.student_id','=','students.id')
-            ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','daily_leaves.begin_time','daily_leaves.end_time','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time')
+            ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','daily_leaves.begin_time','daily_leaves.begin_course','daily_leaves.end_time','daily_leaves.end_course','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time')
             ->where('students.account_id',$userid)
             ->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-2592000))
             ->orderByDesc('class_num')

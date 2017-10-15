@@ -13,10 +13,6 @@ class WeChatController extends LoginAndAccount\Controller
     private $appid = 'wxbbd0b9b15ff23c86';
     private $secret = 'd4a807b95572208e2a6b761e79c22ee4';
 
-    public function serve(){
-        //微信消息处理
-    }
-
     public function getAccessToken(){
         $ch = curl_init();
         curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$this->appid&secret=$this->secret");
