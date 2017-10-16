@@ -164,19 +164,19 @@ class ExcelController extends Controller
 
 
     public function studentExport(){
-        $datas = Student::select('userid','name','sex','phone','grade','major','class','class_num','account_id')->get();
+        $datas = Student::select('userid','name','sex','phone','grade','class','class_num','account_id')->orderBy('userid')->get();
         foreach($datas as $data){
             $classnameid = substr($data->class_num,4,2);
             $teacher = $data->account_id;
             switch ($teacher){
-                case "苏晶":
-                    $account_id = "40365";
+                case "40365":
+                    $data->account_id = "苏晶";
                     break;
-                case "卞广旭":
-                    $account_id = "41451";
+                case "41451":
+                    $data->account_id = "卞广旭";
                     break;
-                case "冯尉瑾":
-                    $account_id = "41906";
+                case "41906":
+                    $data->account_id = "冯尉瑾";
                     break;
             }
             if ($classnameid == '24'){
@@ -192,17 +192,16 @@ class ExcelController extends Controller
             Excel::create('students',function ($excel) use ($datas){
                 $excel->sheet('students',function ($sheet) use ($datas){
                     $sheet->fromModel($datas,null,'A1',true,false);
-                    $sheet->prependRow(1,['学号','姓名','性别','手机号','年级','专业','班级','班号','所属辅导员']);
+                    $sheet->prependRow(1,['学号','姓名','性别','手机号','年级','班级','班号','所属辅导员']);
                     $sheet->setWidth(array(
                         'A'     =>  20,
                         'B'     =>  20,
                         'C'     =>  20,
                         'D'     =>  30,
                         'E'     =>  20,
-                        'F'     =>  20,
+                        'F'     =>  30,
                         'G'     =>  30,
                         'H'     =>  30,
-                        'I'     =>  20,
                     ));
                     $sheet->cells('A1:Z650', function($cells) {
                         $cells->setAlignment('center');

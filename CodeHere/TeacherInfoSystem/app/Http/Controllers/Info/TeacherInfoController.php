@@ -331,9 +331,6 @@ class TeacherInfoController extends Controller
     public function getInfoContent(){//教师查看最近一个月通知内容
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
-        if (!$teacher->info_level){
-            return Response::json(['status' => 500,'msg' => '您无权访问此模块，请联系管理员获取权限']);
-        }
         $data = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
             ->select('info_contents.*','accounts.name')
             ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
@@ -353,8 +350,7 @@ class TeacherInfoController extends Controller
             ->join('info_contents','info_feedbacks.info_content_id','=','info_contents.id')
             ->select('students.userid','students.name','students.phone','students.grade','students.class','students.class_num','students.major','info_feedbacks.status','info_contents.title','info_contents.content','info_contents.send_to')
             //->where('students.account_id','=',$userid)
-            ->orderBy('major')
-            ->orderBy('class')
+            ->orderBy('userid')
             //->orderByDesc('info_feedbacks.created_at')
             ->get();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);

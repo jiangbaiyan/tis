@@ -45,9 +45,6 @@ class AccountController extends Controller
     public function getOthersIndex(){
         $user = Cache::get($_COOKIE['userid']);
         $account = Account::where('userid',$user)->first();
-        if (!$account->account_level){
-            return response()->json(['status' => 500,'msg' => 'permission denied']);
-        }
         $accounts = Account::select('id','name')->orderBy('name','desc')->get();
         if (!$accounts){
             return response()->json(['status' => 431,'msg' => 'account not found']);
