@@ -6,6 +6,7 @@ use App\Account;
 use App\Daily_leave;
 use App\Http\Controllers\Controller;
 use App\Leave_info;
+use App\Student;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use Maatwebsite\Excel\Facades\Excel;
@@ -158,6 +159,56 @@ class ExcelController extends Controller
         else{
             return response()->json(['status' => 402,'msg' => 'Permission denied']);
         }
+        return response()->json(['status' => 200,'msg' => 'Excel exported successfully']);
+    }
+
+
+    public function studentExport(){
+        $datas = Student::select('userid','name','sex','phone','grade','major','class','class_num','account_id')->get();
+        foreach($datas as $data){
+            $classnameid = substr($data->class_num,4,2);
+            $teacher = $data->account_id;
+            switch ($teacher){
+                case "苏晶":
+                    $account_id = "40365";
+                    break;
+                case "卞广旭":
+                    $account_id = "41451";
+                    break;
+                case "冯尉瑾":
+                    $account_id = "41906";
+                    break;
+            }
+            if ($classnameid == '24'){
+                $data->class = '网络工程'.$data->class.'班';
+            }
+            if ($classnameid == '36'){
+                $data->class = '信息安全'.$data->class.'班';
+            }
+            if ($classnameid == '02'){
+                $data->class = '信息安全（卓越工程师计划）';
+            }
+        }
+            Excel::create('students',function ($excel) use ($datas){
+                $excel->sheet('students',function ($sheet) use ($datas){
+                    $sheet->fromModel($datas,null,'A1',true,false);
+                    $sheet->prependRow(1,['学号','姓名','性别','手机号','年级','专业','班级','班号','所属辅导员']);
+                    $sheet->setWidth(array(
+                        'A'     =>  20,
+                        'B'     =>  20,
+                        'C'     =>  20,
+                        'D'     =>  30,
+                        'E'     =>  20,
+                        'F'     =>  20,
+                        'G'     =>  30,
+                        'H'     =>  30,
+                        'I'     =>  20,
+                    ));
+                    $sheet->cells('A1:Z650', function($cells) {
+                        $cells->setAlignment('center');
+                    });
+                });
+            })->export('xlsx');
         return response()->json(['status' => 200,'msg' => 'Excel exported successfully']);
     }
 }

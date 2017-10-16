@@ -149,7 +149,7 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
                 Route::get('dailyleaveexport','ExcelController@dailyLeaveExport');
                 Route::get('holidayleaveexport','ExcelController@holidayLeaveExport');
             });
-
+            Route::get('studentsexport','ExcelController@studentExport');
             //学生端
             Route::group(['middleware' => 'StudentCheckLogin'],function (){
                 Route::post('createdailyleave','DailyLeaveController@studentCreate');

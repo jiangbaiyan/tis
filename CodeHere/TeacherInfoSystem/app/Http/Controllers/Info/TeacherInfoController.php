@@ -24,8 +24,8 @@ class TeacherInfoController extends Controller
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
         if ($type == 'all'){//如果给全体学生发信息
-            //$students = Student::all();
-            $students = Student::where('id','<','3')->get();
+            $students = Student::all();
+            //$students = Student::where('id','<','3')->get();
             foreach ($students as $student){
                 $openid = $student->openid;
                 $ch = curl_init();//给这些学生发送微信模板消息
@@ -70,7 +70,7 @@ class TeacherInfoController extends Controller
             }
         }
 
-        else{
+        else{//如果是给年级/班级/专业发送信息
             $receivers = explode(' ', $receivers);
             foreach ($receivers as $receiver){//传递过来如果类似2015 2016这样
                 $students = Student::where("$type",$receiver)->get();
@@ -309,7 +309,7 @@ class TeacherInfoController extends Controller
                     foreach ($files as $file){
                         $nameArray = explode('.',$file->getClientOriginalName());
                         $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/grade',$file,"$name".'.pdf','public');
+                        $path = Storage::disk('upyun')->putFileAs('info/all',$file,"$name".'.pdf','public');
                         if (!$path){
                             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                         }
