@@ -49,7 +49,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
         Route::group(['prefix' => 'science'],function (){
             Route::group(['middleware'=>'EnableCrossRequest'],function (){
                 Route::group(['middleware' => 'CheckLogin'],function () {
-                    Route::group(['middleware'=>'ScienceMiddleware'],function () {
+                    //Route::group(['middleware'=>'ScienceMiddleware'],function () {
 
                         //获取科研模块首页的个人信息
                         Route::get('scienceInfo', 'ThesisController@getScienceInfo');
@@ -131,7 +131,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
                         Route::put('activity', 'ActivityController@update');
                         Route::delete('activity', 'ActivityController@delete');
                         Route::post('activity', 'ActivityController@create');
-                    });
+                    //});
                 });
             });
         });

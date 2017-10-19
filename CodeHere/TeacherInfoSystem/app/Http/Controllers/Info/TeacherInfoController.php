@@ -20,7 +20,7 @@ class TeacherInfoController extends Controller
     private $url = 'https://cloudfiles.cloudshm.com/';//又拍云存储地址
     private $allowedFormat = ['doc','docx','pdf','DOC','DOCX','PDF'];//允许上传的文件格式
 
-    public function sendModelInfo($type,$receivers,$title,$content,$info){//公用发送模板消息方法(年级、班级、专业)
+    public function sendModelInfo($type,$receivers,$title,$content,$info){//公用发送模板消息方法(年级、班级、专业、全体学生)
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
         if ($type == 'all'){//如果给全体学生发信息
@@ -53,7 +53,8 @@ class TeacherInfoController extends Controller
                             'color' => '#FF0000'
                         ],
                         'remark' => [
-                            'value' => '点击查看详情'
+                            'value' => '点击进入通知详情页',
+                            'color' => '#00B642'
                         ]
                     ]
                 ];
@@ -101,7 +102,8 @@ class TeacherInfoController extends Controller
                                 'color' => '#FF0000'
                             ],
                             'remark' => [
-                                'value' => '点击查看详情'
+                                'value' => '点击进入通知详情页',
+                                'color' => '#00B642'
                             ]
                         ]
                     ];
@@ -285,7 +287,8 @@ class TeacherInfoController extends Controller
                                 'color' => '#FF0000'
                             ],
                             'remark' => [
-                                'value' => '点击查看详情'
+                                'value' => '点击进入通知详情页',
+                                'color' => '#00B642'
                             ]
                         ]
                     ];
