@@ -150,7 +150,7 @@ class TeacherInfoController extends Controller
                 }
                 if ($ext == 'doc'||$ext =='docx'||$ext =='DOC'||$ext == 'DOCX'){
                     $unoconv = Unoconv::create([//如果是word文件格式，那么转码成pdf格式，这里利用了unoconv转码库
-                        'timeout'          => 42,
+                        'timeout'          => 200,
                         'unoconv.binaries' => '/usr/bin/unoconv',
                     ]);
                     $unoconv->transcode($file,'pdf',$file);
