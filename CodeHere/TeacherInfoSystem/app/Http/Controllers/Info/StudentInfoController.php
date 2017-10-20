@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Info;
 use App\Info_Content;
 use App\Info_Feedback;
 use App\Student;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\LoginAndAccount\Controller;
 use Mail;
 use Illuminate\Support\Facades\Response;
 

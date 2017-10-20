@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Leave;
 
 use App\Holiday_leave;
 use App\Leave_info;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\LoginAndAccount\Controller;
 use App\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;

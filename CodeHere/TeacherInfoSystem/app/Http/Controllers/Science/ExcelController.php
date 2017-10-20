@@ -17,6 +17,7 @@ use App\Thesis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\LoginAndAccount\Controller;
 
 class ExcelController extends Controller
 {

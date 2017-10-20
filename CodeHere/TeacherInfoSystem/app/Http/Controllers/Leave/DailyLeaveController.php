@@ -6,7 +6,7 @@ use App\Account;
 use App\Daily_leave;
 use App\Student;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\LoginAndAccount\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\WeChatController;
@@ -115,6 +115,7 @@ class DailyLeaveController extends Controller
                 'Content-Length: ' . strlen($jsonData))
         );
         $result = curl_exec($ch);
+        curl_close($ch);
         $arr = json_decode($result,true);
         if ($arr['errcode'] == 0){
             return Response::json(['status' => 200,'msg' => 'message sent successfully']);

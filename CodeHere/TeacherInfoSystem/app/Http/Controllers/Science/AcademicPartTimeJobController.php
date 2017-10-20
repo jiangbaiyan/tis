@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Science;
 use App\Account;
 use App\AcademicPartTimeJob;
 use Illuminate\Http\Request;
+use App\Http\Controllers\LoginAndAccount\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 

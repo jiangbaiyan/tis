@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Account;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\LoginAndAccount\Controller;
 
 class PlatformAndTeamController extends Controller
 {

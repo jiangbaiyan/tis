@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Leave;
 
 use App\Account;
 use App\Daily_leave;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\LoginAndAccount\Controller;
 use App\Leave_info;
 use App\Student;
 use Illuminate\Support\Facades\Cache;

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Project;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\LoginAndAccount\Controller;
 
 class ProjectController extends Controller
 {

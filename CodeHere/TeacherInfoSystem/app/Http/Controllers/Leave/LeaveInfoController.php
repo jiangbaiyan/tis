@@ -7,7 +7,7 @@ use App\Leave_info;;
 use App\Student;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\LoginAndAccount\Controller;
 use Illuminate\Support\Facades\Response;
 
 class LeaveInfoController extends Controller

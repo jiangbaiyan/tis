@@ -9,7 +9,7 @@ use App\Hold_Meeting;
 use App\Join_Meeting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\LoginAndAccount\Controller;
 
 class ActivityController extends Controller
 {

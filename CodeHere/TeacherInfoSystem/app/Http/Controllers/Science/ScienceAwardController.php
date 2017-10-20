@@ -7,6 +7,7 @@ use App\ScienceAward;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\LoginAndAccount\Controller;
 
 class ScienceAwardController extends Controller
 {

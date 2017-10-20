@@ -155,7 +155,8 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
                     Route::get('holidayleaveexport', 'ExcelController@holidayLeaveExport');
                 });
             });
-            Route::get('studentsexport','ExcelController@studentExport');
+
+            Route::get('studentsexport','ExcelController@studentExport');//导出绑定信息的学生表格
 
             //学生端
             Route::group(['middleware' => 'StudentCheckLogin'],function (){
@@ -192,18 +193,6 @@ Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
                 Route::get('studentdetail/{id}','StudentInfoController@getDetail');
                 Route::get('sendemail/{id}','StudentInfoController@sendEmail');
             });
-        });
-    });
-});
-
-//教师工作手册
-Route::group(['prefix' => 'api','namespace' => 'WorkBook'],function (){//教师端
-    Route::group(['middleware'=>'EnableCrossRequest'],function (){
-        Route::group(['prefix' => 'v1.0'],function (){
-            //教师端
-            //Route::group(['middleware'=>'CheckLogin'],function (){
-            Route::post('write','WorkBookController@write');
-            //});
         });
     });
 });
