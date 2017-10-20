@@ -20,48 +20,49 @@ class TeacherInfoController extends Controller
     private $url = 'https://cloudfiles.cloudshm.com/';//又拍云存储地址
     private $allowedFormat = ['doc','docx','pdf','DOC','DOCX','PDF'];//允许上传的文件格式
 
-    public function sendModelInfo($type,$receivers,$title,$content,$info){//公用发送模板消息方法(年级、班级、专业、全体学生)
+    public function sendModelInfo($type,$receivers,$title,$content,$info){//公用发送模板消息方法
+
+        //提取循环外公用的变量
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$userid)->first();
-        if ($type == 'all'){//如果给全体学生发信息
+        $ch = curl_init("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");//初始化curl与请求地址
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $post_data = [//模板消息相关
+            'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
+            'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
+            'data' => [
+                'first' => [
+                    'value' => "$title",
+                    'color' => '#FF0000'
+                ],
+                'keyword1' => [
+                    'value' => '杭州电子科技大学网络空间安全学院'
+                ],
+                'keyword2' => [
+                    'value' => $teacher->name
+                ],
+                'keyword3' => [
+                    'value' => date('Y-m-d H:i:s')
+                ],
+                'keyword4' => [
+                    'value' => $content,
+                    'color' => '#FF0000'
+                ],
+                'remark' => [
+                    'value' => '点击进入通知详情页',
+                    'color' => '#00B642'
+                ]
+            ]
+        ];
+
+        if ($type == 'all'){//给全体学生发信息
             $students = Student::all();
-            //$students = Student::where('id','<','3')->get();
             foreach ($students as $student){
                 $openid = $student->openid;
-                $ch = curl_init();//给这些学生发送微信模板消息
-                curl_setopt($ch, CURLOPT_URL, "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");
-                $post_data = [
-                    'touser' => $openid,
-                    'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
-                    'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
-                    'data' => [
-                        'first' => [
-                            'value' => "$title",
-                            'color' => '#FF0000'
-                        ],
-                        'keyword1' => [
-                            'value' => '杭州电子科技大学网络空间安全学院'
-                        ],
-                        'keyword2' => [
-                            'value' => $teacher->name
-                        ],
-                        'keyword3' => [
-                            'value' => date('Y-m-d H:i:s')
-                        ],
-                        'keyword4' => [
-                            'value' => $content,
-                            'color' => '#FF0000'
-                        ],
-                        'remark' => [
-                            'value' => '点击进入通知详情页',
-                            'color' => '#00B642'
-                        ]
-                    ]
-                ];
-                $jsonData = json_encode($post_data);
-                curl_setopt($ch, CURLOPT_POST, 1);
+                $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
+                $jsonData = json_encode($post_data);//JSON编码。官方要求
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                         'Content-Type: application/json',
                         'Content-Length: ' . strlen($jsonData))
@@ -70,47 +71,15 @@ class TeacherInfoController extends Controller
                 Info_Feedback::create(['student_id' => $student->id,'info_content_id' => $info->id]);
             }
         }
-
-        else{//如果是给年级/班级/专业发送信息
-            $receivers = explode(' ', $receivers);
-            foreach ($receivers as $receiver){//传递过来如果类似2015 2016这样
+        else{//给年级/班级/专业/特定学生发送信息
+            $receivers = explode(' ', $receivers);//传递过来如果类似"2015 2016"这样，需要进行字符串分割
+            foreach ($receivers as $receiver){
                 $students = Student::where("$type",$receiver)->get();
                 foreach($students as $student){//遍历该年级/班级/专业的所有学生
                     $openid = $student->openid;
-                    $ch = curl_init();//给这些学生发送微信模板消息
-                    curl_setopt($ch, CURLOPT_URL, "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");
-                    $post_data = [
-                        'touser' => $openid,
-                        'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
-                        'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
-                        'data' => [
-                            'first' => [
-                                'value' => "$title",
-                                'color' => '#FF0000'
-                            ],
-                            'keyword1' => [
-                                'value' => '杭州电子科技大学网络空间安全学院'
-                            ],
-                            'keyword2' => [
-                                'value' => $teacher->name
-                            ],
-                            'keyword3' => [
-                                'value' => date('Y-m-d H:i:s')
-                            ],
-                            'keyword4' => [
-                                'value' => $content,
-                                'color' => '#FF0000'
-                            ],
-                            'remark' => [
-                                'value' => '点击进入通知详情页',
-                                'color' => '#00B642'
-                            ]
-                        ]
-                    ];
+                    $post_data['touser'] = $openid;
                     $jsonData = json_encode($post_data);
-                    curl_setopt($ch, CURLOPT_POST, 1);
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                             'Content-Type: application/json',
                             'Content-Length: ' . strlen($jsonData))
@@ -120,16 +89,9 @@ class TeacherInfoController extends Controller
                 }
             }
         }
+        curl_close($ch);
     }
 
-    public function getStudentInfo(){//教师获取所能管理学生的信息
-        $userid = Cache::get($_COOKIE['userid']);
-        $data = Student::all();
-        $grade = $data->groupBy('grade');
-        $class = $data->groupBy('class_num');
-        $major = $data->groupBy('major');
-        return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major]]);
-    }
 
     public function send(Request $request){//教师创建一条通知并携带附件，针对不同群体发送不同的微信模板消息
         $userid = Cache::get($_COOKIE['userid']);
@@ -182,7 +144,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('grade', $receivers, $title, $content, $info);//调用发送模板消息方法
+                $this->sendModelInfo('grade', $receivers, $title, $content, $info);//调用公用发送模板消息方法
                 break;
             case 2://班级
                 $info = Info_Content::create($data);
@@ -233,8 +195,13 @@ class TeacherInfoController extends Controller
                 $this->sendModelInfo('major', $receivers, $title, $content, $info);
                 break;
             case 4://特定学生
-                $teacher = Account::where('userid', $userid)->first();
-                $receivers = explode(' ', $receivers);//将发送者分离
+                $newReceivers = explode(' ', $receivers);//将发送者分离
+                foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
+                    $student = Student::where('userid', $newReceiver)->first();
+                    if (!$student) {
+                        return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "不存在"]);
+                    }
+                }
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
@@ -256,53 +223,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                foreach ($receivers as $receiver) {
-                    $student = Student::where('userid', $receiver)->first();
-                    if (!$student) {
-                        return Response::json(['status' => 404, 'msg' => '学生'."$receiver" . "不存在"]);
-                    }
-                    $openid = $student->openid;
-                    $ch = curl_init();//发送微信模板消息
-                    curl_setopt($ch, CURLOPT_URL, "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");
-                    $post_data = [
-                        'touser' => $openid,
-                        'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
-                        'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
-                        'data' => [
-                            'first' => [
-                                'value' => "$title",
-                                'color' => '#FF0000'
-                            ],
-                            'keyword1' => [
-                                'value' => '杭州电子科技大学网络空间安全学院'
-                            ],
-                            'keyword2' => [
-                                'value' => $teacher->name
-                            ],
-                            'keyword3' => [
-                                'value' => date('Y-m-d H:i:s')
-                            ],
-                            'keyword4' => [
-                                'value' => $content,
-                                'color' => '#FF0000'
-                            ],
-                            'remark' => [
-                                'value' => '点击进入通知详情页',
-                                'color' => '#00B642'
-                            ]
-                        ]
-                    ];
-                    $jsonData = json_encode($post_data);
-                    curl_setopt($ch, CURLOPT_POST, 1);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                            'Content-Type: application/json',
-                            'Content-Length: ' . strlen($jsonData))
-                    );
-                    curl_exec($ch);
-                    Info_Feedback::create(['student_id' => $student->id, 'info_content_id' => $info->id]);
-                }
+                $this->sendModelInfo('userid',$receivers,$title,$content,$info);
                 break;
             case 5: //发给全体学生
                 $info = Info_Content::create($data);
@@ -327,8 +248,18 @@ class TeacherInfoController extends Controller
                     }
                 }
                 $this->sendModelInfo('all', $receivers, $title, $content, $info);//调用发送模板消息方法
+            break;
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
+    }
+
+    public function getStudentInfo(){//教师获取所能管理学生的信息（弹出层）
+        $userid = Cache::get($_COOKIE['userid']);
+        $data = Student::all();
+        $grade = $data->groupBy('grade');
+        $class = $data->groupBy('class_num');
+        $major = $data->groupBy('major');
+        return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major]]);
     }
 
     public function getInfoContent(){//教师查看最近一个月通知内容
