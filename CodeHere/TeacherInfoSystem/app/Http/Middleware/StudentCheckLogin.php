@@ -32,9 +32,9 @@ class StudentCheckLogin
             if ($userid == '15051141' || $userid =='15075119'){//开发者跳过验证
                 goto fuck;
             }
-            if ($unit != '网络空间安全学院、浙江保密学院' || strlen($userid)!=8){
+            if ($unit != '网络空间安全学院、浙江保密学院'){
                 return Response::json(['status' => 500,'msg' => 'permission denied']);
-            }//只有网安的学生能访问系统
+            }//只有网安的学生、教师能够访问系统
             fuck:
             return $next($request);
         }

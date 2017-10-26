@@ -19,6 +19,7 @@
             /*width: 120px;*/
             height: 50px;
             margin: 90px auto 30px auto;
+            -webkit-appearance: none;
         }
         .bold{
             display: block;
@@ -58,9 +59,6 @@
             margin-top: 7px;
         }
     </style>
-    <script type="text/javascript">
-
-    </script>
 </head>
 <body>
 <div class="content">

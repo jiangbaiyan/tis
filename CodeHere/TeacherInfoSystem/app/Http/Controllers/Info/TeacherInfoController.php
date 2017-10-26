@@ -37,13 +37,13 @@ class TeacherInfoController extends Controller
                     'color' => '#FF0000'
                 ],
                 'keyword1' => [
-                    'value' => '杭州电子科技大学网络空间安全学院'
+                    'value' => '网络空间安全学院'
                 ],
                 'keyword2' => [
                     'value' => $teacher->name
                 ],
                 'keyword3' => [
-                    'value' => date('Y-m-d H:i:s')
+                    'value' => date('Y-m-d H:i')
                 ],
                 'keyword4' => [
                     'value' => $content,
@@ -120,7 +120,7 @@ class TeacherInfoController extends Controller
             }
         }
         $wechat = new WeChatController();
-        $this->access_token = $wechat->getAccessToken();//获取access_token并存储，但是调用次数有限制
+        $this->access_token = $wechat->getAccessToken();
         switch ($type) {
             case 1://年级
                 $info = Info_Content::create($data);
