@@ -1,4 +1,8 @@
 <?php
+//单元测试路由
+Route::any('test','TestController@test');
+
+
 //杭电CAS认证模块
 Route::group(['prefix' => 'api'],function (){
     Route::group(['prefix' => 'v1.0'],function (){
@@ -194,5 +198,3 @@ Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
         });
     });
 });
-
-Route::any('test','TestController@testPDF');

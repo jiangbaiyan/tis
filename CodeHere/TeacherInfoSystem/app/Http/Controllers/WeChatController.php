@@ -151,20 +151,20 @@ class WeChatController extends LoginAndAccount\Controller
     }
 
     //JS SDK签名认证逻辑
-    public function jsSDK(Request $request){
-        $access_token = $this->getAccessToken();
-        if (Cache::has('ticket')){
+    public function jsSDK(){
+        $access_token = $this->getAccessToken();//获取access_token
+        if (Cache::has('ticket')){//若缓存里有ticket，则直接从缓存获取
             $ticket = Cache::get('ticket');
         }
-        else{
+        else{//缓存里没有ticket，那么请求官方接口获取并缓存起来
             $ch = curl_init("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=$access_token&type=jsapi");
             curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
             $result = curl_exec($ch);
             $resultArr = json_decode($result,true);
             $ticket = $resultArr['ticket'];
-            Cache::put('ticket',$ticket,119);
+            Cache::put('ticket',$ticket,119);//缓存ticket，官方过期时间120分钟
         }
-        $url = $_SERVER['HTTP_REFERER'];
+        $url = $_SERVER['HTTP_REFERER'];//获取请求的URL
         $nonceStr = 'DKkopqDAnvzqFJNblkjZj';
         $timestamp = time();
         $str = "jsapi_ticket=$ticket&noncestr=$nonceStr&timestamp=$timestamp&url=$url";

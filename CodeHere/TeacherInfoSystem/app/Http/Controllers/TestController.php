@@ -4,18 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\LoginAndAccount\Controller;
+use Mrgoon\AliSms\AliSms;
 
 class TestController extends Controller
 {
-    public function testPDF(Request $request){
-        $file = $request->file('test');
-        $postData = ['file' => $file];
-        $ch = curl_init('121.41.51.133:2002');
-        curl_setopt($ch,CURLOPT_POST,1);
-        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-        curl_setopt($ch,CURLOPT_POSTFIELDS,$postData);
-        $result = curl_exec($ch);
-        curl_close($ch);
+    public function test(){
+        $aliSms = new AliSms();
+        $result = $aliSms->sendSms('15108593833','SMS_107070066',[
+            'teacher' => '胡伟通',
+            'student' => '蒋佰言',
+            'class' => '计算机网络',
+            'date' => '2017-10-27',
+            'instructor' => '苏晶'
+        ]);
         dd($result);
     }
 }
