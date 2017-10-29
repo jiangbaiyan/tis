@@ -80,9 +80,8 @@ class DailyLeaveController extends Controller
 //-------------------------教师端--------------------------------------
 
 
-    public function teacherUpdate(Request $request){//同意或者拒绝并发送微信模板消息（可选发短信）
-        //$teacherid = Cache::get($_COOKIE['userid']);
-        $teacherid = '40365';
+    public function teacherUpdate(Request $request){//教师（批量）同意或单条同意/拒绝，发送模板消息给学生以及发送请假短信给任课老师
+        $teacherid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid',$teacherid)->first();
         $data = $request->all();
         $id = $request->input('id');
@@ -90,18 +89,52 @@ class DailyLeaveController extends Controller
         $is_pass = $request->input('is_pass');
         $wechat = new WeChatController();
         $access_token = $wechat->getAccessToken();
-        $ch = curl_init("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token");
-        if (!$id){//如果没有穿id，则批量同意
-            $daily_leaves = Daily_leave
-                ::join('students','daily_leaves.student_id','=','students.id')
+        $ch1 = curl_init("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token");//$ch1代表模板消息CURL
+        curl_setopt($ch1, CURLOPT_POST, 1);
+        curl_setopt($ch1, CURLOPT_RETURNTRANSFER,true);
+        $ch2 = curl_init('https://sms-api.upyun.com/api/messages');//$ch2代表又拍云发短信CURL
+        $header = [
+            'Authorization:MdALl4JlrIV5zohaS0vsoKx2HY5ud0',
+            'Content-Type: application/json'
+        ];
+        curl_setopt($ch2,CURLOPT_POST,1);
+        curl_setopt($ch2,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch2,CURLOPT_HTTPHEADER,$header);
+        if (!$id){//批量同意逻辑，根据浏览器是否传id来判断，传id则更新单条记录，不传则更新多条记录
+            $daily_leaves = Daily_leave//筛选出符合条件的未审核的请假信息
+            ::join('students','daily_leaves.student_id','=','students.id')
                 ->where('students.account_id','=', $teacherid)
                 ->where('daily_leaves.is_pass','=',0)
                 ->get();
-            //发送模板消息
-            foreach ($daily_leaves as $daily_leave){
+            //给这些学生发送模板消息
+            foreach ($daily_leaves as $daily_leave){//遍历所有请假信息
                 $openid = $daily_leave->student->openid;//学生openid
                 $name = $daily_leave->student->name;//学生姓名
                 $userid = $daily_leave->student->userid;//学生学号
+                $teacher_course = $daily_leave->teacher_course;
+                $teacher_phone = $daily_leave->teacher_phone;
+                $teacher_name = $daily_leave->teacher_name;
+                $daily_leave_time = $daily_leave->begin_time."第$daily_leave->begin_course".'节课'.' ~ '."$daily_leave->end_time"."第$daily_leave->end_course".'节课';
+                $daily_leave_studentname = $userid.$name;
+                if ($teacher_phone!=null&&$teacher_course!=null&&$teacher_name!=null){//如果学生填写了手机号等信息。则发送短信
+                    $teacher_phone= explode(' ',$teacher_phone);//将空格分隔的字符串数据转化为数组
+                    $teacher_name= explode(' ',$teacher_name);
+                    $teacher_course= explode(' ',$teacher_course);
+                    for ($i = 0,$len = count($teacher_phone);$i<$len;$i++){//这里以上三个数组长度应该相等
+                        $postData = [
+                            'template_id' => 540,
+                            'mobile' => $teacher_phone[$i],
+                            'vars' => "$teacher_name[$i]|$teacher_course[$i]|$daily_leave_studentname|$daily_leave_time|$teacher->name"
+                        ];
+                        $jsonData = json_encode($postData);
+                        curl_setopt($ch2,CURLOPT_POSTFIELDS,$jsonData);
+                        $result = curl_exec($ch2);
+                        $result = json_decode($result,true);
+                        if (isset($result['message_ids'][0]['error_code'])){//如果又拍云短信官方报错
+                            return Response::json(['status' => 402,'msg' => '短信发送失败 '.$result['message_ids'][0]['error_code']]);
+                        }
+                    }
+                }
                 $post_data = [
                     'touser' => $openid,
                     'template_id' => 'Nm1LRjfvdeB_c9MAhM4fQOXl-r8YSXzI_U63t2DQCXM',
@@ -111,11 +144,10 @@ class DailyLeaveController extends Controller
                             'color' => '#00B642'
                         ],
                         'keyword1' => [
-                            'value' => $userid.$name
+                            'value' => $daily_leave_studentname
                         ],
                         'keyword2' => [
-                            'value' => $daily_leave->begin_time ."第$daily_leave->begin_course".'节课'.' ~ '."$daily_leave->end_time"
-                                ."第$daily_leave->end_course".'节课'
+                            'value' => $daily_leave_time
                         ],
                         'keyword3' => [
                             'value' => '审批通过'
@@ -124,22 +156,21 @@ class DailyLeaveController extends Controller
                             'value' => "$teacher->name"
                         ],
                         'remark' => [
-                            'value' => "$pass_reason"
+                            'value' => '辅导员意见：'."$pass_reason",
+                            'color' => '#00B642'
                         ]
                     ]
                 ];
                 $jsonData = json_encode($post_data);
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                curl_setopt($ch1, CURLOPT_POSTFIELDS, $jsonData);
+                curl_setopt($ch1, CURLOPT_HTTPHEADER, array(
                         'Content-Type: application/json',
                         'Content-Length: ' . strlen($jsonData))
                 );
-                curl_exec($ch);
+                curl_exec($ch1);
             }
-            DB::table('daily_leaves')//写入数据库
-                ->join('students','daily_leaves.student_id','=','students.id')
+            DB::table('daily_leaves')//批量更新
+            ->join('students','daily_leaves.student_id','=','students.id')
                 ->where('students.account_id','=', $teacherid)
                 ->where('daily_leaves.is_pass','=',0)
                 ->update(['daily_leaves.is_pass' => 1,'daily_leaves.pass_reason' => $pass_reason]);//同意所有请假
@@ -152,26 +183,31 @@ class DailyLeaveController extends Controller
             $openid = $daily_leave->student->openid;
             $name = $daily_leave->student->name;
             $userid = $daily_leave->student->userid;
+            $teacher_course = $daily_leave->teacher_course;
+            $teacher_phone = $daily_leave->teacher_phone;
+            $teacher_name = $daily_leave->teacher_name;
+            $daily_leave_studentname = $userid.$name;
+            $daily_leave_time = $daily_leave->begin_time."第$daily_leave->begin_course".'节课'.' ~ '."$daily_leave->end_time"."第$daily_leave->end_course".'节课';
             //如果审核通过,发送短信
-            /*        if ($is_pass){
-                        $teacherPhones =$daily_leave->teacher_phone;
-                        $teacherCourses = $daily_leave->teacher_course;
-                        $teacherNames = $daily_leave->teacher_name;
-                        if ($teacherPhones){//如果学生填写了手机号这个字段，那么给任课教师发送短信
-                            $phones = explode(' ',$teacherPhones);
-                            $mobile = implode(',',$phones);
-                            $easySms = new EasySms($this->smsConfig);
-                            $easySms->send(15968804215,[
-                                'template' => 'SMS_107070066',
-                                'data' => [
-                                    'teacher' => '蒋佰言',
-                                    'class' => '信息安全',
-                                    'data' => '2017-10-27',
-                                    'instructor' => $teacher->name
-                                ]
-                            ]);
-                        }
-                    }*/
+            if ($is_pass == 1&&$teacher_phone!=null&&$teacher_course!=null&&$teacher_name!=null){//如果学生填写了手机号等信息。且辅导员审核通过，那么发送短信
+                $teacher_phone= explode(' ',$teacher_phone);//将空格分隔的字符串数据转化为数组
+                $teacher_name= explode(' ',$teacher_name);
+                $teacher_course= explode(' ',$teacher_course);
+                for ($i = 0,$len = count($teacher_phone);$i<$len;$i++){//这里以上三个数组长度应该相等
+                    $postData = [
+                        'template_id' => 540,
+                        'mobile' => $teacher_phone[$i],
+                        'vars' => "$teacher_name[$i]|$teacher_course[$i]|$daily_leave_studentname|$daily_leave_time|$teacher->name"
+                    ];
+                    $jsonData = json_encode($postData);
+                    curl_setopt($ch2,CURLOPT_POSTFIELDS,$jsonData);
+                    $result = curl_exec($ch2);
+                    $result = json_decode($result,true);
+                    if (isset($result['message_ids'][0]['error_code'])){//如果又拍云短信官方报错
+                        return Response::json(['status' => 402,'msg' => '短信发送失败 '.$result['message_ids'][0]['error_code']]);
+                    }
+                }
+            }
             //更新审核数据
             if (!$daily_leave->update($data)){
                 return Response::json(['status' => 402,'msg' => 'update failed']);
@@ -192,11 +228,10 @@ class DailyLeaveController extends Controller
                         'color' => $is_pass == '通过'?'#00B642':'#FF0000'
                     ],
                     'keyword1' => [
-                        'value' => $userid.$name
+                        'value' => $daily_leave_studentname
                     ],
                     'keyword2' => [
-                        'value' => $daily_leave->begin_time ."第$daily_leave->begin_course".'节课'.' ~ '."$daily_leave->end_time"
-                            ."第$daily_leave->end_course".'节课'
+                        'value' => $daily_leave_time
                     ],
                     'keyword3' => [
                         'value' => $is_pass == '通过' ? '审批通过' :'审批不通过'
@@ -205,21 +240,21 @@ class DailyLeaveController extends Controller
                         'value' => "$teacher->name"
                     ],
                     'remark' => [
-                        'value' => "$pass_reason"
+                        'value' => '辅导员意见：'."$pass_reason",
+                        'color' => $is_pass == '通过'?'#00B642':'#FF0000'
                     ]
                 ]
             ];
             $jsonData = json_encode($post_data);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            curl_setopt($ch1, CURLOPT_POSTFIELDS, $jsonData);
+            curl_setopt($ch1, CURLOPT_HTTPHEADER, array(
                     'Content-Type: application/json',
                     'Content-Length: ' . strlen($jsonData))
             );
-            curl_exec($ch);
+            curl_exec($ch1);
         }
-        curl_close($ch);
+        curl_close($ch1);
+        curl_close($ch2);
         return Response::json(['status' => 200,'msg' => 'daily_leave was passed successfully']);
     }
 

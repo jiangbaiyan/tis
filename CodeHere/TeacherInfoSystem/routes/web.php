@@ -3,7 +3,7 @@
 Route::any('test','TestController@test');
 
 
-//杭电CAS认证模块
+//杭电CAS认证和JS SDK模块
 Route::group(['prefix' => 'api'],function (){
     Route::group(['prefix' => 'v1.0'],function (){
         Route::group(['middleware'=>'EnableCrossRequest'],function () {
@@ -19,8 +19,8 @@ Route::group(['middleware'=>'EnableCrossRequest'],function () {
 });
 //微信相关
 Route::group(['middleware' => 'web'],function (){
+    Route::any('bind','WeChatController@studentBind');//微信绑定信息入口url
     Route::any('openid','WeChatController@openid');
-    Route::any('bind','WeChatController@studentBind');
     Route::any('callback','WeChatController@callback');
     Route::any('showError','WeChatController@showError');
     Route::any('submit','WeChatController@submit');

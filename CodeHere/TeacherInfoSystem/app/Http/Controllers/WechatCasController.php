@@ -120,7 +120,7 @@ class WechatCasController extends LoginAndAccount\Controller
                     Session::put('class',$class);
                     Session::put('grade',$grade);
                     if ($idtype == '1'){//如果是学生
-                        return redirect('https://tis.cloudshm.com/showError');
+                        return redirect('/showError');
                     }
                     else{//如果是教师
                         die('教师信息绑定成功！');

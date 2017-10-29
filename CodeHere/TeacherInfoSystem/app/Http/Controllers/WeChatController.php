@@ -38,8 +38,9 @@ class WeChatController extends LoginAndAccount\Controller
         return $access_token;
     }
 
+
     public function studentBind(){//绑定信息
-        return redirect('https://tis.cloudshm.com/openid');//跳转到下面的bind方法获取openid
+        return redirect('/openid');//跳转到下面的bind方法获取openid
     }
 
     public function openid(){//微信网页授权获取openid
@@ -58,14 +59,14 @@ class WeChatController extends LoginAndAccount\Controller
         $openid = $arr['openid'];
         Session::put('openid',$openid);
         curl_close($ch);
-        return redirect('https://tis.cloudshm.com/api/v1.0/wechatcas');//跳转到杭电CAS逻辑
+        return redirect('/api/v1.0/wechatcas');//跳转到杭电CAS逻辑
     }
 
-    public function showError(){
+    public function showError(){//模板渲染
         return view('WeChat/getMessage');
     }
 
-    public function submit(Request $request){//获取学生填写的表单信息
+    public function submit(Request $request){//获取学生填写的表单信息并验证
         $validator = Validator::make($request->all(),[
             'phone' => 'required|numeric',
             'email' => 'required|email'
@@ -78,7 +79,7 @@ class WeChatController extends LoginAndAccount\Controller
             'email' => '邮箱'
         ]);
         if ($validator->fails()){
-            return redirect()->back()->withErrors($validator)->withInput();//数据持久化
+            return redirect()->back()->withErrors($validator)->withInput();//返回错误提示并实现数据持久化
         }
         $teacher = $request->input('teacher');
         $phone = trim($request->input('phone'));
@@ -108,7 +109,7 @@ class WeChatController extends LoginAndAccount\Controller
         setcookie('openid',$openid, time()+15552000);
         $student = Student::where('userid',$userid)->first();
         if ($student){//如果学生已经绑定过信息，那么更新记录
-            $student->update([
+            $student->update([//这里其实可以用compact()方法替换
                 'userid' => $userid,
                 'name' => $username,
                 'sex' => $sex,
@@ -127,7 +128,7 @@ class WeChatController extends LoginAndAccount\Controller
             die('信息更新成功！');
         }
         else if (!$student){//如果学生没有绑定信息，那么创建一条新记录
-            $student = Student::create([
+            $student = Student::create([//这里其实可以用compact()方法替换
                 'userid' => $userid,
                 'name' => $username,
                 'sex' => $sex,
@@ -150,7 +151,7 @@ class WeChatController extends LoginAndAccount\Controller
         }
     }
 
-    //JS SDK签名认证逻辑
+    //JS SDK签名认证逻辑（请假定位用）
     public function jsSDK(){
         $access_token = $this->getAccessToken();//获取access_token
         if (Cache::has('ticket')){//若缓存里有ticket，则直接从缓存获取
@@ -164,6 +165,7 @@ class WeChatController extends LoginAndAccount\Controller
             $ticket = $resultArr['ticket'];
             Cache::put('ticket',$ticket,119);//缓存ticket，官方过期时间120分钟
         }
+        //参考官方文档的签名要求
         $url = $_SERVER['HTTP_REFERER'];//获取请求的URL
         $nonceStr = 'DKkopqDAnvzqFJNblkjZj';
         $timestamp = time();

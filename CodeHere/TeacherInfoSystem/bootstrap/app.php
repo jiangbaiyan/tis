@@ -26,17 +26,17 @@ $app = new Illuminate\Foundation\Application(
 |
 */
 
-$app->singleton(
+$app->singleton(//将字符串与对象绑定
     Illuminate\Contracts\Http\Kernel::class,
     App\Http\Kernel::class
 );
 
-$app->singleton(
+$app->singleton(//绑定
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
 
-$app->singleton(
+$app->singleton(//绑定
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
 );
