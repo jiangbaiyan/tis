@@ -11,7 +11,6 @@
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
         "maatwebsite/excel": "~2.1.0",
-        "mrgoon/aliyun-sms": "dev-master",
         "php-unoconv/php-unoconv": "^0.3.0",
         "predis/predis": "^1.1",
         "yangyifan/upload": "^0.2.1"

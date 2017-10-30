@@ -203,8 +203,8 @@ class DailyLeaveController extends Controller
                     curl_setopt($ch2,CURLOPT_POSTFIELDS,$jsonData);
                     $result = curl_exec($ch2);
                     $result = json_decode($result,true);
-                    if (isset($result['message_ids'][0]['error_code'])){//如果又拍云短信官方报错
-                        return Response::json(['status' => 402,'msg' => '短信发送失败 '.$result['message_ids'][0]['error_code']]);
+                    if (isset($result['error_code'])){//如果又拍云短信官方报错
+                        return Response::json(['status' => 402,'msg' => $result['message']]);
                     }
                 }
             }
@@ -275,6 +275,12 @@ class DailyLeaveController extends Controller
             if ($data->teacher_phone == null){
                 $data->teacher_phone = '';
             }
+            if ($data->teacher_name == null){
+                $data->teacher_name = '';
+            }
+            if ($data->teacher_course == null){
+                $data->teacher_course = '';
+            }
         }
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
     }
@@ -282,7 +288,7 @@ class DailyLeaveController extends Controller
     public function teacherGet(){
         $userid = Cache::get($_COOKIE['userid']);
         $datas = Daily_leave::join('students','daily_leaves.student_id','=','students.id')
-            ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','daily_leaves.begin_time','daily_leaves.begin_course','daily_leaves.begin_location','daily_leaves.end_time','daily_leaves.end_course','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time','daily_leaves.cancel_location','daily_leaves.teacher_phone')
+            ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','daily_leaves.begin_time','daily_leaves.begin_course','daily_leaves.begin_location','daily_leaves.end_time','daily_leaves.end_course','daily_leaves.leave_reason','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time','daily_leaves.cancel_location','daily_leaves.teacher_phone','daily_leaves.teacher_name','daily_leaves.teacher_course')
             ->where('students.account_id',$userid)
             ->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-2592000))
             ->orderByDesc('class_num')
@@ -291,6 +297,12 @@ class DailyLeaveController extends Controller
         foreach ($datas as $data){
             if ($data->teacher_phone == null){
                 $data->teacher_phone = '';
+            }
+            if ($data->teacher_name == null){
+                $data->teacher_name = '';
+            }
+            if ($data->teacher_course == null){
+                $data->teacher_course = '';
             }
         }
         return Response::json(['status' => 200,'msg' => 'daily_leave required successfully','data' => $datas->groupBy('class_num')]);
