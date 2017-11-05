@@ -55,24 +55,25 @@ class TeacherCasController extends LoginAndAccount\Controller
                 //print_r($validateXML);
 
                 $i = 0;
-                while ($i < count($validateXML->authenticationSuccess[0]->attributes[0])) {
-
-                    $successnode0 = $validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["name"];
-
-                    if ($successnode0 == "userName") {//学号
-                        $userid = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
+                $validate = $validateXML->authenticationSuccess[0]->attributes[0];
+                $i = 0;
+                $validateNum = count($validate);
+                while ($i < $validateNum) {
+                    $successnode0 = $validate->attribute[$i]["name"];
+                    if ($successnode0 == "userName") {//工号
+                        $userid = ''.$validate->attribute[$i]["value"];
                     }
                     if ($successnode0 == "user_name") {//姓名
-                        $username = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
+                        $username = ''.$validate->attribute[$i]["value"];
                     }
-                    if ($successnode0 == "id_type") {
-                        $idtype = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
+                    if ($successnode0 == "id_type") {//学生还是教师
+                        $idtype = ''.$validate->attribute[$i]["value"];
                     }
                     if ($successnode0 == "user_sex") {//性别
-                        $sex = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
+                        $sex = ''.$validate->attribute[$i]["value"];
                     }
                     if ($successnode0 == "unit_name") {//学院全称
-                        $unit = ''.$validateXML->authenticationSuccess[0]->attributes[0]->attribute[$i]["value"];
+                        $unit = ''.$validate->attribute[$i]["value"];
                     }
                     $i = $i + 1;
                 }
@@ -80,20 +81,11 @@ class TeacherCasController extends LoginAndAccount\Controller
                 $successnode = ''.$validateXML->authenticationSuccess[0];
 
                 if (!empty($successnode)) {
-                    //获取用户账户
-                    //setcookie('userid',$userid);
-                    //setcookie('hducns',"HDU_webjk");
-
-                    //echo ("<br>userName:".$_SESSION["userid0"]);
-                    //echo ("<br>user_name:".$_SESSION["hducns"]);
-
-
                     //如果登录成功，执行下面代码，否则按集成系统业务逻辑处理
                     //集成系统的首页URL
                     if (isset($_REQUEST["redirectUrl"]) && !empty($_REQUEST["redirectUrl"])) {
                         $Rurl = $_REQUEST["redirectUrl"];
                     }
-
                     //将从杭电CAS获取到的数据写入数据库
                     if ($sex == '1'){
                         $sex = '男';
@@ -108,10 +100,10 @@ class TeacherCasController extends LoginAndAccount\Controller
                         return Response::json(['status' => 500,'msg' => 'permission denied']);
                     }
                     fuck:
-                    $teacher = Account::where('userid',$userid)->first();
-                    if (!$teacher){
-                        Account::create(['userid' => $userid,'name' => $username,'sex' => $sex,'academy' => $unit]);
-                    }
+                    Account::updateOrCreate(
+                        ['userid' => $userid],
+                        ['userid' => $userid,'name' => $username,'sex' => $sex,'academy' => $unit]
+                    );
 
                     //************************
                     $userid = Crypt::encrypt($userid);

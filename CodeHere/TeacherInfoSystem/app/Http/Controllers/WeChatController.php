@@ -107,9 +107,9 @@ class WeChatController extends LoginAndAccount\Controller
         $class = Session::get('class');
         $grade = Session::get('grade');
         setcookie('openid',$openid, time()+15552000);
-        $student = Student::where('userid',$userid)->first();
-        if ($student){//如果学生已经绑定过信息，那么更新记录
-            $student->update([//这里其实可以用compact()方法替换
+        Student::updateOrCreate(
+            ['userid' => $userid],
+            [
                 'userid' => $userid,
                 'name' => $username,
                 'sex' => $sex,
@@ -122,33 +122,10 @@ class WeChatController extends LoginAndAccount\Controller
                 'phone' => $phone,
                 'email' => $email,
                 'account_id' => $account_id
-            ]);
-            $student->save();
-            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-            die('信息更新成功！');
-        }
-        else if (!$student){//如果学生没有绑定信息，那么创建一条新记录
-            $student = Student::create([//这里其实可以用compact()方法替换
-                'userid' => $userid,
-                'name' => $username,
-                'sex' => $sex,
-                'openid' => $openid,
-                'unit' => $unit,
-                'major' => $major,
-                'class_num' => $class_num,
-                'class' => $class,
-                'grade' => $grade,
-                'phone' => $phone,
-                'email' => $email,
-                'account_id' => $account_id
-            ]);
-            if (!$student){
-                echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                die('信息创建失败！');
-            }
-            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-            die('信息创建成功！');
-        }
+            ]
+        );
+        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+        die('绑定信息成功！');
     }
 
     //JS SDK签名认证逻辑（请假定位用）

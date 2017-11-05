@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Account;
 use App\Student;
 use Illuminate\Support\Facades\Session;
 
@@ -50,9 +51,7 @@ class WechatCasController extends LoginAndAccount\Controller
                     $i = 0;
                     $validateNum = count($validate);
                     while ($i < $validateNum) {
-
                         $successnode0 = $validate->attribute[$i]["name"];
-
                         if ($successnode0 == "userName") {//学号
                             $userid = ''.$validate->attribute[$i]["value"];
                         }
@@ -73,9 +72,11 @@ class WechatCasController extends LoginAndAccount\Controller
                         }
                         $i = $i + 1;
                     }
-
+                    if ($unit!="网络空间安全学院、浙江保密学院"){
+                        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+                        die('您不是网络空间安全学院的学生或教师，无操作权限！');
+                    }
                     $successnode = ''.$validateXML->authenticationSuccess[0];
-
                     if (!empty($successnode)) {
                         //如果登录成功，执行下面代码，否则按集成系统业务逻辑处理
                         //集成系统的首页URL
@@ -83,49 +84,47 @@ class WechatCasController extends LoginAndAccount\Controller
                             $Rurl = $_REQUEST["redirectUrl"];
                         }
                         //将从杭电CAS获取到的数据写入数据库
-                        if ($sex == '1'){
-                            $sex = '男';
-                        }
-                        else{
-                            $sex = '女';
-                        }
-                        if ($userid == '15051141'){//开发者跳过验证
-                            goto fuck;
-                        }
-                        if ($unit!="网络空间安全学院、浙江保密学院"){
-                            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                            die('您不是网络空间安全学院的学生或教师，无操作权限！');
-                        }
-                        fuck:
-                        $classnameid = substr($classid,4,2);//如15083611中的'36'，用来判断专业
-                        if ($classnameid == '24'){
-                            $major = '网络工程';
-                        }
-                        else if ($classnameid == '36'){
-                            $major = '信息安全';
-                        }
-                        else if ($classnameid == '02'){
-                            $major = '信息安全（卓越工程师计划）';
-                        }//如果增加了新专业，那么在这里添加即可
-                        else{
-                            $major = '其他学院专业';
-                        }
-                        $class = substr($classid,-1);
-                        $grade = '20'.substr($classid,0,2);
-                        Session::put('userid',$userid);
-                        Session::put('name',$username);
-                        Session::put('sex',$sex);
-                        Session::put('openid',$openid);
-                        Session::put('unit',$unit);
-                        Session::put('major',$major);
-                        Session::put('class_num',$classid);
-                        Session::put('class',$class);
-                        Session::put('grade',$grade);
                         if ($idtype == '1'){//如果是学生
+                            if ($sex == '1'){
+                                $sex = '男';
+                            }
+                            else{
+                                $sex = '女';
+                            }
+                            $classnameid = substr($classid,4,2);//如15083611中的'36'，用来判断专业
+                            if ($classnameid == '24'){
+                                $major = '网络工程';
+                            }
+                            else if ($classnameid == '36'){
+                                $major = '信息安全';
+                            }
+                            else if ($classnameid == '02'){
+                                $major = '信息安全（卓越工程师计划）';
+                            }//如果增加了新专业，那么在这里添加即可
+                            else{
+                                $major = '其他学院专业';
+                            }
+                            $class = substr($classid,-1);
+                            $grade = '20'.substr($classid,0,2);
+                            Session::put('userid',$userid);
+                            Session::put('name',$username);
+                            Session::put('sex',$sex);
+                            Session::put('openid',$openid);
+                            Session::put('unit',$unit);
+                            Session::put('major',$major);
+                            Session::put('class_num',$classid);
+                            Session::put('class',$class);
+                            Session::put('grade',$grade);
                             return redirect('/showError');
                         }
                         else{//如果是教师
-                            die('教师信息绑定成功！');
+                            Account::updateOrCreate(//查找是否有教师工号为userid的记录，如果有则更新openid，没有则创建
+                                ['userid' => $userid],
+                                ['openid' => $openid]
+                            );
+                            setcookie('openid',$openid, time()+15552000);
+                            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+                            die('信息绑定成功!');
                         }
 
                         //header("Location: " . $Rurl);
