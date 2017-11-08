@@ -31,7 +31,7 @@ Route::group(['middleware' => 'web'],function (){
 Route::group(['prefix'=>'api','namespace' => 'LoginAndAccount'],function (){
     Route::group(['prefix'=>'v1.0'],function(){
         Route::group(['middleware'=>'EnableCrossRequest'],function (){
-            Route::group(['middleware'=>'CheckLogin'],function () {
+            Route::group(['middleware'=>'TeacherCheckLogin'],function () {
                 Route::put('account', 'AccountController@update');
                 Route::get('account', 'AccountController@get');
                 Route::post('head', 'AccountController@uploadHead');
@@ -50,7 +50,7 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
     Route::group(['prefix' => 'v1.0'],function(){
         Route::group(['prefix' => 'science'],function (){
             Route::group(['middleware'=>'EnableCrossRequest'],function (){
-                Route::group(['middleware' => 'CheckLogin'],function () {
+                Route::group(['middleware' => 'TeacherCheckLogin'],function () {
                     //Route::group(['middleware'=>'ScienceMiddleware'],function () {
 
                     //获取科研模块首页的个人信息
@@ -145,8 +145,8 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
 Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
     Route::group(['middleware'=>'EnableCrossRequest'],function (){
         Route::group(['prefix' => 'v1.0'],function (){
-            //教师端
-            Route::group(['middleware'=>'CheckLogin'],function (){
+            //教师PC端
+            Route::group(['middleware'=>'TeacherCheckLogin'],function (){
                 Route::group(['middleware'=>'LeaveMiddleware'],function () {
                     Route::get('notVerifiedLeaves', 'DailyLeaveController@getNotVerifiedLeaves');
                     Route::put('dailyleave', 'DailyLeaveController@teacherUpdate');
@@ -160,8 +160,8 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
 
             Route::get('studentsexport','ExcelController@studentExport');//导出绑定信息的学生表格
 
-            //学生端
-            Route::group(['middleware' => 'StudentCheckLogin'],function (){
+            //学生微信端
+            Route::group(['middleware' => 'WechatCheckLogin'],function (){
                 Route::post('createdailyleave','DailyLeaveController@studentCreate');
                 Route::get('getdailyleave','DailyLeaveController@studentGet');
                 Route::get('deletedailyleave/{id}/{location}','DailyLeaveController@studentDelete');
@@ -179,21 +179,27 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
 Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
     Route::group(['middleware'=>'EnableCrossRequest'],function (){
         Route::group(['prefix' => 'v1.0'],function (){
-            //教师端
-            Route::group(['middleware'=>'CheckLogin'],function (){
+
+            //教师PC端
+            Route::group(['middleware'=>'TeacherCheckLogin'],function (){
                 Route::group(['middleware'=>'InfoMiddleware'],function () {
-                    Route::get('teacherinfo', 'TeacherInfoController@getStudentInfo');
+                    Route::get('teacherinfo','TeacherInfoController@getStudentInfo');
+                    Route::get('studentinfo','TeacherInfoController@getStudentInfo');
                     Route::post('send', 'TeacherInfoController@send');
                     Route::get('infocontent', 'TeacherInfoController@getInfoContent');
                     Route::get('infofeedback/{id}', 'TeacherInfoController@getFeedback');
                 });
             });
 
-            //学生端
-            Route::group(['middleware' => 'StudentCheckLogin'],function (){
-                Route::get('studentindex','StudentInfoController@getIndex');
-                Route::get('studentdetail/{id}','StudentInfoController@getDetail');
-                Route::get('sendemail/{id}','StudentInfoController@sendEmail');
+            //教师、学生微信端
+            Route::group(['middleware' => 'WechatCheckLogin'],function (){
+                Route::get('type','WeChatController@getType');//判断用户信息
+                Route::get('studentindex','WechatInfoController@getIndex');
+                Route::get('studentdetail/{id}','WechatInfoController@getDetail');
+                Route::get('sendemail/{id}','WechatInfoController@sendEmail');
+                Route::get('teachers','WechatInfoController@getTeacherInfo');
+                Route::get('students','WechatInfoController@getStudentInfo');
+                Route::post('wechatsend','WechatInfoController@send');
             });
         });
     });

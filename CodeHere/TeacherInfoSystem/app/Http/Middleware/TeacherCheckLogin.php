@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Crypt;
 use Response;
 use Illuminate\Support\Facades\Redis;
 
-class CheckLogin
+class TeacherCheckLogin
 {
     /**
      * Handle an incoming request.

@@ -78,11 +78,6 @@ class WechatCasController extends LoginAndAccount\Controller
                     }
                     $successnode = ''.$validateXML->authenticationSuccess[0];
                     if (!empty($successnode)) {
-                        //如果登录成功，执行下面代码，否则按集成系统业务逻辑处理
-                        //集成系统的首页URL
-                        if (isset($_REQUEST["redirectUrl"]) && !empty($_REQUEST["redirectUrl"])) {
-                            $Rurl = $_REQUEST["redirectUrl"];
-                        }
                         //将从杭电CAS获取到的数据写入数据库
                         if ($idtype == '1'){//如果是学生
                             if ($sex == '1'){
@@ -124,7 +119,7 @@ class WechatCasController extends LoginAndAccount\Controller
                             );
                             setcookie('openid',$openid, time()+15552000);
                             echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                            die('信息绑定成功!');
+                            die('教师信息绑定成功!');
                         }
 
                         //header("Location: " . $Rurl);

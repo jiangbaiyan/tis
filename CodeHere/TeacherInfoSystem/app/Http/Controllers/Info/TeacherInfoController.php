@@ -16,15 +16,22 @@ use Unoconv\Unoconv;
 
 class TeacherInfoController extends Controller
 {
-    private $access_token = '';
+    //————————————————————教师PC端————————————————————————————
+    public  $access_token = '';
     private $url = 'https://cloudfiles.cloudshm.com/';//又拍云存储地址
     private $allowedFormat = ['doc','docx','pdf','DOC','DOCX','PDF'];//允许上传的文件格式
 
-    public function sendModelInfo($type,$receivers,$title,$content,$info){//公用发送模板消息方法
-
+    public function sendModelInfo($type,$receivers,$title,$content,$info,$isPC){//公用发送模板消息方法
         //提取循环外公用的变量
-        $userid = Cache::get($_COOKIE['userid']);
-        $teacher = Account::where('userid',$userid)->first();
+        if ($isPC){
+            $userid = Cache::get($_COOKIE['userid']);
+            $teacher = Account::where('userid',$userid)->first();
+        }
+        else{
+            //$openid = 'oTkqI0XMZFPldSWRrKvnOUpLYN9o';
+            $openid = $_COOKIE['openid'];
+            $teacher = Account::where('openid',$openid)->first();
+        }
         $ch = curl_init("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");//初始化curl与请求地址
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -56,7 +63,7 @@ class TeacherInfoController extends Controller
             ]
         ];
 
-        if ($type == 'all'){//给全体学生发信息
+        if ($type == 'all'){//给全体学生发信息(case:5)
             $students = Student::all();
             foreach ($students as $student){
                 $openid = $student->openid;
@@ -71,7 +78,40 @@ class TeacherInfoController extends Controller
                 Info_Feedback::create(['student_id' => $student->id,'info_content_id' => $info->id]);
             }
         }
-        else{//给年级/班级/专业/特定学生发送信息
+        else if ($type == 'allTeacher'){//给全体教师发送信息(case:7)
+            $teachers = Account::all();
+            foreach ($teachers as $teacher){
+                $openid = $teacher->openid;
+                $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
+                $jsonData = json_encode($post_data);//JSON编码。官方要求
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen($jsonData))
+                );
+                curl_exec($ch);
+                Info_Feedback::create(['student_id' => $teacher->id,'info_content_id' => $info->id]);
+            }
+        }
+        else if ($type == 'teacher'){//给特定教师发送信息(case:6)
+            $receivers = explode(' ', $receivers);//传递过来如果类似"2015 2016"这样，需要进行字符串分割
+            foreach ($receivers as $receiver){
+                $teachers = Account::where('userid',$receiver)->get();
+                foreach($teachers as $teacher){//遍历该年级/班级/专业的所有学生
+                    $openid = $teacher->openid;
+                    $post_data['touser'] = $openid;
+                    $jsonData = json_encode($post_data);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'Content-Type: application/json',
+                            'Content-Length: ' . strlen($jsonData))
+                    );
+                    curl_exec($ch);
+                    Info_Feedback::create(['student_id' => $teacher->id,'info_content_id' => $info->id]);
+                }
+            }
+        }
+        else{//给年级/班级/专业/特定学生发送信息(case:1、2、3、4)
             $receivers = explode(' ', $receivers);//传递过来如果类似"2015 2016"这样，需要进行字符串分割
             foreach ($receivers as $receiver){
                 $students = Student::where("$type",$receiver)->get();
@@ -144,7 +184,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('grade', $receivers, $title, $content, $info);//调用公用发送模板消息方法
+                $this->sendModelInfo('grade', $receivers, $title, $content, $info,1);//调用公用发送模板消息方法
                 break;
             case 2://班级
                 $info = Info_Content::create($data);
@@ -168,7 +208,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('class_num', $receivers, $title, $content, $info);
+                $this->sendModelInfo('class_num', $receivers, $title, $content, $info,1);
                 break;
             case 3://专业
                 $info = Info_Content::create($data);
@@ -192,7 +232,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('major', $receivers, $title, $content, $info);
+                $this->sendModelInfo('major', $receivers, $title, $content, $info,1);
                 break;
             case 4://特定学生
                 $newReceivers = explode(' ', $receivers);//将发送者分离
@@ -223,7 +263,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('userid',$receivers,$title,$content,$info);
+                $this->sendModelInfo('userid',$receivers,$title,$content,$info,1);
                 break;
             case 5: //发给全体学生
                 $info = Info_Content::create($data);
@@ -247,14 +287,13 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('all', $receivers, $title, $content, $info);//调用发送模板消息方法
+                $this->sendModelInfo('all', $receivers, $title, $content, $info,1);//调用发送模板消息方法
             break;
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
     }
 
     public function getStudentInfo(){//教师获取所能管理学生的信息（弹出层）
-        $userid = Cache::get($_COOKIE['userid']);
         $data = Student::all();
         $grade = $data->groupBy('grade');
         $class = $data->groupBy('class_num');
@@ -262,9 +301,13 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major]]);
     }
 
+    public function getTeacherInfo(){
+        $data = Account::all();
+        return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
+    }
+
+
     public function getInfoContent(){//教师查看最近一个月通知内容
-        $userid = Cache::get($_COOKIE['userid']);
-        $teacher = Account::where('userid',$userid)->first();
         $data = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
             ->select('info_contents.*','accounts.name')
             ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
@@ -289,4 +332,7 @@ class TeacherInfoController extends Controller
             ->get();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
+
+
+
 }

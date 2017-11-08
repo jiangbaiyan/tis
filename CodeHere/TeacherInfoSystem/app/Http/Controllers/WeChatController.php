@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Account;
 use App\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +18,18 @@ class WeChatController extends LoginAndAccount\Controller
 
     public function welcome(){//框架根目录映射地址
         return redirect('https://teacher.cloudshm.com');
+    }
+
+    public static function getUser(){//判断石老师还是学生，并获取学号/工号
+        $openid = $_COOKIE['openid'];
+        $student = Student::where('openid',$openid)->first();
+        $teacher = Account::where('openid',$openid)->first();
+        if ($teacher){
+            return $teacher;
+        }
+        else{
+            return $student;
+        }
     }
 
     //绑定信息逻辑
@@ -125,7 +138,7 @@ class WeChatController extends LoginAndAccount\Controller
             ]
         );
         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-        die('绑定信息成功！');
+        die('学生信息绑定成功！');
     }
 
     //JS SDK签名认证逻辑（请假定位用）
@@ -159,5 +172,14 @@ class WeChatController extends LoginAndAccount\Controller
                 'signature' => $signature,
             ]
         ]);
+    }
+
+    public function getType(){//获取微信端用户类型（0-普通/1-辅导员/2-教务老师/3-学生）
+        $openid = $_COOKIE['openid'];
+        $user = Account::where('openid',$openid)->count();//先去教师表查找
+        if ($user){//教师表找到了一条记录，那么是老师
+            return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => $user->info_level]]);
+        }
+        return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => 3]]);//如果教师表中查不到数据，那么该用户是学生
     }
 }

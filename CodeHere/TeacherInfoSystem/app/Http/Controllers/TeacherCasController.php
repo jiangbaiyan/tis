@@ -54,7 +54,6 @@ class TeacherCasController extends LoginAndAccount\Controller
                 //获取验证成功节点
                 //print_r($validateXML);
 
-                $i = 0;
                 $validate = $validateXML->authenticationSuccess[0]->attributes[0];
                 $i = 0;
                 $validateNum = count($validate);
@@ -97,14 +96,13 @@ class TeacherCasController extends LoginAndAccount\Controller
                         goto fuck;
                     }
                     if ($unit!="网络空间安全学院、浙江保密学院" || $idtype == '1'){
-                        return Response::json(['status' => 500,'msg' => 'permission denied']);
+                        return Response::json(['status' => 500,'msg' => '您不是恩学院的教师，无权访问系统！']);
                     }
                     fuck:
                     Account::updateOrCreate(
                         ['userid' => $userid],
                         ['userid' => $userid,'name' => $username,'sex' => $sex,'academy' => $unit]
                     );
-
                     //************************
                     $userid = Crypt::encrypt($userid);
                     setcookie('userid',$userid, time()+604800);
