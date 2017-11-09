@@ -76,16 +76,16 @@ class WechatCasController extends LoginAndAccount\Controller
                         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
                         die('您不是网络空间安全学院的学生或教师，无操作权限！');
                     }
+                    if ($sex == '1'){
+                        $sex = '男';
+                    }
+                    else{
+                        $sex = '女';
+                    }
                     $successnode = ''.$validateXML->authenticationSuccess[0];
                     if (!empty($successnode)) {
                         //将从杭电CAS获取到的数据写入数据库
                         if ($idtype == '1'){//如果是学生
-                            if ($sex == '1'){
-                                $sex = '男';
-                            }
-                            else{
-                                $sex = '女';
-                            }
                             $classnameid = substr($classid,4,2);//如15083611中的'36'，用来判断专业
                             if ($classnameid == '24'){
                                 $major = '网络工程';
@@ -114,7 +114,10 @@ class WechatCasController extends LoginAndAccount\Controller
                         }
                         else{//如果是教师
                             Session::put('userid',$userid);
+                            Session::put('name',$username);
+                            Session::put('sex',$sex);
                             Session::put('openid',$openid);
+                            Session::put('unit',$unit);
                             return redirect('/teacherShowError');
                         }
 

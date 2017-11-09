@@ -10,7 +10,9 @@ Route::group(['prefix' => 'api'],function (){
             Route::get('teachercas', 'TeacherCasController@cas');
             Route::get('wechatcas', 'WechatCasController@cas');
             Route::get('jssdk', 'WeChatController@jsSDK');
-            Route::get('type','WeChatController@getType');//判断用户信息
+            Route::group(['middleware' => 'WechatCheckLogin'],function (){
+                Route::get('type','WeChatController@getType');//判断用户信息
+            });
         });
     });
 });

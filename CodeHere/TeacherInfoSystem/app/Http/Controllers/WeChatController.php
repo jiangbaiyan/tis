@@ -157,13 +157,19 @@ class WeChatController extends LoginAndAccount\Controller
         }
         $email = trim($request->input('email'));
         $userid = Session::get('userid');
+        $username = Session::get('name');
+        $sex = Session::get('sex');
         $openid = Session::get('openid');
+        $unit = Session::get('unit');
         setcookie('openid',$openid, time()+15552000);
         Account::updateOrCreate(//查找是否有教师工号为userid的记录，如果有则更新openid与email，没有则创建
             ['userid' => $userid],
             [
                 'openid' => $openid,
-                'email' => $email
+                'email' => $email,
+                'academy' => $unit,
+                'name' => $username,
+                'sex' => $sex
             ]
         );
         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";

@@ -46,6 +46,9 @@ class HolidayLeaveController extends Controller
         $openid = $_COOKIE['openid'];
         //$holidayLeave = new Holiday_leave($data);
         $student = Student::where('openid',$openid)->first();
+        if (!$student){
+            return Response::json(['status' => 404 ,'msg' => 'student not found']);
+        }
         $student_id = $student->id;
         $leave_info = Leave_info::find($id);
         if ($student->holiday_leaves()){
@@ -61,6 +64,9 @@ class HolidayLeaveController extends Controller
     public function studentGet(){//获取请假信息
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
+        if (!$student){
+            return Response::json(['status' => 404 ,'msg' => 'student not found']);
+        }
         $userid = $student->account_id;
         $datas = $student->holiday_leaves()
             ->join('leave_infos','holiday_leaves.leave_info_id','=','leave_infos.id')

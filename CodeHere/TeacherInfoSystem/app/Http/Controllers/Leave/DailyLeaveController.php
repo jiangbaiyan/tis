@@ -14,40 +14,15 @@ use App\Http\Controllers\WeChatController;
 
 class DailyLeaveController extends Controller
 {
-    //EasySms库
-    /*private $smsConfig = [
-        // HTTP 请求的超时时间（秒）
-        'timeout' => 5.0,
-
-        // 默认发送配置
-        'default' => [
-            // 网关调用策略，默认：顺序调用
-            'strategy' => \Overtrue\EasySms\Strategies\OrderStrategy::class,
-
-            // 默认可用的发送网关
-            'gateways' => [
-                 'aliyun'
-            ],
-        ],
-        // 可用的网关配置
-        'gateways' => [
-            'errorlog' => [
-                'file' => '/tmp/easy-sms.log',
-            ],
-            'aliyun' => [
-                'access_key_id' => 'LTAIetEBGOpokNQc',
-                'access_key_secret' => 'uBkh6R4sK1dSly13L5wYNIE8MX02VM',
-                'sign_name' => '杭电网安信息平台',
-            ],
-        ],
-    ];
-    */
 //-------------------------学生端--------------------------------------
     public function studentCreate(Request $request){//创建请假信息
         $data = $request->all();
         $openid = $_COOKIE['openid'];
         $dailyLeave = new Daily_leave($data);
         $student = Student::where('openid',$openid)->first();
+        if (!$student){
+            return Response::json(['status' => 404 ,'msg' => 'student not found']);
+        }
         $student->daily_leaves()->save($dailyLeave);
         return Response::json(['status' => 200,'msg' => 'create successfully']);
     }
@@ -55,6 +30,9 @@ class DailyLeaveController extends Controller
     public function studentGet(){//获取所有未销假的信息
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
+        if (!$student){
+            return Response::json(['status' => 404 ,'msg' => 'student not found']);
+        }
         $datas = $student->daily_leaves()
             ->where('cancel_time','=',null)
             ->where('is_leave','=',1)
