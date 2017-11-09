@@ -65,13 +65,13 @@
     <form action="https://tis.cloudshm.com/teacherSubmit" method="post" name="form">
         <label for="email" class="bold">请输入您的邮箱：</label><br><input type="text" name="email" id="email" value="{{old('email')}}"><br><br>
         @if (count($errors) > 0)
-        <div class="alert alert-danger bold">
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+            <div class="alert alert-danger bold">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
         <p ><input type="submit" class="submit" value="提交"></p>
     </form>

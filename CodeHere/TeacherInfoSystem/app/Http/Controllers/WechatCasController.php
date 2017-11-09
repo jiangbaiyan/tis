@@ -113,13 +113,9 @@ class WechatCasController extends LoginAndAccount\Controller
                             return redirect('/showError');
                         }
                         else{//如果是教师
-                            Account::updateOrCreate(//查找是否有教师工号为userid的记录，如果有则更新openid，没有则创建
-                                ['userid' => $userid],
-                                ['openid' => $openid]
-                            );
-                            setcookie('openid',$openid, time()+15552000);
-                            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                            die('教师信息绑定成功!');
+                            Session::put('userid',$userid);
+                            Session::put('openid',$openid);
+                            return redirect('/teacherShowError');
                         }
 
                         //header("Location: " . $Rurl);

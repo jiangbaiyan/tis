@@ -10,6 +10,7 @@ Route::group(['prefix' => 'api'],function (){
             Route::get('teachercas', 'TeacherCasController@cas');
             Route::get('wechatcas', 'WechatCasController@cas');
             Route::get('jssdk', 'WeChatController@jsSDK');
+            Route::get('type','WeChatController@getType');//判断用户信息
         });
     });
 });
@@ -23,7 +24,9 @@ Route::group(['middleware' => 'web'],function (){
     Route::any('openid','WeChatController@openid');
     Route::any('callback','WeChatController@callback');
     Route::any('showError','WeChatController@showError');
+    Route::any('teacherShowError','WeChatController@teacherShowError');
     Route::any('submit','WeChatController@submit');
+    Route::any('teacherSubmit','WeChatController@teacherSubmit');
 });
 
 
@@ -183,22 +186,19 @@ Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
             //教师PC端
             Route::group(['middleware'=>'TeacherCheckLogin'],function (){
                 Route::group(['middleware'=>'InfoMiddleware'],function () {
-                    Route::get('teacherinfo','TeacherInfoController@getStudentInfo');
-                    Route::get('studentinfo','TeacherInfoController@getStudentInfo');
+                    Route::get('receivers/{info_level}','TeacherInfoController@getReceivers');
                     Route::post('send', 'TeacherInfoController@send');
-                    Route::get('infocontent', 'TeacherInfoController@getInfoContent');
-                    Route::get('infofeedback/{id}', 'TeacherInfoController@getFeedback');
+                    Route::get('infocontent/{info_level}', 'TeacherInfoController@getInfoContent');
+                    Route::get('infofeedback/{id}/{info_level}', 'TeacherInfoController@getFeedback');
                 });
             });
 
             //教师、学生微信端
             Route::group(['middleware' => 'WechatCheckLogin'],function (){
-                Route::get('type','WeChatController@getType');//判断用户信息
                 Route::get('studentindex','WechatInfoController@getIndex');
                 Route::get('studentdetail/{id}','WechatInfoController@getDetail');
                 Route::get('sendemail/{id}','WechatInfoController@sendEmail');
-                Route::get('teachers','WechatInfoController@getTeacherInfo');
-                Route::get('students','WechatInfoController@getStudentInfo');
+                Route::get('wechatreceivers/{info_level}','WechatInfoController@getReceivers');
                 Route::post('wechatsend','WechatInfoController@send');
             });
         });

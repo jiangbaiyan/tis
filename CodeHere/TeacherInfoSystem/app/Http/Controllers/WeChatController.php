@@ -20,20 +20,18 @@ class WeChatController extends LoginAndAccount\Controller
         return redirect('https://teacher.cloudshm.com');
     }
 
-    public static function getUser(){//判断石老师还是学生，并获取学号/工号
+    public function getType(){//获取微信端用户类型（0-普通/1-辅导员/2-教务老师/3-学生）
         $openid = $_COOKIE['openid'];
-        $student = Student::where('openid',$openid)->first();
-        $teacher = Account::where('openid',$openid)->first();
-        if ($teacher){
-            return $teacher;
+        //$openid = 'oTkqI0XMZFPldSWRrKvnOUpLYN9o';
+        $user = Account::where('openid',$openid)->first();//先去教师表查找
+        if ($user){//教师表找到了一条记录，那么是老师
+            return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => $user->info_level]]);
         }
-        else{
-            return $student;
-        }
+        return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => 3]]);//如果教师表中查不到数据，那么该用户是学生
     }
 
     //绑定信息逻辑
-    public function getAccessToken(){//公用获取access_token方法（模板消息要用到）
+    public function getAccessToken(){//公用获取access_token方法
         if (Cache::has('access_token')){
             $access_token = Cache::get('access_token');
         }
@@ -79,7 +77,11 @@ class WeChatController extends LoginAndAccount\Controller
         return view('WeChat/getMessage');
     }
 
-    public function submit(Request $request){//获取学生填写的表单信息并验证
+    public function teacherShowError(){//模板渲染
+        return view('WeChat/teacherGetMessage');
+    }
+
+    public function submit(Request $request){//获取学生提交的表单信息并验证
         $validator = Validator::make($request->all(),[
             'phone' => 'required|numeric',
             'email' => 'required|email'
@@ -141,6 +143,33 @@ class WeChatController extends LoginAndAccount\Controller
         die('学生信息绑定成功！');
     }
 
+    public function teacherSubmit(Request $request){//获取教师提交的表单信息并验证
+        $validator = Validator::make($request->all(),[
+            'email' => 'required|email'
+        ],[
+            'required' => ':attribute不能为空',
+            'email' => ':attribute格式不正确'
+        ],[
+            'email' => '邮箱'
+        ]);
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator)->withInput();//返回错误提示并实现数据持久化
+        }
+        $email = trim($request->input('email'));
+        $userid = Session::get('userid');
+        $openid = Session::get('openid');
+        setcookie('openid',$openid, time()+15552000);
+        Account::updateOrCreate(//查找是否有教师工号为userid的记录，如果有则更新openid与email，没有则创建
+            ['userid' => $userid],
+            [
+                'openid' => $openid,
+                'email' => $email
+            ]
+        );
+        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+        die('教师信息绑定成功!');
+    }
+
     //JS SDK签名认证逻辑（请假定位用）
     public function jsSDK(){
         $access_token = $this->getAccessToken();//获取access_token
@@ -174,12 +203,4 @@ class WeChatController extends LoginAndAccount\Controller
         ]);
     }
 
-    public function getType(){//获取微信端用户类型（0-普通/1-辅导员/2-教务老师/3-学生）
-        $openid = $_COOKIE['openid'];
-        $user = Account::where('openid',$openid)->count();//先去教师表查找
-        if ($user){//教师表找到了一条记录，那么是老师
-            return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => $user->info_level]]);
-        }
-        return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => 3]]);//如果教师表中查不到数据，那么该用户是学生
-    }
 }

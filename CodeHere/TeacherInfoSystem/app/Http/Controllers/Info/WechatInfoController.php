@@ -14,30 +14,50 @@ use Illuminate\Support\Facades\Response;
 
 class WechatInfoController extends Controller
 {
-    //——————————————————————————学生微信端————————————————————————
+    //——————————————————————————教师、学生微信端接收通知————————————————————————
     public function getIndex(){//通知系统首页
-        $user = WeChatController::getUser();
-        $userId = $user->id;//获取教师/学生的id
-        $data = Info_Content::join('info_feedbacks','info_feedbacks.info_content_id','=','info_contents.id')
-            ->join('accounts','info_contents.account_id','=','accounts.userid')
-            ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
-            ->where('info_feedbacks.student_id','=',$userId)
-            ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
-            ->orderByDesc('info_contents.created_at')
-            ->get();
+        $openid = $_COOKIE['openid'];
+        $student = Student::where('openid',$openid)->first();
+        $teacher = Account::where('openid',$openid)->first();
+        if ($teacher){//如果是老师
+            $data = Info_Content::join('info_feedbacks','info_feedbacks.info_content_id','=','info_contents.id')
+                ->join('accounts','info_contents.account_id','=','accounts.userid')
+                ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
+                ->where('info_feedbacks.student_id','=',$teacher->userid)
+                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+                ->orderByDesc('info_contents.created_at')
+                ->get();
+        }
+        else{//如果是学生
+            $data = Info_Content::join('info_feedbacks','info_feedbacks.info_content_id','=','info_contents.id')
+                ->join('accounts','info_contents.account_id','=','accounts.userid')
+                ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
+                ->where('info_feedbacks.student_id','=',$student->id)
+                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+                ->orderByDesc('info_contents.created_at')
+                ->get();
+        }
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
-    }
+        }
 
     public function getDetail($id){//通知系统详情页
-        $user = WeChatController::getUser();//获取教师/学生的id
-        $userId = $user->id;
         $content = Info_Content::find($id);
         if (!$content){
             return Response::json(['status' => 404,'msg' => '内容id不存在']);
         }
-        $feedback = Info_Feedback::where('info_content_id','=',$id)
-            ->where('student_id','=',$userId)
-            ->first();
+        $openid = $_COOKIE['openid'];
+        $student = Student::where('openid',$openid)->first();
+        $teacher = Account::where('openid',$openid)->first();
+        if ($teacher) {//如果是老师
+            $feedback = Info_Feedback::where('info_content_id','=',$id)
+                ->where('student_id','=',$teacher->userid)
+                ->first();
+        }
+        else{
+            $feedback = Info_Feedback::where('info_content_id','=',$id)
+                ->where('student_id','=',$student->id)
+                ->first();
+        }
         $feedback->status = 1;
         $feedback->save();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $content]);
@@ -46,8 +66,15 @@ class WechatInfoController extends Controller
     public function sendEmail($id){//把附件发送到学生邮箱
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
-        $name = $student->name;
-        $email = $student->email;
+        $teacher = Account::where('openid',$openid)->first();
+        if ($teacher) {//如果是老师
+            $name = $teacher->name;
+            $email = $teacher->email;
+        }
+        else{
+            $name = $student->name;
+            $email = $student->email;
+        }
         if (!$email){
             return Response::json(['status' => 404,'msg' => '请先绑定您的邮箱信息']);
         }
@@ -62,23 +89,23 @@ class WechatInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'send email successfully']);
     }
 
-    //————————————————————教师微信端——————————————————————
-    public function getTeacherInfo(){//面向教务老师
-        $data = Account::where('openid','!=',null)->get();
-        return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
-    }
-
-    public function getStudentInfo(){//面向辅导员
+    //————————————————————教师微信端发送通知——————————————————————
+    public function getReceivers($info_level){//获取发送者
         $data = Student::all();
         $grade = $data->groupBy('grade');
         $class = $data->groupBy('class_num');
         $major = $data->groupBy('major');
-        return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major]]);
+        if ($info_level == 1){//如果是1-辅导员
+            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major]]);
+        }
+        else{//如果是教务老师
+            $teachers = Account::where('openid','!=',null)->orderBy('name')->get();
+            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'teacher' => $teachers]]);
+        }
     }
 
     public function send(Request $request){
         $openid = $_COOKIE['openid'];
-        //$openid = 'oTkqI0XMZFPldSWRrKvnOUpLYN9o';
         $teacher = Account::where('openid',$openid)->first();
         $userid = $teacher->userid;
         $data = $request->all();
