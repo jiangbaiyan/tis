@@ -7,6 +7,7 @@ use App\Http\Controllers\WeChatController;
 use App\Info_Content;
 use App\Info_Feedback;
 use App\Student;
+use App\Teacher_Info_Feedback;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LoginAndAccount\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -28,7 +29,6 @@ class TeacherInfoController extends Controller
             $teacher = Account::where('userid',$userid)->first();
         }
         else{
-            //$openid = 'oTkqI0XMZFPldSWRrKvnOUpLYN9o';
             $openid = $_COOKIE['openid'];
             $teacher = Account::where('openid',$openid)->first();
         }
@@ -90,7 +90,7 @@ class TeacherInfoController extends Controller
                         'Content-Length: ' . strlen($jsonData))
                 );
                 curl_exec($ch);
-                Info_Feedback::create(['student_id' => $teacher->userid,'info_content_id' => $info->id]);
+                Teacher_Info_Feedback::create(['account_id' => $teacher->id,'info_content_id' => $info->id]);
             }
         }
         else if ($type == 'teacher'){//给特定教师发送信息(case:6)
@@ -107,7 +107,7 @@ class TeacherInfoController extends Controller
                             'Content-Length: ' . strlen($jsonData))
                     );
                     curl_exec($ch);
-                    Info_Feedback::create(['student_id' => $teacher->userid,'info_content_id' => $info->id]);
+                    Teacher_Info_Feedback::create(['account_id' => $teacher->id,'info_content_id' => $info->id]);
                 }
             }
         }
@@ -341,23 +341,23 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
     }
 
-    public function getReceivers($info_level){//获取发送者
+    public function getReceivers($info_level){//获取通知对象
         $data = Student::all();
         $grade = $data->groupBy('grade');
         $class = $data->groupBy('class_num');
         $major = $data->groupBy('major');
-        if ($info_level == 1){//如果是1-辅导员
+        if ($info_level == 1){//如果是辅导员，那么只能给学生发通知
             return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major]]);
         }
-        else{//如果是教务老师
+        else{//如果是教务老师，那么可以给学生和老师发通知
             $teachers = Account::where('openid','!=',null)->orderBy('name')->get();
             return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'teacher' => $teachers]]);
         }
     }
 
 
-    public function getInfoContent($info_level){
-        if ($info_level == 1){//如果是辅导员，通知表与学生表相连
+    public function getInfoContent($info_level){//教师查看所发通知列表
+        if ($info_level == 1){//如果是辅导员，可查看type为1-5（发给学生的通知）
             $data = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.*','accounts.name')
                 ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
@@ -365,7 +365,7 @@ class TeacherInfoController extends Controller
                 ->orderByDesc('info_contents.created_at')
                 ->get();
         }
-        else{//如果是教务老师，通知表与教师表相连
+        else{//如果是教务老师，可以查看所有通知（type为1-7）
             $data = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.*','accounts.name')
                 ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
@@ -375,12 +375,13 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
 
-    public function getFeedback($id,$info_level){//教师查看学生反馈情况
+    public function getFeedback($id){//教师查看学生反馈情况
         $content = Info_Content::find($id);
         if (!$content){
             return Response::json(['status' => 404,'msg' => '通知id不存在']);
         }
-        if ($info_level == 1){//如果是辅导员，反馈表与学生表相连
+        $type = $content->type;//查询通知对象
+        if ($type >=1&&$type<=5){//若该通知是发给学生的，那么链接学生反馈表
             $data = $content->info_feedbacks()
                 ->join('students','info_feedbacks.student_id','=','students.id')
                 ->join('info_contents','info_feedbacks.info_content_id','=','info_contents.id')
@@ -388,15 +389,14 @@ class TeacherInfoController extends Controller
                 ->orderBy('students.userid')
                 ->get();
         }
-        else{//如果是教务老师，反馈表与教师表相连
-            $data = $content->info_feedbacks()
-                ->join('accounts','info_feedbacks.student_id','=','accounts.userid')
-                ->join('info_contents','info_feedbacks.info_content_id','=','info_contents.id')
-                ->select('accounts.userid','accounts.name','info_feedbacks.status','info_contents.title','info_contents.content','info_contents.send_to')
+        else{//若是发给教师的，链接教师反馈表
+            $data = $content->teacher_info_feedbacks()
+                ->join('accounts','teacher_info_feedbacks.account_id','=','accounts.id')
+                ->join('info_contents','teacher_info_feedbacks.info_content_id','=','info_contents.id')
+                ->select('accounts.userid','accounts.name','teacher_info_feedbacks.status','info_contents.title','info_contents.content','info_contents.send_to')
                 ->orderBy('accounts.userid')
                 ->get();
         }
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
-
 }

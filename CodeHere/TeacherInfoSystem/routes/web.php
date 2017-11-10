@@ -191,7 +191,7 @@ Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
                     Route::get('receivers/{info_level}','TeacherInfoController@getReceivers');
                     Route::post('send', 'TeacherInfoController@send');
                     Route::get('infocontent/{info_level}', 'TeacherInfoController@getInfoContent');
-                    Route::get('infofeedback/{id}/{info_level}', 'TeacherInfoController@getFeedback');
+                    Route::get('infofeedback/{id}', 'TeacherInfoController@getFeedback');
                 });
             });
 

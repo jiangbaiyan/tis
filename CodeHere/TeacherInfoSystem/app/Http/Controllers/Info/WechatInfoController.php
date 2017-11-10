@@ -8,6 +8,7 @@ use App\Info_Content;
 use App\Info_Feedback;
 use App\Student;
 use App\Http\Controllers\LoginAndAccount\Controller;
+use App\Teacher_Info_Feedback;
 use Illuminate\Http\Request;
 use Mail;
 use Illuminate\Support\Facades\Response;
@@ -20,10 +21,10 @@ class WechatInfoController extends Controller
         $student = Student::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();
         if ($teacher){//如果是老师
-            $data = Info_Content::join('info_feedbacks','info_feedbacks.info_content_id','=','info_contents.id')
+            $data = Info_Content::join('teacher_info_feedbacks','teacher_info_feedbacks.info_content_id','=','info_contents.id')
                 ->join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
-                ->where('info_feedbacks.student_id','=',$teacher->userid)
+                ->where('teacher_info_feedbacks.account_id','=',$teacher->id)
                 ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
                 ->orderByDesc('info_contents.created_at')
                 ->get();
@@ -38,7 +39,7 @@ class WechatInfoController extends Controller
                 ->get();
         }
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
-        }
+    }
 
     public function getDetail($id){//通知系统详情页
         $content = Info_Content::find($id);
@@ -48,12 +49,12 @@ class WechatInfoController extends Controller
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();
-        if ($teacher) {//如果是老师
-            $feedback = Info_Feedback::where('info_content_id','=',$id)
-                ->where('student_id','=',$teacher->userid)
+        if ($teacher) {//如果是老师，查教师反馈表
+            $feedback = Teacher_Info_Feedback::where('info_content_id','=',$id)
+                ->where('account_id','=',$teacher->id)
                 ->first();
         }
-        else{
+        else{//如果是学生，查学生反馈表
             $feedback = Info_Feedback::where('info_content_id','=',$id)
                 ->where('student_id','=',$student->id)
                 ->first();

@@ -13,4 +13,8 @@ class Info_Content extends Model
     public function info_feedbacks(){
         return $this->hasMany('App\Info_Feedback','info_content_id','id');
     }
+
+    public function teacher_info_feedbacks(){
+        return $this->hasMany('App\Teacher_Info_Feedback','info_content_id','id');
+    }
 }
