@@ -8,6 +8,7 @@ use App\Info_Content;
 use App\Info_Feedback;
 use App\Student;
 use App\Teacher_Info_Feedback;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LoginAndAccount\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -44,7 +45,7 @@ class TeacherInfoController extends Controller
                     'color' => '#FF0000'
                 ],
                 'keyword1' => [
-                    'value' => '网络空间安全学院'
+                    'value' => '网安学院'
                 ],
                 'keyword2' => [
                     'value' => $teacher->name
@@ -57,12 +58,11 @@ class TeacherInfoController extends Controller
                     'color' => '#FF0000'
                 ],
                 'remark' => [
-                    'value' => '点击进入通知详情页',
+                    'value' => '因统计需要，请点击该通知进入详情页，即视为您已阅读',
                     'color' => '#00B642'
                 ]
             ]
         ];
-
         if ($type == 'all'){//给全体学生发信息(case:5)
             $students = Student::all();
             foreach ($students as $student){
@@ -129,6 +129,31 @@ class TeacherInfoController extends Controller
                 }
             }
         }
+        $client = new Client();
+        $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token",[
+            'json' => [
+                'touser' => $teacher->openid,
+                'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
+                'data' => [
+                    'first' => [
+                        'value' => '您已成功发送通知'.'《'.$info->title.'》',
+                        'color' => '#00B642'
+                    ],
+                    'keyword1' => [
+                        'value' => '网安学院'
+                    ],
+                    'keyword2' => [
+                        'value' => $teacher->name
+                    ],
+                    'keyword3' => [
+                        'value' => $info->created_at->diffForHumans()
+                    ],
+                    'keyword4' => [
+                        'value' => $info->content
+                    ],
+                ]
+            ]
+        ]);
         curl_close($ch);
     }
 
