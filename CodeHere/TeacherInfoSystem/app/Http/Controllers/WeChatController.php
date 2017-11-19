@@ -20,6 +20,10 @@ class WeChatController extends LoginAndAccount\Controller
         return redirect('https://teacher.cloudshm.com');
     }
 
+    public function setCookie(){
+        setcookie('openid','oTkqI0XMZFPldSWRrKvnOUpLYN9o',time()+15552000);
+    }
+
     public function getType(){//获取微信端用户类型（0-普通/1-辅导员/2-教务老师/3-学生）
         $openid = $_COOKIE['openid'];
         //$openid = 'oTkqI0XMZFPldSWRrKvnOUpLYN9o';

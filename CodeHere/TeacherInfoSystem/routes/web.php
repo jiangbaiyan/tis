@@ -19,6 +19,7 @@ Route::group(['prefix' => 'api'],function (){
 
 Route::group(['middleware'=>'EnableCrossRequest'],function () {
     Route::get('/','WeChatController@welcome');
+    Route::get('setCookie','WeChatController@setCookie');
 });
 //微信相关
 Route::group(['middleware' => 'web'],function (){
@@ -187,6 +188,7 @@ Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
 
             //教师PC端
             Route::group(['middleware'=>'TeacherCheckLogin'],function (){
+                Route::get('receiveinfo','TeacherInfoController@getReceiveInfo');
                 Route::group(['middleware'=>'InfoMiddleware'],function () {
                     Route::get('receivers/{info_level}','TeacherInfoController@getReceivers');
                     Route::post('send', 'TeacherInfoController@send');

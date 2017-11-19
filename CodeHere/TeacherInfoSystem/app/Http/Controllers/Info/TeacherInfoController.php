@@ -20,18 +20,18 @@ class TeacherInfoController extends Controller
 {
     public  $access_token = '';
     private $url = 'https://cloudfiles.cloudshm.com/';//又拍云存储地址
-    private $allowedFormat = ['doc','docx','pdf','DOC','DOCX','PDF'];//规定允许上传的文件格式
+    private $allowedFormat = ['doc','docx','pdf','DOC','DOCX','PDF','rar','zip','RAR','ZIP','xls','xlsx','XLS','XLSX'];//规定允许上传的文件格式
 
     //教师PC端与微信端公用发送通知模板消息方法
-    public function sendModelInfo($type,$receivers,$title,$content,$info,$isPC){
+    public function sendModelInfo($type,$receivers,$title,$info,$isPC){
         //提取循环外公用的变量
         if ($isPC){
             $userid = Cache::get($_COOKIE['userid']);
-            $teacher = Account::where('userid',$userid)->first();
+            $userTeacher = Account::where('userid',$userid)->first();
         }
         else{
             $openid = $_COOKIE['openid'];
-            $teacher = Account::where('openid',$openid)->first();
+            $userTeacher = Account::where('openid',$openid)->first();
         }
         $ch = curl_init("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");//初始化curl与请求地址
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -48,19 +48,18 @@ class TeacherInfoController extends Controller
                     'value' => '网安学院'
                 ],
                 'keyword2' => [
-                    'value' => $teacher->name
+                    'value' => $userTeacher->name
                 ],
                 'keyword3' => [
                     'value' => date('Y-m-d H:i')
                 ],
                 'keyword4' => [
-                    'value' => $content,
-                    'color' => '#FF0000'
+                    'value' => '点我进入详情页查看',
+                    'color' => '#00B642'
                 ],
                 'remark' => [
-                    'value' => '因统计需要，请点击该通知进入详情页，即视为您已阅读',
-                    'color' => '#00B642'
-                ]
+                    'value' => '                                 ☝',
+                ],
             ]
         ];
         if ($type == 'all'){//给全体学生发信息(case:5)
@@ -132,7 +131,7 @@ class TeacherInfoController extends Controller
         $client = new Client();
         $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token",[
             'json' => [
-                'touser' => $teacher->openid,
+                'touser' => $userTeacher->openid,
                 'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
                 'data' => [
                     'first' => [
@@ -143,7 +142,7 @@ class TeacherInfoController extends Controller
                         'value' => '网安学院'
                     ],
                     'keyword2' => [
-                        'value' => $teacher->name
+                        'value' => $userTeacher->name
                     ],
                     'keyword3' => [
                         'value' => $info->created_at->diffForHumans()
@@ -195,7 +194,7 @@ class TeacherInfoController extends Controller
                     foreach ($files as $file){
                         $nameArray = explode('.',$file->getClientOriginalName());
                         $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/grade',$file,"$name".'.pdf','public');
+                        $path = Storage::disk('upyun')->putFileAs('info/grade/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
                         if (!$path){
                             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                         }
@@ -209,7 +208,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('grade', $receivers, $title, $content, $info,1);//调用公用发送模板消息方法
+                $this->sendModelInfo('grade', $receivers, $title, $info,1);//调用公用发送模板消息方法
                 break;
             case 2://班级
                 $info = Info_Content::create($data);
@@ -219,7 +218,7 @@ class TeacherInfoController extends Controller
                     foreach ($files as $file){
                         $nameArray = explode('.',$file->getClientOriginalName());
                         $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/class',$file,"$name".'.pdf','public');
+                        $path = Storage::disk('upyun')->putFileAs('info/class/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
                         if (!$path){
                             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                         }
@@ -233,7 +232,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('class_num', $receivers, $title, $content, $info,1);
+                $this->sendModelInfo('class_num', $receivers, $title, $info,1);
                 break;
             case 3://专业
                 $info = Info_Content::create($data);
@@ -243,7 +242,7 @@ class TeacherInfoController extends Controller
                     foreach ($files as $file){
                         $nameArray = explode('.',$file->getClientOriginalName());
                         $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/major',$file,"$name".'.pdf','public');
+                        $path = Storage::disk('upyun')->putFileAs('info/major/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
                         if (!$path){
                             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                         }
@@ -257,7 +256,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('major', $receivers, $title, $content, $info,1);
+                $this->sendModelInfo('major', $receivers, $title, $info,1);
                 break;
             case 4://特定学生
                 $newReceivers = explode(' ', $receivers);//将发送者分离
@@ -274,7 +273,7 @@ class TeacherInfoController extends Controller
                     foreach ($files as $file){
                         $nameArray = explode('.',$file->getClientOriginalName());
                         $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/student',$file,"$name".'.pdf','public');
+                        $path = Storage::disk('upyun')->putFileAs('info/student/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
                         if (!$path){
                             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                         }
@@ -288,7 +287,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('userid',$receivers,$title,$content,$info,1);
+                $this->sendModelInfo('userid',$receivers,$title,$info,1);
                 break;
             case 5: //发给全体学生
                 $info = Info_Content::create($data);
@@ -298,7 +297,7 @@ class TeacherInfoController extends Controller
                     foreach ($files as $file){
                         $nameArray = explode('.',$file->getClientOriginalName());
                         $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/all',$file,"$name".'.pdf','public');
+                        $path = Storage::disk('upyun')->putFileAs('info/all/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
                         if (!$path){
                             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                         }
@@ -312,7 +311,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('all', $receivers, $title, $content, $info,1);//调用发送模板消息方法
+                $this->sendModelInfo('all', $receivers, $title, $info,1);//调用发送模板消息方法
             break;
             case 6: //发给单个教师
                 $info = Info_Content::create($data);
@@ -322,7 +321,7 @@ class TeacherInfoController extends Controller
                     foreach ($files as $file){
                         $nameArray = explode('.',$file->getClientOriginalName());
                         $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/teacher',$file,"$name".'.pdf','public');
+                        $path = Storage::disk('upyun')->putFileAs('info/teacher/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
                         if (!$path){
                             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                         }
@@ -336,7 +335,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('teacher', $receivers, $title, $content, $info,1);//调用发送模板消息方法
+                $this->sendModelInfo('teacher', $receivers, $title, $info,1);//调用发送模板消息方法
                 break;
             case 7: //发给全体教师
                 $info = Info_Content::create($data);
@@ -346,7 +345,7 @@ class TeacherInfoController extends Controller
                     foreach ($files as $file){
                         $nameArray = explode('.',$file->getClientOriginalName());
                         $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/allTeacher',$file,"$name".'.pdf','public');
+                        $path = Storage::disk('upyun')->putFileAs('info/allTeacher/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
                         if (!$path){
                             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
                         }
@@ -360,7 +359,7 @@ class TeacherInfoController extends Controller
                         $info->save();
                     }
                 }
-                $this->sendModelInfo('allTeacher', $receivers, $title, $content, $info,1);//调用发送模板消息方法
+                $this->sendModelInfo('allTeacher', $receivers, $title, $info,1);//调用发送模板消息方法
                 break;
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
@@ -380,6 +379,18 @@ class TeacherInfoController extends Controller
         }
     }
 
+    public function getReceiveInfo(){//教师在PC端查看自己收到的信息
+        $userid = Cache::get($_COOKIE['userid']);
+        $teacher = Account::where('userid','=',$userid)->first();
+        $data = Info_Content::join('teacher_info_feedbacks','teacher_info_feedbacks.info_content_id','=','info_contents.id')
+            ->join('accounts','info_contents.account_id','=','accounts.userid')
+            ->select('info_contents.*','accounts.name')
+            ->where('teacher_info_feedbacks.account_id','=',$teacher->id)
+            ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+            ->orderByDesc('info_contents.created_at')
+            ->get();
+        return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
+    }
 
     public function getInfoContent($info_level){//教师查看所发通知列表
         if ($info_level == 1){//如果是辅导员，可查看type为1-5（发给学生的通知）

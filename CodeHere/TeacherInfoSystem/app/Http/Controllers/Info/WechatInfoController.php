@@ -44,7 +44,7 @@ class WechatInfoController extends Controller
     public function getDetail($id){//通知系统详情页
         $content = Info_Content::find($id);
         if (!$content){
-            return Response::json(['status' => 404,'msg' => '内容id不存在']);
+            return Response::json(['status' => 405,'msg' => '该通知已被删除，请联系管理员']);
         }
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
@@ -125,19 +125,19 @@ class WechatInfoController extends Controller
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $sendModelInfo->sendModelInfo('grade', $receivers, $title, $content, $info,0);//调用公用发送模板消息方法
+                $sendModelInfo->sendModelInfo('grade', $receivers, $title, $info,0);//调用公用发送模板消息方法
                 break;
             case 2://班级
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $sendModelInfo->sendModelInfo('class_num', $receivers, $title, $content, $info,0);
+                $sendModelInfo->sendModelInfo('class_num', $receivers, $title, $info,0);
                 break;
             case 3://专业
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $sendModelInfo->sendModelInfo('major', $receivers, $title, $content, $info,0);
+                $sendModelInfo->sendModelInfo('major', $receivers, $title, $info,0);
                 break;
             case 4://特定学生
                 $newReceivers = explode(' ', $receivers);//将发送者分离
@@ -150,25 +150,25 @@ class WechatInfoController extends Controller
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $sendModelInfo->sendModelInfo('userid',$receivers,$title,$content,$info,0);
+                $sendModelInfo->sendModelInfo('userid',$receivers,$title,$info,0);
                 break;
             case 5: //全体学生
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $sendModelInfo->sendModelInfo('all', $receivers, $title, $content, $info,0);//调用发送模板消息方法
+                $sendModelInfo->sendModelInfo('all', $receivers, $title, $info,0);//调用发送模板消息方法
                 break;
             case 6: //特定教师
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $sendModelInfo->sendModelInfo('teacher', $receivers, $title, $content, $info,0);//调用发送模板消息方法
+                $sendModelInfo->sendModelInfo('teacher', $receivers, $title, $info,0);//调用发送模板消息方法
                 break;
             case 7: //全体教师
                 $info = Info_Content::create($data);
                 $info->account_id = $userid;
                 $info->save();
-                $sendModelInfo->sendModelInfo('allTeacher', $receivers, $title, $content, $info,0);//调用发送模板消息方法
+                $sendModelInfo->sendModelInfo('allTeacher', $receivers, $title, $info,0);//调用发送模板消息方法
                 break;
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
