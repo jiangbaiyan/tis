@@ -19,6 +19,6 @@ class Info_Content extends Model
     }
 
     public function teacher(){
-        return $this->belongsTo('App\Info_Content','userid','account_id');
+        return $this->belongsTo('App\Account','account_id','userid');
     }
 }

@@ -41,7 +41,7 @@ class TeacherInfoController extends Controller
             'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
             'data' => [
                 'first' => [
-                    'value' => "$title",
+                    'value' => '《'."$title".'》',
                     'color' => '#FF0000'
                 ],
                 'keyword1' => [
