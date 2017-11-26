@@ -14,12 +14,12 @@ class TestController extends Controller//单元测试控制器
     public function test(){//GuzzleHttp扩展包
         $wechat = new WeChatController();
         $access_token = $wechat->getAccessToken();
-        $unreads = Teacher_Info_Feedback::where('status','=',0)
-            ->where('created_at','<=',date('Y-m-d H:i:s',time()-10800))//如果三个小时内还没有查看通知
-            ->where('account_id','=',39)//刘霞
-            ->orwhere('account_id','=',40)//胡伟通
-            ->orwhere('account_id','=',44)//岳恒立
-            ->get();//获取未阅读的通知
+        $unreads = Teacher_Info_Feedback::where('status','=',0)//未阅读
+            ->where('is_remind','=',0)//没有给老师发送过提醒
+            ->where('created_at','<=',date('Y-m-d H:i:s',time()-10800))//三个小时内还没有查看通知
+            ->whereIn('account_id',[39,40])
+            ->get();
+        dd($unreads);
         foreach ($unreads as $unread){
             $openid = $unread->account->openid;
             if (isset($unread->info_content)){//如果反馈对应的通知没有被删除，那么发送提醒

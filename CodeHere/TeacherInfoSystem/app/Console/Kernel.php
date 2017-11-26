@@ -138,7 +138,7 @@ class Kernel extends ConsoleKernel
             }
         })->twiceDaily(9,15);
 
-        $schedule->call(function (){//每天检测是否发送了相应通知的统计信息给发送者
+        $schedule->call(function (){//每天检测是否发送了统计信息给发送老师
             $infos = Info_Content::where('status','=',0)->get();//取出没有发送统计信息提醒的通知
             $wechat = new WeChatController();
             $access_token = $wechat->getAccessToken();
@@ -153,7 +153,7 @@ class Kernel extends ConsoleKernel
                     $read = $info->teacher_info_feedbacks()->where('status','=',1)->count();
                     $notRead = $info->teacher_info_feedbacks()->where('status','=',0)->count();
                 }
-                $time = $info->created_at->diffForHumans();
+                $time = $info->created_at->diffForHumans();//格式化时间
                 $teacher = Account::where('userid','=',$info->account_id)->first();
                 $openid = $teacher->openid;
                 $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token",[
@@ -184,26 +184,25 @@ class Kernel extends ConsoleKernel
                         ]
                     ]
                 ]);
-                $info->status = 1;
+                $info->status = 1;//发送完信息，更新status字段为1，代表已经给老师发送了统计信息
                 $info->save();
             }
         })->dailyAt('12:00');
 
-        //如果教师三小时内未阅读通知，那么三小时过后，每小时提醒一次
+        //如果教师三小时内未阅读通知，那么三小时过后进行一次提醒
         $schedule->call(function (){
             $wechat = new WeChatController();
+            $client = new Client();
             $access_token = $wechat->getAccessToken();
-            $unreads = Teacher_Info_Feedback::where('status','=',0)
-                ->where('created_at','<=',date('Y-m-d H:i:s',time()-10800))//如果三个小时内还没有查看通知
-                ->where('account_id','=',39)//刘霞
-                ->orwhere('account_id','=',40)//胡伟通
-                ->orwhere('account_id','=',44)//岳恒立
-                ->get();//获取未阅读的通知
+            $unreads = Teacher_Info_Feedback::where('status','=',0)//未阅读
+                ->where('is_remind','=',0)//没有给老师发送过提醒
+                ->where('created_at','<=',date('Y-m-d H:i:s',time()-10800))//三个小时内还没有查看通知
+                ->whereIn('account_id',[39,40])
+                ->get();
             foreach ($unreads as $unread){
                 $openid = $unread->account->openid;
                 if (isset($unread->info_content)){//如果反馈对应的通知没有被删除，那么发送提醒
                     $info = $unread->info_content;
-                    $client = new Client();
                     $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token",[
                         'json' => [
                             'touser' => $openid,
@@ -234,9 +233,11 @@ class Kernel extends ConsoleKernel
                             ]
                         ]
                     ]);
+                    $unread->is_remind = 1;//标志已经给该条通知对应的老师发送过提醒
+                    $unread->save();
                 }
             }
-        })->hourly();
+        })->everyFiveMinutes();
     }
 
     /**
