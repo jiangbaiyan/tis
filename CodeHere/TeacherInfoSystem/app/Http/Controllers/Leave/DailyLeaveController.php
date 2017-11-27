@@ -84,7 +84,7 @@ class DailyLeaveController extends Controller
                 ->where('students.account_id','=', $teacherid)
                 ->where('daily_leaves.is_pass','=',0)
                 ->get();
-            //给这些学生发送模板消息
+            //给这些学生发送短信与模板消息
             foreach ($daily_leaves as $daily_leave){//遍历所有请假信息
                 $openid = $daily_leave->student->openid;//学生openid
                 $name = $daily_leave->student->name;//学生姓名
@@ -98,6 +98,9 @@ class DailyLeaveController extends Controller
                     $teacher_phone= explode(' ',$teacher_phone);//将空格分隔的字符串数据转化为数组
                     $teacher_name= explode(' ',$teacher_name);
                     $teacher_course= explode(' ',$teacher_course);
+                    if (count($teacher_phone)!=count($teacher_course)||count($teacher_course)!=count($teacher_name)||count($teacher_phone)!=count($teacher_name)){//判断用户输入合法性
+                        return Response::json(['status' => 402,'msg' => '教师手机号、名称、课程数量不匹配']);
+                    }
                     for ($i = 0,$len = count($teacher_phone);$i<$len;$i++){//这里以上三个数组长度应该相等
                         $postData = [
                             'template_id' => 540,
@@ -171,6 +174,9 @@ class DailyLeaveController extends Controller
                 $teacher_phone= explode(' ',$teacher_phone);//将空格分隔的字符串数据转化为数组
                 $teacher_name= explode(' ',$teacher_name);
                 $teacher_course= explode(' ',$teacher_course);
+                if (count($teacher_phone)!=count($teacher_course)||count($teacher_course)!=count($teacher_name)||count($teacher_phone)!=count($teacher_name)){//判断用户输入合法性
+                    return Response::json(['status' => 402,'msg' => '教师手机号、名称、课程数量不匹配']);
+                }
                 for ($i = 0,$len = count($teacher_phone);$i<$len;$i++){//这里以上三个数组长度应该相等
                     $postData = [
                         'template_id' => 540,
