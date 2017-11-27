@@ -13,18 +13,19 @@ class TestController extends Controller//单元测试控制器
 {
     public function test(){//GuzzleHttp扩展包
         $wechat = new WeChatController();
+        $client = new Client();
         $access_token = $wechat->getAccessToken();
         $unreads = Teacher_Info_Feedback::where('status','=',0)//未阅读
             ->where('is_remind','=',0)//没有给老师发送过提醒
             ->where('created_at','<=',date('Y-m-d H:i:s',time()-10800))//三个小时内还没有查看通知
-            ->whereIn('account_id',[39,40])
+            ->groupBy('account_id')
+            //->whereIn('account_id',[39,40])
             ->get();
-        dd($unreads);
         foreach ($unreads as $unread){
             $openid = $unread->account->openid;
             if (isset($unread->info_content)){//如果反馈对应的通知没有被删除，那么发送提醒
                 $info = $unread->info_content;
-                $client = new Client();
+                //发送模板消息
                 $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token",[
                     'json' => [
                         'touser' => $openid,
@@ -55,6 +56,24 @@ class TestController extends Controller//单元测试控制器
                         ]
                     ]
                 ]);
+
+                //发送短信
+                $phone = $unread->account->mobile_phone;
+                $name = $unread->account->name;
+                $unreadCount = Teacher_Info_Feedback::where('status','=',0)//未阅读
+                ->where('created_at','<=',date('Y-m-d H:i:s',time()-10800))//三个小时内还没有查看通知
+                ->whereIn('account_id',[39,40])
+                ->get();
+                $client->request('POST','https://sms-api.upyun.com/api/messages',[
+                    'json' => [
+                        'template_id' => 695,
+                        'mobile' => $phone,
+                        'vars' => ""
+                    ]
+                ]);
+
+                $unread->is_remind = 1;//标志已经给该条通知对应的老师发送过提醒
+                $unread->save();
             }
         }
     }

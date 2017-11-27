@@ -29,7 +29,7 @@ class WechatInfoController extends Controller
                 ->orderByDesc('info_contents.created_at')
                 ->get();
         }
-        else{//如果是学生
+        else if ($student){//如果是学生，查学生反馈表
             $data = Info_Content::join('info_feedbacks','info_feedbacks.info_content_id','=','info_contents.id')
                 ->join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
@@ -37,6 +37,9 @@ class WechatInfoController extends Controller
                 ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
                 ->orderByDesc('info_contents.created_at')
                 ->get();
+        }
+        else{//如果两张表都没找到用户信息
+            return Response::json(['status' => 404,'msg' => '用户信息未找到，请重新绑定']);
         }
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
@@ -54,10 +57,17 @@ class WechatInfoController extends Controller
                 ->where('account_id','=',$teacher->id)
                 ->first();
         }
-        else{//如果是学生，查学生反馈表
+        else if ($student){//如果是学生，查学生反馈表
             $feedback = Info_Feedback::where('info_content_id','=',$id)
                 ->where('student_id','=',$student->id)
                 ->first();
+        }
+        else{//如果两张表都没找到用户信息
+            return Response::json(['status' => 404,'msg' => '用户信息未找到，请重新绑定']);
+        }
+
+        if (!$feedback){
+            return Response::json(['status' => 404,'msg' => '您无权限查看该通知']);
         }
         $feedback->status = 1;
         $feedback->save();
@@ -72,9 +82,12 @@ class WechatInfoController extends Controller
             $name = $teacher->name;
             $email = $teacher->email;
         }
-        else{
+        else if ($student){
             $name = $student->name;
             $email = $student->email;
+        }
+        else{
+            return Response::json(['status' => 404,'msg' => '用户信息未找到，请重新绑定']);
         }
         if (!$email){
             return Response::json(['status' => 404,'msg' => '请先绑定您的邮箱信息']);
