@@ -85,7 +85,7 @@ class WechatCasController extends LoginAndAccount\Controller
                     $successnode = ''.$validateXML->authenticationSuccess[0];
                     if (!empty($successnode)) {
                         //将从杭电CAS获取到的数据写入数据库
-                        if ($idtype == '1'){//如果是学生
+                        if ($idtype == '1'){//适配本科生
                             $classnameid = substr($classid,4,2);//如15083611中的'36'，用来判断专业
                             if ($classnameid == '24'){
                                 $major = '网络工程';
@@ -112,7 +112,17 @@ class WechatCasController extends LoginAndAccount\Controller
                             Session::put('grade',$grade);
                             return redirect('/showError');
                         }
-                        else{//如果是教师
+                        else if ($idtype == '2'){//适配研究生
+                            $grade = '20'.substr($userid,0,2);
+                            Session::put('userid',$userid);
+                            Session::put('name',$username);
+                            Session::put('sex',$sex);
+                            Session::put('openid',$openid);
+                            Session::put('unit',$unit);
+                            Session::put('grade',$grade);
+                            return redirect('/postgraduateShowError');
+                        }
+                        else{//适配教师
                             Session::put('userid',$userid);
                             Session::put('name',$username);
                             Session::put('sex',$sex);

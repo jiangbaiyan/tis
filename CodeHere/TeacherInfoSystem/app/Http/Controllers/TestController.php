@@ -11,70 +11,78 @@ use App\Http\Controllers\LoginAndAccount\Controller;
 
 class TestController extends Controller//单元测试控制器
 {
-    public function test(){//GuzzleHttp扩展包
-        $wechat = new WeChatController();
-        $client = new Client();
-        $access_token = $wechat->getAccessToken();
-        $unreads = Teacher_Info_Feedback::where('status','=',0)//未阅读
-            ->where('is_remind','=',0)//没有给老师发送过提醒
-            ->where('created_at','<=',date('Y-m-d H:i:s',time()-10800))//三个小时内还没有查看通知
-            ->groupBy('account_id')
-            //->whereIn('account_id',[39,40])
-            ->get();
-        foreach ($unreads as $unread){
-            $openid = $unread->account->openid;
-            if (isset($unread->info_content)){//如果反馈对应的通知没有被删除，那么发送提醒
-                $info = $unread->info_content;
-                //发送模板消息
-                $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token",[
-                    'json' => [
-                        'touser' => $openid,
-                        'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
-                        'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
-                        'data' => [
-                            'first' => [
-                                'value' => '您有尚未阅读的学院通知，请尽快阅读',
-                                'color' => '#FF0000'
-                            ],
-                            'keyword1' => [
-                                'value' => '网安学院'
-                            ],
-                            'keyword2' => [
-                                'value' => $info->teacher->name
-                            ],
-                            'keyword3' => [
-                                'value' => $unread->created_at->diffForHumans()
-                            ],
-                            'keyword4' => [
-                                'value' => '《'.$info->title.'》',
-                                'color' => '#FF0000'
-                            ],
-                            'remark' => [
-                                'value' => '点我查看该通知详情，即视为您已阅读',
-                                'color' => '#00B642'
-                            ]
-                        ]
-                    ]
-                ]);
+    public function test1(){//GuzzleHttp扩展包
+        $loginServer = "http://cas.hdu.edu.cn/cas/login";
+        $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
+        $thisURL = "https://tis.cloudshm.com/test1";
 
-                //发送短信
-                $phone = $unread->account->mobile_phone;
-                $name = $unread->account->name;
-                $unreadCount = Teacher_Info_Feedback::where('status','=',0)//未阅读
-                ->where('created_at','<=',date('Y-m-d H:i:s',time()-10800))//三个小时内还没有查看通知
-                ->whereIn('account_id',[39,40])
-                ->get();
-                $client->request('POST','https://sms-api.upyun.com/api/messages',[
-                    'json' => [
-                        'template_id' => 695,
-                        'mobile' => $phone,
-                        'vars' => ""
-                    ]
-                ]);
+        //判断是否有验证成功后需要跳转页面，如果有，增加跳转参数
+/*        if (isset($_REQUEST["redirectUrl"]) && !empty($_REQUEST["redirectUrl"])) {
+            $thisURL = $thisURL . "?redirectUrl=" . $_REQUEST["redirectUrl"];
+        }*/
 
-                $unread->is_remind = 1;//标志已经给该条通知对应的老师发送过提醒
-                $unread->save();
+        //判断是否已经登录
+        if (isset($_REQUEST["ticket"]) && !empty($_REQUEST["ticket"])) {
+            //获取登录后的返回信息
+            try {//认证ticket
+                $validateurl = $validateServer . "?ticket=" . $_REQUEST["ticket"] . "&service=" . $thisURL;
+                $validateResult = file_get_contents($validateurl);
+
+                $validateResult = preg_replace("/sso:/", "", $validateResult);
+
+                $validateXML = simplexml_load_string($validateResult);
+
+                if (isset($validateXML->authenticationSuccess[0]->attributes[0])) {
+                    $validate = $validateXML->authenticationSuccess[0]->attributes[0];
+                    $i = 0;
+                    $validateNum = count($validate);
+                    while ($i < $validateNum) {
+                        $successnode0 = $validate->attribute[$i]["name"];
+                        if ($successnode0 == "userName") {//学号
+                            $userid = ''.$validate->attribute[$i]["value"];
+                        }
+                        if ($successnode0 == "user_name") {//姓名
+                            $username = ''.$validate->attribute[$i]["value"];
+                        }
+                        if ($successnode0 == "id_type") {//学生还是教师
+                            $idtype = ''.$validate->attribute[$i]["value"];
+                        }
+                        if ($successnode0 == "user_sex") {//性别
+                            $sex = ''.$validate->attribute[$i]["value"];
+                        }
+                        if ($successnode0 == "unit_name") {//学院全称
+                            $unit = ''.$validate->attribute[$i]["value"];
+                        }
+                        if ($successnode0 == "classid") {//班级号
+                            $classid = ''.$validate->attribute[$i]["value"];
+                        }
+                        $i = $i + 1;
+                    }
+                    $successnode = ''.$validateXML->authenticationSuccess[0];
+                    if (!empty($successnode)) {
+                        //测试，将获取到的XML信息存到文件中\
+                        $time = time();
+                        $casArr = (array)$validate;
+                        $casArr = var_export($casArr,true);
+                        file_put_contents("/home/wwwroot/TeacherInfoSystem/storage/app/public/cas/$time",$casArr,2);
+                        dd($validate);
+                    } else {
+                        header("Location: " . $loginServer . "?service=" . $thisURL);
+                        exit();
+                    }
+                }
             }
+            catch (Exception $e) {
+                echo "出错了";
+                echo $e->getMessage();
+            }
+        }
+        else//没有ticket，重定向到登录服务器
+        {
+            //重定向浏览器
+            header("Location: " . $loginServer . "?service=" . $thisURL);
+            //确保重定向后，后续代码不会被执行
+            exit();
         }
     }
 }

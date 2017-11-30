@@ -1,14 +1,14 @@
 <?php
 //单元测试路由
-Route::any('test','TestController@test');
+Route::any('test1','TestController@test1');
 
 
 //杭电CAS认证和JS SDK模块
 Route::group(['prefix' => 'api'],function (){
     Route::group(['prefix' => 'v1.0'],function (){
         Route::group(['middleware'=>'EnableCrossRequest'],function () {
-            Route::get('teachercas', 'TeacherCasController@cas');
-            Route::get('wechatcas', 'WechatCasController@cas');
+            Route::get('teachercas', 'TeacherCasController@cas');//教师PC端CAS认证
+            Route::get('wechatcas', 'WechatCasController@cas');//教师学生微信端CAS认证
             Route::get('jssdk', 'WeChatController@jsSDK');
             Route::group(['middleware' => 'WechatCheckLogin'],function (){
                 Route::get('type','WeChatController@getType');//判断用户信息
@@ -18,18 +18,21 @@ Route::group(['prefix' => 'api'],function (){
 });
 
 Route::group(['middleware'=>'EnableCrossRequest'],function () {
-    Route::get('/','WeChatController@welcome');
-    Route::get('setCookie','WeChatController@setCookie');
+    Route::get('/','WeChatController@welcome');//根目录
+    Route::get('setCookie','WeChatController@setCookie');//开发用
 });
+
 //微信相关
 Route::group(['middleware' => 'web'],function (){
     Route::any('bind','WeChatController@studentBind');//微信绑定信息入口url
-    Route::any('openid','WeChatController@openid');
-    Route::any('callback','WeChatController@callback');
-    Route::any('showError','WeChatController@showError');
-    Route::any('teacherShowError','WeChatController@teacherShowError');
-    Route::any('submit','WeChatController@submit');
-    Route::any('teacherSubmit','WeChatController@teacherSubmit');
+    Route::any('openid','WeChatController@openid');//bind接口后跳转地址
+    Route::any('callback','WeChatController@callback');//从微信回调中获取openid
+    Route::any('showError','WeChatController@showError');//本科生填写信息
+    Route::any('postgraduateShowError','WeChatController@postgraduateShowError');//研究生填写信息
+    Route::any('teacherShowError','WeChatController@teacherShowError');//教师填写信息
+    Route::any('submit','WeChatController@submit');//本科生
+    Route::any('postgraduateSubmit','WeChatController@postgraduateSubmit');//研究生
+    Route::any('teacherSubmit','WeChatController@teacherSubmit');//教师
 });
 
 

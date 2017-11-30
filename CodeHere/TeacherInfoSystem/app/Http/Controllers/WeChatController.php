@@ -20,7 +20,7 @@ class WeChatController extends LoginAndAccount\Controller
         return redirect('https://teacher.cloudshm.com');
     }
 
-    public function setCookie(){
+    public function setCookie(){//开发者用
         setcookie('openid','oTkqI0XMZFPldSWRrKvnOUpLYN9o',time()+15552000);
     }
 
@@ -34,7 +34,6 @@ class WeChatController extends LoginAndAccount\Controller
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => 3]]);//如果教师表中查不到数据，那么该用户是学生
     }
 
-    //绑定信息逻辑
     public function getAccessToken(){//公用获取access_token方法
         if (Cache::has('access_token')){
             $access_token = Cache::get('access_token');
@@ -54,7 +53,7 @@ class WeChatController extends LoginAndAccount\Controller
     }
 
 
-    public function studentBind(){//绑定信息
+    public function studentBind(){//绑定信息按钮入口
         return redirect('/openid');//跳转到下面的bind方法获取openid
     }
 
@@ -77,15 +76,19 @@ class WeChatController extends LoginAndAccount\Controller
         return redirect('/api/v1.0/wechatcas');//跳转到杭电CAS逻辑
     }
 
-    public function showError(){//模板渲染
+    public function showError(){//本科生模板渲染
         return view('WeChat/getMessage');
     }
 
-    public function teacherShowError(){//模板渲染
+    public function postgraduateShowError(){//研究生模板渲染
+        return view('WeChat/postGraduateGetMessage');
+    }
+
+    public function teacherShowError(){//教师模板渲染
         return view('WeChat/teacherGetMessage');
     }
 
-    public function submit(Request $request){//获取学生提交的表单信息并验证
+    public function submit(Request $request){//获取本科生提交的表单信息并验证
         $validator = Validator::make($request->all(),[
             'phone' => 'required|numeric',
             'email' => 'required|email'
@@ -106,13 +109,13 @@ class WeChatController extends LoginAndAccount\Controller
         $account_id = '';
         switch ($teacher){
             case "苏晶":
-                $account_id = "40365";
+                $account_id = '40365';
                 break;
             case "卞广旭":
-                $account_id = "41451";
+                $account_id = '41451';
                 break;
             case "冯尉瑾":
-                $account_id = "41906";
+                $account_id = '41906';
                 break;
         }
         //获得CAS绑定信息页面拿到的信息，一并存入学生表
@@ -145,6 +148,55 @@ class WeChatController extends LoginAndAccount\Controller
         );
         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
         die('学生信息绑定成功！');
+    }
+
+    public function postgraduateSubmit(Request $request){//获取研究生提交的表单信息并验证
+        $validator = Validator::make($request->all(),[
+            'phone' => 'required|numeric',
+            'email' => 'required|email'
+        ],[
+            'required' => ':attribute不能为空',
+            'numeric' => ':attribute格式不正确',
+            'email' => ':attribute格式不正确'
+        ],[
+            'phone' => '联系电话',
+            'email' => '邮箱'
+        ]);
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator)->withInput();//返回错误提示并实现数据持久化
+        }
+        $teacher = $request->input('teacher');
+        $phone = trim($request->input('phone'));
+        $email = trim($request->input('email'));
+        $account_id = '';
+        switch ($teacher){
+            case "袁理锋":
+                $account_id = '41978';
+                break;
+        }
+        $userid = Session::get('userid');
+        $username = Session::get('name');
+        $sex = Session::get('sex');
+        $openid = Session::get('openid');
+        $unit = Session::get('unit');
+        $grade = Session::get('grade');
+        setcookie('openid',$openid, time()+15552000);
+        Student::updateOrCreate(
+            ['userid' => $userid],
+            [
+                'userid' => $userid,
+                'name' => $username,
+                'sex' => $sex,
+                'openid' => $openid,
+                'unit' => $unit,
+                'grade' => $grade,
+                'phone' => $phone,
+                'email' => $email,
+                'account_id' => $account_id
+            ]
+        );
+        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+        die('研究生信息绑定成功！');
     }
 
     public function teacherSubmit(Request $request){//获取教师提交的表单信息并验证
