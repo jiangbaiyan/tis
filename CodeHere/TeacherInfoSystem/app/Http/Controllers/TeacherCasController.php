@@ -94,8 +94,8 @@ class TeacherCasController extends LoginAndAccount\Controller
                         if ($userid == '15075119' || $userid == '15051141') {//开发者跳过验证
                             goto fuck;
                         }
-                        if ($unit != "网络空间安全学院、浙江保密学院" || $idtype == '1') {
-                            return Response::json(['status' => 500, 'msg' => '您不是恩学院的教师，无权访问系统！']);
+                        if ($unit != "网络空间安全学院、浙江保密学院" || $idtype == '1' || $idtype == '2') {
+                            return Response::json(['status' => 500, 'msg' => '您不是网安学院的教师，无权访问系统']);
                         }
                         fuck:
                         Account::updateOrCreate(

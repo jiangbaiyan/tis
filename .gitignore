@@ -1,4 +1,4 @@
-.idea/
+﻿.idea/
 将删除 .env.example
 将删除 .gitattributes
 将删除 .gitignore

@@ -77,23 +77,8 @@ class TeacherInfoController extends Controller
                 Info_Feedback::create(['student_id' => $student->id,'info_content_id' => $info->id]);
             }
         }
-        else if ($type == 'allTeacher'){//给全体教师发送信息(case:7)
-            $teachers = Account::all();
-            foreach ($teachers as $teacher){
-                $openid = $teacher->openid;
-                $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
-                $jsonData = json_encode($post_data);//JSON编码。官方要求
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                        'Content-Type: application/json',
-                        'Content-Length: ' . strlen($jsonData))
-                );
-                curl_exec($ch);
-                Teacher_Info_Feedback::create(['account_id' => $teacher->id,'info_content_id' => $info->id]);
-            }
-        }
         else if ($type == 'teacher'){//给特定教师发送信息(case:6)
-            $receivers = explode(' ', $receivers);//传递过来如果类似"2015 2016"这样，需要进行字符串分割
+            $receivers = explode(' ', $receivers);//前端传递参数40365 41451需要进行字符串分割
             foreach ($receivers as $receiver){
                 $teachers = Account::where('userid',$receiver)->get();
                 foreach($teachers as $teacher){//遍历该年级/班级/专业的所有学生
@@ -110,8 +95,23 @@ class TeacherInfoController extends Controller
                 }
             }
         }
+        else if ($type == 'allTeacher'){//给全体教师发送信息(case:7)
+            $teachers = Account::all();
+            foreach ($teachers as $teacher){
+                $openid = $teacher->openid;
+                $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
+                $jsonData = json_encode($post_data);//JSON编码。官方要求
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json',
+                        'Content-Length: ' . strlen($jsonData))
+                );
+                curl_exec($ch);
+                Teacher_Info_Feedback::create(['account_id' => $teacher->id,'info_content_id' => $info->id]);
+            }
+        }
         else{//给年级/班级/专业/特定学生发送信息(case:1、2、3、4)
-            $receivers = explode(' ', $receivers);//传递过来如果类似"2015 2016"这样，需要进行字符串分割
+            $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
             foreach ($receivers as $receiver){
                 $students = Student::where("$type",$receiver)->get();
                 foreach($students as $student){//遍历该年级/班级/专业的所有学生
@@ -128,6 +128,7 @@ class TeacherInfoController extends Controller
                 }
             }
         }
+        //给发通知的人发送成功发送通知提醒
         $client = new Client();
         $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token",[
             'json' => [
@@ -168,198 +169,74 @@ class TeacherInfoController extends Controller
         if (!$title||!$content||!$type||!$receivers){
             return Response::json(['status' => 400,'msg' => 'missing parameters']);
         }
-        if ($request->hasFile('file')){
-            foreach($files as $file){
-                $ext = $file->getClientOriginalExtension();//获取扩展名
-                if (!in_array($ext,$this->allowedFormat)){
-                    return response()->json(['status' => 402,'msg' => 'wrong file format']);
-                }
-                if ($ext == 'doc'||$ext =='docx'||$ext =='DOC'||$ext == 'DOCX'){
-                    $unoconv = Unoconv::create([//如果是word文件格式，那么转码成pdf格式，这里利用了unoconv转码库
-                        'timeout'          => 200,
-                        'unoconv.binaries' => '/usr/bin/unoconv',
-                    ]);
-                    $unoconv->transcode($file,'pdf',$file);
+        if ($type == 4){//如果给特定学生发送信息，判断输入的学号是否存在
+            $newReceivers = explode(' ', $receivers);//将发送者分离
+            foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
+                $student = Student::where('userid', $newReceiver)->first();
+                if (!$student) {
+                    return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "还未绑定信息，无此学生信息"]);
                 }
             }
         }
+        $info = Info_Content::create($data);
+        $info->account_id = $userid;
+        $info->save();
+        if ($request->hasFile('file')){//如果上传了附件，那么进行格式判断与文件存储
+            foreach($files as $file){//遍历请求中的多个文件
+                $ext = $file->getClientOriginalExtension();//获取扩展名
+                if (!in_array($ext,$this->allowedFormat)){//判断格式是否是允许上传的格式
+                    return response()->json(['status' => 402,'msg' => 'wrong file format']);
+                }
+                if ($ext == 'doc'||$ext =='docx'||$ext =='DOC'||$ext == 'DOCX'){
+                    $unoconv = Unoconv::create([//如果是word类型的文件格式,那么转成PDF
+                        'timeout'          => 200,
+                        'unoconv.binaries' => '/usr/bin/unoconv',
+                    ]);
+                    $unoconv->transcode($file,'pdf',$file);//用unoconv转码
+                    $nameArray = explode('.',$file->getClientOriginalName());
+                    $name = $nameArray[0];//取出不带后缀的文件名
+                    $path = Storage::disk('upyun')->putFileAs('info/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
+                }
+                else{//其他格式，按照原文件格式存储
+                    $path = Storage::disk('upyun')->putFileAs('info/'.date('Y').'/'.date('md'),$file,$file->getClientOriginalName(),'public');
+                }
+                if (!$path){
+                    return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
+                }
+                //通知数据创建，并写入文件路径信息
+                $url = $this->url."$path";
+                if (!$info->attach_url){
+                    $info->attach_url = $url;
+                }
+                else{
+                    $info->attach_url .= ','.$url;
+                }
+                $info->save();
+            }
+        }
         $wechat = new WeChatController();
-        $this->access_token = $wechat->getAccessToken();
+        $this->access_token = $wechat->getAccessToken();//获取accesstoken
         switch ($type) {
             case 1://年级
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
-                if ($request->hasFile('file')){
-                    foreach ($files as $file){
-                        $nameArray = explode('.',$file->getClientOriginalName());
-                        $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/grade/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
-                        if (!$path){
-                            return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
-                        }
-                        $url = $this->url."$path";
-                        if (!$info->attach_url){
-                            $info->attach_url = $url;
-                        }
-                        else{
-                            $info->attach_url .= ','.$url;
-                        }
-                        $info->save();
-                    }
-                }
-                $this->sendModelInfo('grade', $receivers, $title, $info,1);//调用公用发送模板消息方法
+                $this->sendModelInfo('grade', $receivers, $title, $info,1);
                 break;
             case 2://班级
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
-                if ($request->hasFile('file')){
-                    foreach ($files as $file){
-                        $nameArray = explode('.',$file->getClientOriginalName());
-                        $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/class/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
-                        if (!$path){
-                            return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
-                        }
-                        $url = $this->url."$path";
-                        if (!$info->attach_url){
-                            $info->attach_url = $url;
-                        }
-                        else{
-                            $info->attach_url .= ','.$url;
-                        }
-                        $info->save();
-                    }
-                }
                 $this->sendModelInfo('class_num', $receivers, $title, $info,1);
                 break;
             case 3://专业
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
-                if ($request->hasFile('file')){
-                    foreach ($files as $file){
-                        $nameArray = explode('.',$file->getClientOriginalName());
-                        $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/major/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
-                        if (!$path){
-                            return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
-                        }
-                        $url = $this->url."$path";//将路径写入数据库
-                        if (!$info->attach_url){
-                            $info->attach_url = $url;
-                        }
-                        else{
-                            $info->attach_url .= ','.$url;
-                        }
-                        $info->save();
-                    }
-                }
                 $this->sendModelInfo('major', $receivers, $title, $info,1);
                 break;
             case 4://特定学生
-                $newReceivers = explode(' ', $receivers);//将发送者分离
-                foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
-                    $student = Student::where('userid', $newReceiver)->first();
-                    if (!$student) {
-                        return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "不存在"]);
-                    }
-                }
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
-                if ($request->hasFile('file')){
-                    foreach ($files as $file){
-                        $nameArray = explode('.',$file->getClientOriginalName());
-                        $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/student/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
-                        if (!$path){
-                            return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
-                        }
-                        $url = $this->url."$path";
-                        if (!$info->attach_url){
-                            $info->attach_url = $url;
-                        }
-                        else{
-                            $info->attach_url .= ','.$url;
-                        }
-                        $info->save();
-                    }
-                }
                 $this->sendModelInfo('userid',$receivers,$title,$info,1);
                 break;
             case 5: //发给全体学生
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
-                if ($request->hasFile('file')){
-                    foreach ($files as $file){
-                        $nameArray = explode('.',$file->getClientOriginalName());
-                        $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/all/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
-                        if (!$path){
-                            return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
-                        }
-                        $url = $this->url."$path";
-                        if (!$info->attach_url){
-                            $info->attach_url = $url;
-                        }
-                        else{
-                            $info->attach_url .= ','.$url;
-                        }
-                        $info->save();
-                    }
-                }
-                $this->sendModelInfo('all', $receivers, $title, $info,1);//调用发送模板消息方法
-            break;
+                $this->sendModelInfo('all', $receivers, $title, $info,1);
+                break;
             case 6: //发给单个教师
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
-                if ($request->hasFile('file')){
-                    foreach ($files as $file){
-                        $nameArray = explode('.',$file->getClientOriginalName());
-                        $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/teacher/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
-                        if (!$path){
-                            return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
-                        }
-                        $url = $this->url."$path";
-                        if (!$info->attach_url){
-                            $info->attach_url = $url;
-                        }
-                        else{
-                            $info->attach_url .= ','.$url;
-                        }
-                        $info->save();
-                    }
-                }
-                $this->sendModelInfo('teacher', $receivers, $title, $info,1);//调用发送模板消息方法
+                $this->sendModelInfo('teacher', $receivers, $title, $info,1);
                 break;
             case 7: //发给全体教师
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
-                if ($request->hasFile('file')){
-                    foreach ($files as $file){
-                        $nameArray = explode('.',$file->getClientOriginalName());
-                        $name = $nameArray[0];//取出不带后缀的文件名
-                        $path = Storage::disk('upyun')->putFileAs('info/allTeacher/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
-                        if (!$path){
-                            return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
-                        }
-                        $url = $this->url."$path";
-                        if (!$info->attach_url){
-                            $info->attach_url = $url;
-                        }
-                        else{
-                            $info->attach_url .= ','.$url;
-                        }
-                        $info->save();
-                    }
-                }
-                $this->sendModelInfo('allTeacher', $receivers, $title, $info,1);//调用发送模板消息方法
+                $this->sendModelInfo('allTeacher', $receivers, $title, $info,1);
                 break;
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);

@@ -130,57 +130,41 @@ class WechatInfoController extends Controller
         if (!$title||!$content||!$type||!$receivers){
             return Response::json(['status' => 400,'msg' => 'missing parameters']);
         }
+        if ($type == 4){//如果给特定学生发送信息，判断输入的学号是否存在
+            $newReceivers = explode(' ', $receivers);//将发送者分离
+            foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
+                $student = Student::where('userid', $newReceiver)->first();
+                if (!$student) {
+                    return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "还未绑定信息，无此学生信息"]);
+                }
+            }
+        }
         $wechat = new WeChatController();
         $sendModelInfo = new TeacherInfoController();
         $sendModelInfo->access_token = $wechat->getAccessToken();
+        $info = Info_Content::create($data);
+        $info->account_id = $userid;
+        $info->save();
         switch ($type) {
             case 1://年级
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
-                $sendModelInfo->sendModelInfo('grade', $receivers, $title, $info,0);//调用公用发送模板消息方法
+                $sendModelInfo->sendModelInfo('grade', $receivers, $title, $info,0);
                 break;
             case 2://班级
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
                 $sendModelInfo->sendModelInfo('class_num', $receivers, $title, $info,0);
                 break;
             case 3://专业
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
                 $sendModelInfo->sendModelInfo('major', $receivers, $title, $info,0);
                 break;
             case 4://特定学生
-                $newReceivers = explode(' ', $receivers);//将发送者分离
-                foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
-                    $student = Student::where('userid', $newReceiver)->first();
-                    if (!$student) {
-                        return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "不存在"]);
-                    }
-                }
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
                 $sendModelInfo->sendModelInfo('userid',$receivers,$title,$info,0);
                 break;
             case 5: //全体学生
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
                 $sendModelInfo->sendModelInfo('all', $receivers, $title, $info,0);//调用发送模板消息方法
                 break;
             case 6: //特定教师
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
                 $sendModelInfo->sendModelInfo('teacher', $receivers, $title, $info,0);//调用发送模板消息方法
                 break;
             case 7: //全体教师
-                $info = Info_Content::create($data);
-                $info->account_id = $userid;
-                $info->save();
                 $sendModelInfo->sendModelInfo('allTeacher', $receivers, $title, $info,0);//调用发送模板消息方法
                 break;
         }
