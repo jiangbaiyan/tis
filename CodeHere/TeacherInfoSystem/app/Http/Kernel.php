@@ -63,5 +63,6 @@ class Kernel extends HttpKernel
         'LeaveMiddleware' => \App\Http\Middleware\LeaveMiddleware::class,
         'AccountMiddleware' => \App\Http\Middleware\AccountMiddleware::class,
         'ScienceMiddleware' => \App\Http\Middleware\ScienceMiddleware::class,
+        'WechatLeaveMiddleware' => \App\Http\Middleware\WechatLeaveMiddleware::class,
     ];
 }

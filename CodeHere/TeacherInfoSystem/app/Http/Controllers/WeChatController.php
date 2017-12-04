@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use App\Graduate;
 use App\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -80,8 +81,8 @@ class WeChatController extends LoginAndAccount\Controller
         return view('WeChat/getMessage');
     }
 
-    public function postgraduateShowError(){//研究生模板渲染
-        return view('WeChat/postGraduateGetMessage');
+    public function graduateShowError(){//研究生模板渲染
+        return view('WeChat/graduateGetMessage');
     }
 
     public function teacherShowError(){//教师模板渲染
@@ -150,7 +151,7 @@ class WeChatController extends LoginAndAccount\Controller
         die('学生信息绑定成功！');
     }
 
-    public function postgraduateSubmit(Request $request){//获取研究生提交的表单信息并验证
+    public function graduateSubmit(Request $request){//获取研究生提交的表单信息并验证
         $validator = Validator::make($request->all(),[
             'phone' => 'required|numeric',
             'email' => 'required|email'
@@ -181,7 +182,7 @@ class WeChatController extends LoginAndAccount\Controller
         $unit = Session::get('unit');
         $grade = Session::get('grade');
         setcookie('openid',$openid, time()+15552000);
-        Student::updateOrCreate(
+        Graduate::updateOrCreate(
             ['userid' => $userid],
             [
                 'userid' => $userid,

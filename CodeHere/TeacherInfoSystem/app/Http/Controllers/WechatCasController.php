@@ -120,7 +120,7 @@ class WechatCasController extends LoginAndAccount\Controller
                             Session::put('openid',$openid);
                             Session::put('unit',$unit);
                             Session::put('grade',$grade);
-                            return redirect('/postgraduateShowError');
+                            return redirect('/graduateShowError');
                         }
                         else{//适配教师
                             Session::put('userid',$userid);

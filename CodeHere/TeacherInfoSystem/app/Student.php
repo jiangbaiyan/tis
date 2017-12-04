@@ -15,8 +15,4 @@ class Student extends Model
     public function holiday_leaves(){
         return $this->hasMany('App\Holiday_leave','student_id');
     }
-
-    public function info_contents(){
-        return $this->hasMany('App\Info_Feedback','student_id');
-    }
 }

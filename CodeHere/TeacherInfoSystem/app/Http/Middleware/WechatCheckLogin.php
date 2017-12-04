@@ -21,7 +21,7 @@ class WechatCheckLogin
         if (!isset($_COOKIE['openid'])){//如果cookie没有openid
             return Response::json(['status' => 401,'msg' => 'cookie openid not found']);
         }
-        else{
+/*        else{
         //oTkqI0fKCB6K97VEjf-E8rNpkDzw oTkqI0c8ZdHkCIFB_0vrrhfUgvcI
             //$openid = 'oTkqI0XMZFPldSWRrKvnOUpLYN9o';
             $openid = $_COOKIE['openid'];
@@ -41,5 +41,4 @@ class WechatCheckLogin
             }//只有网安的学生、教师能够访问系统*/
             return $next($request);
         }
-    }
 }

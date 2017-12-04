@@ -28,10 +28,10 @@ Route::group(['middleware' => 'web'],function (){
     Route::any('openid','WeChatController@openid');//bind接口后跳转地址
     Route::any('callback','WeChatController@callback');//从微信回调中获取openid
     Route::any('showError','WeChatController@showError');//本科生填写信息
-    Route::any('postgraduateShowError','WeChatController@postgraduateShowError');//研究生填写信息
+    Route::any('graduateShowError','WeChatController@graduateShowError');//研究生填写信息
     Route::any('teacherShowError','WeChatController@teacherShowError');//教师填写信息
     Route::any('submit','WeChatController@submit');//本科生
-    Route::any('postgraduateSubmit','WeChatController@postgraduateSubmit');//研究生
+    Route::any('graduateSubmit','WeChatController@graduateSubmit');//研究生
     Route::any('teacherSubmit','WeChatController@teacherSubmit');//教师
 });
 
@@ -171,13 +171,15 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
 
             //学生微信端
             Route::group(['middleware' => 'WechatCheckLogin'],function (){
-                Route::post('createdailyleave','DailyLeaveController@studentCreate');
-                Route::get('getdailyleave','DailyLeaveController@studentGet');
-                Route::get('deletedailyleave/{id}/{location}','DailyLeaveController@studentDelete');
-                Route::post('createholidayleave','HolidayLeaveController@studentCreate');
-                Route::get('getholidayleave','HolidayLeaveController@studentGet');
-                Route::get('deleteholidayleave/{id}','HolidayLeaveController@studentDelete');
-                Route::get('getleaveinfo','LeaveInfoController@get');
+                Route::group(['middleware' => 'WechatLeaveMiddleware'],function (){
+                    Route::post('createdailyleave','DailyLeaveController@studentCreate');
+                    Route::get('getdailyleave','DailyLeaveController@studentGet');
+                    Route::get('deletedailyleave/{id}/{location}','DailyLeaveController@studentDelete');
+                    Route::post('createholidayleave','HolidayLeaveController@studentCreate');
+                    Route::get('getholidayleave','HolidayLeaveController@studentGet');
+                    Route::get('deleteholidayleave/{id}','HolidayLeaveController@studentDelete');
+                    Route::get('getleaveinfo','LeaveInfoController@get');
+                });
             });
         });
     });

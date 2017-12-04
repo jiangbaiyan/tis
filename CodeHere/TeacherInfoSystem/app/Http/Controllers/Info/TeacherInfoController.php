@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Info;
 
 use App\Account;
+use App\Graduate;
+use App\Graduate_Info_Feedback;
 use App\Http\Controllers\WeChatController;
 use App\Info_Content;
 use App\Info_Feedback;
@@ -62,62 +64,14 @@ class TeacherInfoController extends Controller
                 ],
             ]
         ];
-        if ($type == 'all'){//给全体学生发信息(case:5)
-            $students = Student::all();
-            foreach ($students as $student){
-                $openid = $student->openid;
-                $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
-                $jsonData = json_encode($post_data);//JSON编码。官方要求
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                        'Content-Type: application/json',
-                        'Content-Length: ' . strlen($jsonData))
-                );
-                curl_exec($ch);
-                Info_Feedback::create(['student_id' => $student->id,'info_content_id' => $info->id]);
-            }
-        }
-        else if ($type == 'teacher'){//给特定教师发送信息(case:6)
-            $receivers = explode(' ', $receivers);//前端传递参数40365 41451需要进行字符串分割
-            foreach ($receivers as $receiver){
-                $teachers = Account::where('userid',$receiver)->get();
-                foreach($teachers as $teacher){//遍历该年级/班级/专业的所有学生
-                    $openid = $teacher->openid;
-                    $post_data['touser'] = $openid;
-                    $jsonData = json_encode($post_data);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                            'Content-Type: application/json',
-                            'Content-Length: ' . strlen($jsonData))
-                    );
-                    curl_exec($ch);
-                    Teacher_Info_Feedback::create(['account_id' => $teacher->id,'info_content_id' => $info->id]);
-                }
-            }
-        }
-        else if ($type == 'allTeacher'){//给全体教师发送信息(case:7)
-            $teachers = Account::all();
-            foreach ($teachers as $teacher){
-                $openid = $teacher->openid;
-                $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
-                $jsonData = json_encode($post_data);//JSON编码。官方要求
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                        'Content-Type: application/json',
-                        'Content-Length: ' . strlen($jsonData))
-                );
-                curl_exec($ch);
-                Teacher_Info_Feedback::create(['account_id' => $teacher->id,'info_content_id' => $info->id]);
-            }
-        }
-        else{//给年级/班级/专业/特定学生发送信息(case:1、2、3、4)
-            $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
-            foreach ($receivers as $receiver){
-                $students = Student::where("$type",$receiver)->get();
-                foreach($students as $student){//遍历该年级/班级/专业的所有学生
+        //根据通知对象选择对应的发送方法
+        switch ($type){
+            case 'all': //case 5
+                $students = Student::all();
+                foreach ($students as $student){
                     $openid = $student->openid;
-                    $post_data['touser'] = $openid;
-                    $jsonData = json_encode($post_data);
+                    $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
+                    $jsonData = json_encode($post_data);//JSON编码。官方要求
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                             'Content-Type: application/json',
@@ -126,7 +80,109 @@ class TeacherInfoController extends Controller
                     curl_exec($ch);
                     Info_Feedback::create(['student_id' => $student->id,'info_content_id' => $info->id]);
                 }
-            }
+                break;
+            case 'graduateGrade': //case 6
+                $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
+                foreach ($receivers as $receiver){
+                    $graduates = Graduate::where('grade',$receiver)->get();
+                    foreach($graduates as $graduate){//遍历该年级/班级/专业的所有学生
+                        $openid = $graduate->openid;
+                        $post_data['touser'] = $openid;
+                        $jsonData = json_encode($post_data);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                                'Content-Type: application/json',
+                                'Content-Length: ' . strlen($jsonData))
+                        );
+                        curl_exec($ch);
+                        Graduate_Info_Feedback::create(['graduate_id' => $graduate->id,'info_content_id' => $info->id]);
+                    }
+                }
+                break;
+            case 'graduateUserid': //case 7
+                $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
+                foreach ($receivers as $receiver){
+                    $graduates = Graduate::where('userid',$receiver)->get();
+                    foreach($graduates as $graduate){//遍历该年级/班级/专业的所有学生
+                        $openid = $graduate->openid;
+                        $post_data['touser'] = $openid;
+                        $jsonData = json_encode($post_data);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                                'Content-Type: application/json',
+                                'Content-Length: ' . strlen($jsonData))
+                        );
+                        curl_exec($ch);
+                        Graduate_Info_Feedback::create(['graduate_id' => $graduate->id,'info_content_id' => $info->id]);
+                    }
+                }
+                break;
+            case 'allGraduate': //case 8
+                $graduates = Graduate::all();
+                foreach ($graduates as $graduate){
+                    $openid = $graduate->openid;
+                    $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
+                    $jsonData = json_encode($post_data);//JSON编码。官方要求
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'Content-Type: application/json',
+                            'Content-Length: ' . strlen($jsonData))
+                    );
+                    curl_exec($ch);
+                    Graduate_Info_Feedback::create(['graduate_id' => $graduate->id,'info_content_id' => $info->id]);
+                }
+                break;
+            case 'teacher': //case 9
+                $receivers = explode(' ', $receivers);//前端传递参数40365 41451需要进行字符串分割
+                foreach ($receivers as $receiver){
+                    $teachers = Account::where('userid',$receiver)->get();
+                    foreach($teachers as $teacher){//遍历该年级/班级/专业的所有学生
+                        $openid = $teacher->openid;
+                        $post_data['touser'] = $openid;
+                        $jsonData = json_encode($post_data);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                                'Content-Type: application/json',
+                                'Content-Length: ' . strlen($jsonData))
+                        );
+                        curl_exec($ch);
+                        Teacher_Info_Feedback::create(['account_id' => $teacher->id,'info_content_id' => $info->id]);
+                    }
+                }
+                break;
+            case 'allTeacher': //case 10
+                $teachers = Account::where('openid','!=',null)->get();
+                foreach ($teachers as $teacher){
+                    $openid = $teacher->openid;
+                    $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
+                    $jsonData = json_encode($post_data);//JSON编码。官方要求
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'Content-Type: application/json',
+                            'Content-Length: ' . strlen($jsonData))
+                    );
+                    curl_exec($ch);
+                    Teacher_Info_Feedback::create(['account_id' => $teacher->id,'info_content_id' => $info->id]);
+                }
+                break;
+            default: //case 1、2、3、4
+                $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
+                foreach ($receivers as $receiver){
+                    $students = Student::where("$type",$receiver)->get();
+                    foreach($students as $student){//遍历该年级/班级/专业的所有学生
+                        $openid = $student->openid;
+                        $post_data['touser'] = $openid;
+                        $jsonData = json_encode($post_data);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                                'Content-Type: application/json',
+                                'Content-Length: ' . strlen($jsonData))
+                        );
+                        curl_exec($ch);
+                        Info_Feedback::create(['student_id' => $student->id,'info_content_id' => $info->id]);
+                    }
+                }
+                break;
         }
         //给发通知的人发送成功发送通知提醒
         $client = new Client();
@@ -174,6 +230,15 @@ class TeacherInfoController extends Controller
             foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
                 $student = Student::where('userid', $newReceiver)->first();
                 if (!$student) {
+                    return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "还未绑定信息，无此学生信息"]);
+                }
+            }
+        }
+        if ($type == 7){//如果给特定研究生发送信息，判断输入的学号是否存在
+            $newReceivers = explode(' ', $receivers);//将发送者分离
+            foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
+                $graduate = Graduate::where('userid', $newReceiver)->first();
+                if (!$graduate) {
                     return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "还未绑定信息，无此学生信息"]);
                 }
             }
@@ -232,10 +297,19 @@ class TeacherInfoController extends Controller
             case 5: //发给全体学生
                 $this->sendModelInfo('all', $receivers, $title, $info,1);
                 break;
-            case 6: //发给单个教师
+            case 6: //研究生年级
+                $this->sendModelInfo('graduateGrade',$receivers,$title,$info,1);
+                break;
+            case 7: //研究生学号
+                $this->sendModelInfo('graduateUserid',$receivers,$title,$info,1);
+                break;
+            case 8://全体研究生
+                $this->sendModelInfo('allGraduate', $receivers, $title, $info,1);
+                break;
+            case 9: //发给单个教师
                 $this->sendModelInfo('teacher', $receivers, $title, $info,1);
                 break;
-            case 7: //发给全体教师
+            case 10: //发给全体教师
                 $this->sendModelInfo('allTeacher', $receivers, $title, $info,1);
                 break;
         }
@@ -247,12 +321,14 @@ class TeacherInfoController extends Controller
         $grade = $data->groupBy('grade');
         $class = $data->groupBy('class_num');
         $major = $data->groupBy('major');
+        $graduateData = Graduate::all();
+        $graduateGrade = $graduateData->groupBy('grade');
         if ($info_level == 1){//如果是辅导员，那么只能给学生发通知
-            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major]]);
+            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'graduate_grade' => $graduateGrade]]);
         }
         else{//如果是教务老师，那么可以给学生和老师发通知
             $teachers = Account::where('openid','!=',null)->orderBy('name')->get();
-            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'teacher' => $teachers]]);
+            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'teacher' => $teachers,'graduate_grade' => $graduateGrade]]);
         }
     }
 
@@ -270,15 +346,15 @@ class TeacherInfoController extends Controller
     }
 
     public function getInfoContent($info_level){//教师查看所发通知列表
-        if ($info_level == 1){//如果是辅导员，可查看type为1-5（发给学生的通知）
+        if ($info_level == 1){//如果是辅导员，可查看type为1-8（发给学生和研究生的通知）
             $data = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.*','accounts.name')
                 ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
-                ->whereBetween('info_contents.type', [1,5])
+                ->whereBetween('info_contents.type', [1,8])
                 ->orderByDesc('info_contents.created_at')
                 ->get();
         }
-        else{//如果是教务老师，可以查看所有通知（type为1-7）
+        else{//如果是教务老师，可以查看所有通知（type为1-10）
             $data = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.*','accounts.name')
                 ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
@@ -300,6 +376,14 @@ class TeacherInfoController extends Controller
                 ->join('info_contents','info_feedbacks.info_content_id','=','info_contents.id')
                 ->select('students.userid','students.name','students.phone','students.grade','students.class','students.class_num','students.major','info_feedbacks.status','info_contents.title','info_contents.content','info_contents.send_to')
                 ->orderBy('students.userid')
+                ->get();
+        }
+        else if ($type>=6&&$type<=8){//若是发给研究生的，查研究生反馈表
+            $data = $content->graduate_info_feedbacks()
+                ->join('graduates','graduate_info_feedbacks.graduate_id','=','graduates.id')
+                ->join('info_contents','graduate_info_feedbacks.info_content_id','=','info_contents.id')
+                ->select('graduates.userid','graduates.name','graduates.phone','graduates.grade','graduate_info_feedbacks.status','info_contents.title','info_contents.content','info_contents.send_to')
+                ->orderBy('graduates.userid')
                 ->get();
         }
         else{//若是发给教师的，链接教师反馈表

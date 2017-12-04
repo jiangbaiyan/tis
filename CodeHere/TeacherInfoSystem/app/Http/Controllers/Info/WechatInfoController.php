@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Info;
 
 use App\Account;
+use App\Graduate;
+use App\Graduate_Info_Feedback;
 use App\Http\Controllers\WeChatController;
 use App\Info_Content;
 use App\Info_Feedback;
@@ -19,12 +21,22 @@ class WechatInfoController extends Controller
     public function getIndex(){//通知系统首页
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
+        $graduate = Graduate::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();
         if ($teacher){//如果是老师
             $data = Info_Content::join('teacher_info_feedbacks','teacher_info_feedbacks.info_content_id','=','info_contents.id')
                 ->join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
                 ->where('teacher_info_feedbacks.account_id','=',$teacher->id)
+                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+                ->orderByDesc('info_contents.created_at')
+                ->get();
+        }
+        else if ($graduate){//如果是研究生，查研究生反馈表
+            $data = Info_Content::join('graduate_info_feedbacks','graduate_info_feedbacks.info_content_id','=','info_contents.id')
+                ->join('accounts','info_contents.account_id','=','accounts.userid')
+                ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
+                ->where('graduate_info_feedbacks.graduate_id','=',$graduate->id)
                 ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
                 ->orderByDesc('info_contents.created_at')
                 ->get();
@@ -51,10 +63,16 @@ class WechatInfoController extends Controller
         }
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
+        $graduate = Graduate::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();
         if ($teacher) {//如果是老师，查教师反馈表
             $feedback = Teacher_Info_Feedback::where('info_content_id','=',$id)
                 ->where('account_id','=',$teacher->id)
+                ->first();
+        }
+        else if ($graduate){//如果是学生，查学生反馈表
+            $feedback = Graduate_Info_Feedback::where('info_content_id','=',$id)
+                ->where('graduate_id','=',$student->id)
                 ->first();
         }
         else if ($student){//如果是学生，查学生反馈表
@@ -77,10 +95,15 @@ class WechatInfoController extends Controller
     public function sendEmail($id){//把附件发送到学生邮箱
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
+        $graduate = Graduate::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();
         if ($teacher) {//如果是老师
             $name = $teacher->name;
             $email = $teacher->email;
+        }
+        else if ($graduate){
+            $name = $graduate->name;
+            $email = $graduate->email;
         }
         else if ($student){
             $name = $student->name;
@@ -109,12 +132,14 @@ class WechatInfoController extends Controller
         $grade = $data->groupBy('grade');
         $class = $data->groupBy('class_num');
         $major = $data->groupBy('major');
+        $graduateData = Graduate::all();
+        $graduateGrade = $graduateData->groupBy('grade');
         if ($info_level == 1){//如果是1-辅导员
-            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major]]);
+            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'graduate_grade' => $graduateGrade]]);
         }
         else{//如果是教务老师
             $teachers = Account::where('openid','!=',null)->orderBy('name')->get();
-            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'teacher' => $teachers]]);
+            return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'teacher' => $teachers,'graduate_grade' => $graduateGrade]]);
         }
     }
 
@@ -139,6 +164,15 @@ class WechatInfoController extends Controller
                 }
             }
         }
+        if ($type == 7){//如果给特定研究生发送信息，判断输入的学号是否存在
+            $newReceivers = explode(' ', $receivers);//将发送者分离
+            foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
+                $graduate = Graduate::where('userid', $newReceiver)->first();
+                if (!$graduate) {
+                    return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "还未绑定信息，无此学生信息"]);
+                }
+            }
+        }
         $wechat = new WeChatController();
         $sendModelInfo = new TeacherInfoController();
         $sendModelInfo->access_token = $wechat->getAccessToken();
@@ -158,14 +192,23 @@ class WechatInfoController extends Controller
             case 4://特定学生
                 $sendModelInfo->sendModelInfo('userid',$receivers,$title,$info,0);
                 break;
-            case 5: //全体学生
-                $sendModelInfo->sendModelInfo('all', $receivers, $title, $info,0);//调用发送模板消息方法
+            case 5: //发给全体学生
+                $sendModelInfo->sendModelInfo('all', $receivers, $title, $info,0);
                 break;
-            case 6: //特定教师
-                $sendModelInfo->sendModelInfo('teacher', $receivers, $title, $info,0);//调用发送模板消息方法
+            case 6: //研究生年级
+                $sendModelInfo->sendModelInfo('graduateGrade',$receivers,$title,$info,0);
                 break;
-            case 7: //全体教师
-                $sendModelInfo->sendModelInfo('allTeacher', $receivers, $title, $info,0);//调用发送模板消息方法
+            case 7: //研究生学号
+                $sendModelInfo->sendModelInfo('graduateUserid',$receivers,$title,$info,0);
+                break;
+            case 8://全体研究生
+                $sendModelInfo->sendModelInfo('allGraduate', $receivers, $title, $info,0);
+                break;
+            case 9: //发给单个教师
+                $sendModelInfo->sendModelInfo('teacher', $receivers, $title, $info,0);
+                break;
+            case 10: //发给全体教师
+                $sendModelInfo->sendModelInfo('allTeacher', $receivers, $title, $info,0);
                 break;
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
