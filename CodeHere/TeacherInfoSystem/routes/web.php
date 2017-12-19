@@ -1,6 +1,6 @@
 <?php
 //单元测试路由
-Route::any('test1','TestController@test1');
+Route::any('test','TestController@test');
 
 
 //杭电CAS认证和JS SDK模块
@@ -10,6 +10,7 @@ Route::group(['prefix' => 'api'],function (){
             Route::get('teachercas', 'TeacherCasController@cas');//教师PC端CAS认证
             Route::get('wechatcas', 'WechatCasController@cas');//教师学生微信端CAS认证
             Route::get('jssdk', 'WeChatController@jsSDK');
+            Route::get('reach','Reach\ReachCalculateController@calculate');
             Route::group(['middleware' => 'WechatCheckLogin'],function (){
                 Route::get('type','WeChatController@getType');//判断用户信息
             });

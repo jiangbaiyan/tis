@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'host' => env('MAIL_HOST', 'smtp.qq.com'),
+    'host' => env('MAIL_HOST', 'smtp.mxhichina.com'),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,7 +56,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', '987082332@qq.com'),
+        'address' => env('MAIL_FROM_ADDRESS', 'support@hzcloudservice.com'),
         'name' => env('MAIL_FROM_NAME', '网络空间安全学院'),
     ],
 

@@ -4,85 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Account;
 use App\Info_Content;
+use App\Reach_major;
 use App\Teacher_Info_Feedback;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LoginAndAccount\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TestController extends Controller//单元测试控制器
 {
-    public function test1(){//GuzzleHttp扩展包
-        $loginServer = "http://cas.hdu.edu.cn/cas/login";
-        $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
-        $thisURL = "https://tis.cloudshm.com/test1";
-
-        //判断是否有验证成功后需要跳转页面，如果有，增加跳转参数
-/*        if (isset($_REQUEST["redirectUrl"]) && !empty($_REQUEST["redirectUrl"])) {
-            $thisURL = $thisURL . "?redirectUrl=" . $_REQUEST["redirectUrl"];
-        }*/
-
-        //判断是否已经登录
-        if (isset($_REQUEST["ticket"]) && !empty($_REQUEST["ticket"])) {
-            //获取登录后的返回信息
-            try {//认证ticket
-                $validateurl = $validateServer . "?ticket=" . $_REQUEST["ticket"] . "&service=" . $thisURL;
-                $validateResult = file_get_contents($validateurl);
-
-                $validateResult = preg_replace("/sso:/", "", $validateResult);
-
-                $validateXML = simplexml_load_string($validateResult);
-
-                if (isset($validateXML->authenticationSuccess[0]->attributes[0])) {
-                    $validate = $validateXML->authenticationSuccess[0]->attributes[0];
-                    $i = 0;
-                    $validateNum = count($validate);
-                    while ($i < $validateNum) {
-                        $successnode0 = $validate->attribute[$i]["name"];
-                        if ($successnode0 == "userName") {//学号
-                            $userid = ''.$validate->attribute[$i]["value"];
-                        }
-                        if ($successnode0 == "user_name") {//姓名
-                            $username = ''.$validate->attribute[$i]["value"];
-                        }
-                        if ($successnode0 == "id_type") {//学生还是教师
-                            $idtype = ''.$validate->attribute[$i]["value"];
-                        }
-                        if ($successnode0 == "user_sex") {//性别
-                            $sex = ''.$validate->attribute[$i]["value"];
-                        }
-                        if ($successnode0 == "unit_name") {//学院全称
-                            $unit = ''.$validate->attribute[$i]["value"];
-                        }
-                        if ($successnode0 == "classid") {//班级号
-                            $classid = ''.$validate->attribute[$i]["value"];
-                        }
-                        $i = $i + 1;
-                    }
-                    $successnode = ''.$validateXML->authenticationSuccess[0];
-                    if (!empty($successnode)) {
-                        //测试，将获取到的XML信息存到文件中\
-                        $time = time();
-                        $casArr = (array)$validate;
-                        $casArr = var_export($casArr,true);
-                        file_put_contents("/home/wwwroot/TeacherInfoSystem/storage/app/public/cas/$time",$casArr,2);
-                        dd($validate);
-                    } else {
-                        header("Location: " . $loginServer . "?service=" . $thisURL);
-                        exit();
-                    }
-                }
-            }
-            catch (Exception $e) {
-                echo "出错了";
-                echo $e->getMessage();
-            }
+    public function test()
+    {
+        $data = Excel::load('/storage/app/public/reach/test.xlsx')->get()->toArray();//读取excel
+        $length = count($data);
+        $sum1 = 0;
+        $sum2 = 0;
+        $sum3 = 0;
+        for ($i = 1;$i<$length;$i++){//数组下表为[行-2,列相等]
+            $sum1 += $data[$i][2];//评价环节1成绩总和
+            $sum2 += $data[$i][3];//评价环节2成绩总和
+            $sum3 += $data[$i][4];//评价环节3成绩总和
         }
-        else//没有ticket，重定向到登录服务器
-        {
-            //重定向浏览器
-            header("Location: " . $loginServer . "?service=" . $thisURL);
-            //确保重定向后，后续代码不会被执行
-            exit();
-        }
+        $avg1 = $sum1/($length-1);
+        $avg2 = $sum2/($length-1);
+        $avg3 = $sum3/($length-1);
     }
 }

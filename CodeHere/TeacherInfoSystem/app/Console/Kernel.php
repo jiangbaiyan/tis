@@ -189,8 +189,8 @@ class Kernel extends ConsoleKernel
             }
         })->dailyAt('12:00');
 
-        //如果教师三小时内未阅读通知，那么三小时过后进行一次提醒
-        $schedule->call(function (){
+        //如果教师三小时内未阅读通知，那么三小时过后进行一次提醒,此功能暂时停用
+/*        $schedule->call(function (){
             $wechat = new WeChatController();
             $client = new Client();
             $access_token = $wechat->getAccessToken();
@@ -237,7 +237,7 @@ class Kernel extends ConsoleKernel
                     $unread->save();
                 }
             }
-        })->everyFiveMinutes();
+        })->everyFiveMinutes();*/
     }
 
     /**
