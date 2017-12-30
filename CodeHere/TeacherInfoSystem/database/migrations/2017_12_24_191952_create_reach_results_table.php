@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateReachGradesTable extends Migration
+class CreateReachResultsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,14 @@ class CreateReachGradesTable extends Migration
      */
     public function up()
     {
-        Schema::create('reach_grades', function (Blueprint $table) {
+        Schema::create('reach_results', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('account_id');
-            $table->integer('reach_course_id');
-            $table->string('userid',10)->default('');
-            $table->string('name',10)->default('');
-            $table->double('grade');
+            $table->string('course_result')->default('');
+            $table->string('graduate_result')->default('');
             $table->string('year',4)->default('');
             $table->tinyInteger('term');
+            $table->string('url')->default('');
             $table->timestamps();
         });
     }
@@ -33,6 +32,6 @@ class CreateReachGradesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('reach_grades');
+        Schema::dropIfExists('reach_results');
     }
 }

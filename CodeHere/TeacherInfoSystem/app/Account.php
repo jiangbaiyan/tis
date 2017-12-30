@@ -18,4 +18,8 @@ class Account extends Model
         return $this->hasMany('App\Info_Content','account_id','userid');
     }
 
+    public function reach_results(){
+        return $this->hasMany('App\Reach_result');
+    }
+
 }
