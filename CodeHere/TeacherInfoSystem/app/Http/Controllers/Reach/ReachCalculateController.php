@@ -31,7 +31,7 @@ class ReachCalculateController extends Controller
         }
         $results = Reach_result::where('url', 'like', 'reach/'.$teacher->name . '_' . $courseName . '_' . $year . '_' . $term . '%')->get();
         if (!$results) {
-            goto fuck;
+            goto newFile;
         }
         $md5_1 = md5_file($file);
         foreach ($results as $result) {
@@ -40,8 +40,11 @@ class ReachCalculateController extends Controller
             if (strcmp($md5_1, $md5_2) == 0) {//比较两文件内容是否相同
                 return Response::json(['status' => 200, 'msg' => 'history data requiured successfully', 'data' => ['CG' => $result->course_result, 'GS' => $result->graduate_result]]);
             }
+            else{//不相同，说明文件内容被修改过，那么重新计算并存储
+                goto newFile;
+            }
         }
-        fuck:
+        newFile:
         $path = Storage::putFileAs('reach', $file, $teacher->name . '_' . $courseName . '_' . $year . '_' . $term . '_' . time() . '.' . 'xlsx', 'public');//文件存储
         $data = Excel::load('storage/'.$path)->get()->toArray();//读取excel
         $length = count($data);
