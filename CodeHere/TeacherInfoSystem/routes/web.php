@@ -1,5 +1,6 @@
 <?php
-//单元测试路由
+
+//单元测试
 Route::any('test','TestController@test');
 
 

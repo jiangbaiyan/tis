@@ -11,6 +11,7 @@ use App\Info_Feedback;
 use App\Student;
 use App\Teacher_Info_Feedback;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LoginAndAccount\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -25,7 +26,7 @@ class TeacherInfoController extends Controller
     private $allowedFormat = ['doc','docx','pdf','DOC','DOCX','PDF','rar','zip','RAR','ZIP','xls','xlsx','XLS','XLSX'];//规定允许上传的文件格式
 
     //教师PC端与微信端公用发送通知模板消息方法
-    public function sendModelInfo($type,$receivers,$title,$info,$isPC){
+    public function sendModelInfo($type,$info,$isPC){
         //提取循环外公用的变量
         if ($isPC){
             $userid = Cache::get($_COOKIE['userid']);
@@ -35,6 +36,9 @@ class TeacherInfoController extends Controller
             $openid = $_COOKIE['openid'];
             $userTeacher = Account::where('openid',$openid)->first();
         }
+        $wechat = new WeChatController();
+        $this->access_token = $wechat->getAccessToken();//获取accesstoken
+        $receivers = $info->send_to;
         $ch = curl_init("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token");//初始化curl与请求地址
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -43,7 +47,7 @@ class TeacherInfoController extends Controller
             'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
             'data' => [
                 'first' => [
-                    'value' => '《'."$title".'》',
+                    'value' => '《'."$info->title".'》',
                     'color' => '#FF0000'
                 ],
                 'keyword1' => [
@@ -186,30 +190,34 @@ class TeacherInfoController extends Controller
         }
         //给发通知的人发送成功发送通知提醒
         $client = new Client();
-        $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token",[
-            'json' => [
-                'touser' => $userTeacher->openid,
-                'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
-                'data' => [
-                    'first' => [
-                        'value' => '您已成功发送通知'.'《'.$info->title.'》',
-                        'color' => '#00B642'
-                    ],
-                    'keyword1' => [
-                        'value' => '网安学院'
-                    ],
-                    'keyword2' => [
-                        'value' => $userTeacher->name
-                    ],
-                    'keyword3' => [
-                        'value' => $info->created_at->diffForHumans()
-                    ],
-                    'keyword4' => [
-                        'value' => $info->content
-                    ],
+        try {
+            $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                'json' => [
+                    'touser' => $userTeacher->openid,
+                    'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
+                    'data' => [
+                        'first' => [
+                            'value' => '您已成功发送通知' . '《' . $info->title . '》',
+                            'color' => '#00B642'
+                        ],
+                        'keyword1' => [
+                            'value' => '网安学院'
+                        ],
+                        'keyword2' => [
+                            'value' => $userTeacher->name
+                        ],
+                        'keyword3' => [
+                            'value' => $info->created_at->diffForHumans()
+                        ],
+                        'keyword4' => [
+                            'value' => $info->content
+                        ],
+                    ]
                 ]
-            ]
-        ]);
+            ]);
+        } catch (GuzzleException $e) {
+            echo $e->getMessage();
+        }
         curl_close($ch);
     }
 
@@ -279,39 +287,39 @@ class TeacherInfoController extends Controller
                 $info->save();
             }
         }
-        $wechat = new WeChatController();
-        $this->access_token = $wechat->getAccessToken();//获取accesstoken
         switch ($type) {
             case 1://年级
-                $this->sendModelInfo('grade', $receivers, $title, $info,1);
+                $this->sendModelInfo('grade', $info,1);
                 break;
             case 2://班级
-                $this->sendModelInfo('class_num', $receivers, $title, $info,1);
+                $this->sendModelInfo('class_num', $info,1);
                 break;
             case 3://专业
-                $this->sendModelInfo('major', $receivers, $title, $info,1);
+                $this->sendModelInfo('major', $info,1);
                 break;
             case 4://特定学生
-                $this->sendModelInfo('userid',$receivers,$title,$info,1);
+                $this->sendModelInfo('userid',$info,1);
                 break;
             case 5: //发给全体学生
-                $this->sendModelInfo('all', $receivers, $title, $info,1);
+                $this->sendModelInfo('all', $info,1);
                 break;
             case 6: //研究生年级
-                $this->sendModelInfo('graduateGrade',$receivers,$title,$info,1);
+                $this->sendModelInfo('graduateGrade',$info,1);
                 break;
             case 7: //研究生学号
-                $this->sendModelInfo('graduateUserid',$receivers,$title,$info,1);
+                $this->sendModelInfo('graduateUserid',$info,1);
                 break;
             case 8://全体研究生
-                $this->sendModelInfo('allGraduate', $receivers, $title, $info,1);
+                $this->sendModelInfo('allGraduate', $info,1);
                 break;
             case 9: //发给单个教师
-                $this->sendModelInfo('teacher', $receivers, $title, $info,1);
+                $this->sendModelInfo('teacher', $info,1);
                 break;
             case 10: //发给全体教师
-                $this->sendModelInfo('allTeacher', $receivers, $title, $info,1);
+                $this->sendModelInfo('allTeacher', $info,1);
                 break;
+            default://发送定时预约通知。业务逻辑说明：把预约时间先存到数据库中（精确到分钟），然后设置定时任务：查询所有未发送的预约通知，循环遍历每条预约通知，每一分钟检查一次当前时间和通知预约时间是否相同，如果相同则发送通知
+                return Response::json(['status' => 200,'msg' => "schedule info saved successfully"]);
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
     }

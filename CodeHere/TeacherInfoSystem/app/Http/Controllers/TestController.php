@@ -8,9 +8,8 @@ use Illuminate\Http\Request;
 
 class TestController extends Controller//单元测试控制器
 {
-    public function test(Request $request)
+    public function test()
     {
-        $file = $request->file('file');
-        dd(md5_file($file));
+        dd(strtotime("2018-2-12 12:02"));
     }
 }

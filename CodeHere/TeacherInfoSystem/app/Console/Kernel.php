@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Account;
 use App\Daily_leave;
+use App\Http\Controllers\Info\TeacherInfoController;
 use App\Http\Controllers\WeChatController;
 use App\Info_Content;
 use App\Teacher_Info_Feedback;
@@ -189,55 +190,55 @@ class Kernel extends ConsoleKernel
             }
         })->dailyAt('12:00');
 
-        //如果教师三小时内未阅读通知，那么三小时过后进行一次提醒,此功能暂时停用
-/*        $schedule->call(function (){
-            $wechat = new WeChatController();
-            $client = new Client();
-            $access_token = $wechat->getAccessToken();
-            $unreads = Teacher_Info_Feedback::where('status','=',0)//未阅读
-                ->where('is_remind','=',0)//没有给老师发送过提醒
-                ->where('created_at','<=',date('Y-m-d H:i:s',time()-10800))//三个小时内还没有查看通知
-                ->whereIn('account_id',[39,40])
-                ->get();
-            foreach ($unreads as $unread){
-                $openid = $unread->account->openid;
-                if (isset($unread->info_content)){//如果反馈对应的通知没有被删除，那么发送提醒
-                    $info = $unread->info_content;
-                    $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token",[
-                        'json' => [
-                            'touser' => $openid,
-                            'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
-                            'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
-                            'data' => [
-                                'first' => [
-                                    'value' => '您有尚未阅读的学院通知，请尽快阅读',
-                                    'color' => '#FF0000'
-                                ],
-                                'keyword1' => [
-                                    'value' => '网安学院'
-                                ],
-                                'keyword2' => [
-                                    'value' => $info->teacher->name
-                                ],
-                                'keyword3' => [
-                                    'value' => $unread->created_at->diffForHumans()
-                                ],
-                                'keyword4' => [
-                                    'value' => '《'.$info->title.'》',
-                                    'color' => '#FF0000'
-                                ],
-                                'remark' => [
-                                    'value' => '点我查看该通知详情，即视为您已阅读',
-                                    'color' => '#00B642'
-                                ]
-                            ]
-                        ]
-                    ]);
-                    $unread->is_remind = 1;//标志已经给该条通知对应的老师发送过提醒
-                    $unread->save();
+        $schedule->call(function (){
+            $infos = Info_Content::where([
+                ['is_schedule','!=',''],
+                ['is_send','=',0]
+            ])->get();//查询所有未发送的预约通知
+            if (isset($infos)){
+                foreach ($infos as $info) {
+                    if (strtotime($info->time) == time()) {//每隔一分钟比较一次，如果预约的时间等于当前时间则现在发送通知
+                        $type = $info->time;
+                        $teacherInfoController = new TeacherInfoController();
+                        switch ($type) {
+                            case 1://年级
+                                $teacherInfoController->sendModelInfo('grade', $info, 1);
+                                break;
+                            case 2://班级
+                                $teacherInfoController->sendModelInfo('class_num', $info, 1);
+                                break;
+                            case 3://专业
+                                $teacherInfoController->sendModelInfo('major', $info, 1);
+                                break;
+                            case 4://特定学生
+                                $teacherInfoController->sendModelInfo('userid', $info, 1);
+                                break;
+                            case 5: //发给全体学生
+                                $teacherInfoController->sendModelInfo('all', $info, 1);
+                                break;
+                            case 6: //研究生年级
+                                $teacherInfoController->sendModelInfo('graduateGrade', $info, 1);
+                                break;
+                            case 7: //研究生学号
+                                $teacherInfoController->sendModelInfo('graduateUserid', $info, 1);
+                                break;
+                            case 8://全体研究生
+                                $teacherInfoController->sendModelInfo('allGraduate', $info, 1);
+                                break;
+                            case 9: //发给单个教师
+                                $teacherInfoController->sendModelInfo('teacher', $info, 1);
+                                break;
+                            case 10: //发给全体教师
+                                $teacherInfoController->sendModelInfo('allTeacher', $info, 1);
+                                break;
+                        }
+                        $info->is_send = 1;
+                        $info->save();
+                    }
                 }
             }
-        })->everyFiveMinutes();*/
+        })->everyMinute();
+
     }
 
     /**
