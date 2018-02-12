@@ -160,7 +160,7 @@ class WechatInfoController extends Controller
             foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
                 $student = Student::where('userid', $newReceiver)->first();
                 if (!$student) {
-                    return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "还未绑定信息，无此学生信息"]);
+                    return Response::json(['status' => 404, 'msg' => '本科生'."$newReceiver" . "还未绑定信息，无此学生信息"]);
                 }
             }
         }
@@ -169,7 +169,7 @@ class WechatInfoController extends Controller
             foreach ($newReceivers as $newReceiver){//检测所填写的学号是否存在
                 $graduate = Graduate::where('userid', $newReceiver)->first();
                 if (!$graduate) {
-                    return Response::json(['status' => 404, 'msg' => '学生'."$newReceiver" . "还未绑定信息，无此学生信息"]);
+                    return Response::json(['status' => 404, 'msg' => '研究生'."$newReceiver" . "还未绑定信息，无此学生信息"]);
                 }
             }
         }

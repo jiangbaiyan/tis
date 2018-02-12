@@ -7,6 +7,7 @@ use App\Daily_leave;
 use App\Http\Controllers\Info\TeacherInfoController;
 use App\Http\Controllers\WeChatController;
 use App\Info_Content;
+use App\Info_Feedback;
 use App\Teacher_Info_Feedback;
 use GuzzleHttp\Client;
 use Illuminate\Console\Scheduling\Schedule;
@@ -239,6 +240,10 @@ class Kernel extends ConsoleKernel
             }
         })->everyMinute();
 
+        //定期清理反馈表，防止查询反馈信息性能变差
+        $schedule->call(function (){
+            Info_Feedback::where('created_at','<',date('Y-m-d H:i:s',time()-2593000))->delete();
+        })->weekly();
     }
 
     /**
