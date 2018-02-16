@@ -29,7 +29,7 @@ class TeacherInfoController extends Controller
     public function sendModelInfo($type,$info,$isPC){
         //提取循环外公用的变量
         if ($isPC){
-            $userid = Cache::get($_COOKIE['userid']);
+            $userid = $info->account_id;
             $userTeacher = Account::where('userid',$userid)->first();
         }
         else{
@@ -287,6 +287,9 @@ class TeacherInfoController extends Controller
                 $info->save();
             }
         }
+        if ($request->has('time')){//发送定时预约通知。业务逻辑说明：把预约时间先存到数据库中（精确到分钟），然后设置定时任务：查询所有未发送的预约通知，循环遍历每条预约通知，每一分钟检查一次当前时间和通知预约时间是否相同，如果相同则发送通知
+            return Response::json(['status' => 200,'msg' => "schedule info saved successfully"]);
+        }
         switch ($type) {
             case 1://年级
                 $this->sendModelInfo('grade', $info,1);
@@ -318,8 +321,6 @@ class TeacherInfoController extends Controller
             case 10: //发给全体教师
                 $this->sendModelInfo('allTeacher', $info,1);
                 break;
-            default://发送定时预约通知。业务逻辑说明：把预约时间先存到数据库中（精确到分钟），然后设置定时任务：查询所有未发送的预约通知，循环遍历每条预约通知，每一分钟检查一次当前时间和通知预约时间是否相同，如果相同则发送通知
-                return Response::json(['status' => 200,'msg' => "schedule info saved successfully"]);
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
     }

@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Account;
 use App\Daily_leave;
+use App\Graduate_Info_Feedback;
 use App\Http\Controllers\Info\TeacherInfoController;
 use App\Http\Controllers\WeChatController;
 use App\Info_Content;
@@ -193,13 +194,13 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function (){
             $infos = Info_Content::where([
-                ['is_schedule','!=',''],
+                ['time','!=',''],
                 ['is_send','=',0]
             ])->get();//查询所有未发送的预约通知
             if (isset($infos)){
                 foreach ($infos as $info) {
-                    if (strtotime($info->time) == time()) {//每隔一分钟比较一次，如果预约的时间等于当前时间则现在发送通知
-                        $type = $info->time;
+                    if ($info->time == date("Y-m-d H:i")) {//每隔一分钟比较一次，如果预约的时间等于当前时间则现在发送通知
+                        $type = $info->type;
                         $teacherInfoController = new TeacherInfoController();
                         switch ($type) {
                             case 1://年级
@@ -240,9 +241,11 @@ class Kernel extends ConsoleKernel
             }
         })->everyMinute();
 
-        //定期清理反馈表，防止查询反馈信息性能变差
+        //定期清理三张反馈表的冗余记录，防止查询性能变差
         $schedule->call(function (){
             Info_Feedback::where('created_at','<',date('Y-m-d H:i:s',time()-2593000))->delete();
+            Teacher_Info_Feedback::where('created_at','<',date('Y-m-d H:i:s',time()-2593000))->delete();
+            Graduate_Info_Feedback::where('created_at','<',date('Y-m-d H:i:s',time()-2593000))->delete();
         })->weekly();
     }
 
