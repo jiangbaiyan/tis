@@ -229,7 +229,6 @@ class TeacherInfoController extends Controller
         $content = $request->input('content');
         $type = $request->input('type');
         $receivers = $request->input('send_to');
-        $files = $request->file('file');
         if (!$title||!$content||!$type||!$receivers){
             return Response::json(['status' => 400,'msg' => 'missing parameters']);
         }
@@ -253,30 +252,17 @@ class TeacherInfoController extends Controller
         }
         $info = Info_Content::create($data);
         $info->account_id = $userid;
-        $info->save();
         if ($request->hasFile('file')){//如果上传了附件，那么进行格式判断与文件存储
+            $files = $request->file('file');
             foreach($files as $file){//遍历请求中的多个文件
                 $ext = $file->getClientOriginalExtension();//获取扩展名
+                $fname = $file->getClientOriginalName();
                 if (!in_array($ext,$this->allowedFormat)){//判断格式是否是允许上传的格式
                     return response()->json(['status' => 402,'msg' => 'wrong file format']);
                 }
-                if ($ext == 'doc'||$ext =='docx'||$ext =='DOC'||$ext == 'DOCX'){
-                    $unoconv = Unoconv::create([//如果是word类型的文件格式,那么转成PDF
-                        'timeout'          => 200,
-                        'unoconv.binaries' => '/usr/bin/unoconv',
-                    ]);
-                    $unoconv->transcode($file,'pdf',$file);//用unoconv转码
-                    $nameArray = explode('.',$file->getClientOriginalName());
-                    $name = $nameArray[0];//取出不带后缀的文件名
-                    $path = Storage::disk('upyun')->putFileAs('info/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
-                }
-                else{//其他格式，按照原文件格式存储
-                    $path = Storage::disk('upyun')->putFileAs('info/'.date('Y').'/'.date('md'),$file,$file->getClientOriginalName(),'public');
-                }
-                if (!$path){
-                    return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
-                }
-                //通知数据创建，并写入文件路径信息
+                //如果不是doc(x)格式，直接存储
+                $path = Storage::disk('upyun')->putFileAs('info/'.date('Y').'/'.date('md'),$file,$fname,'public');
+                //向数据库写入文件地址
                 $url = $this->url."$path";
                 if (!$info->attach_url){
                     $info->attach_url = $url;
@@ -284,9 +270,23 @@ class TeacherInfoController extends Controller
                 else{
                     $info->attach_url .= ','.$url;
                 }
-                $info->save();
+                //如果是doc(x)类型的格式,那么转成PDF格式并且额外存一份，方便在线查看
+                if ($ext == 'doc'||$ext =='docx'||$ext =='DOC'||$ext == 'DOCX'){
+                    $unoconv = Unoconv::create([
+                        'timeout'          => 200,
+                        'unoconv.binaries' => '/usr/bin/unoconv',
+                    ]);
+                    $unoconv->transcode($file,'pdf',$file);//用unoconv转码
+                    $nameArray = explode('.',$fname);
+                    $name = $nameArray[0];//取出不带后缀的文件名
+                    $path = Storage::disk('upyun')->putFileAs('info/'.date('Y').'/'.date('md'),$file,"$name".'.pdf','public');
+                    $url = $this->url."$path";
+                    $info->attach_url .= ','.$url;
+                }
             }
+            $info->save();
         }
+        //如果是定时通知，直接返回
         if ($request->has('time')){//发送定时预约通知。业务逻辑说明：把预约时间先存到数据库中（精确到分钟），然后设置定时任务：查询所有未发送的预约通知，循环遍历每条预约通知，每一分钟检查一次当前时间和通知预约时间是否相同，如果相同则发送通知
             return Response::json(['status' => 200,'msg' => "schedule info saved successfully"]);
         }
@@ -309,7 +309,7 @@ class TeacherInfoController extends Controller
             case 6: //研究生年级
                 $this->sendModelInfo('graduateGrade',$info,1);
                 break;
-            case 7: //研究生学号
+            case 7: //特定研究生
                 $this->sendModelInfo('graduateUserid',$info,1);
                 break;
             case 8://全体研究生

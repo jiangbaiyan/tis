@@ -91,7 +91,7 @@ class TeacherCasController extends LoginAndAccount\Controller
                         } else {
                             $sex = '女';
                         }
-                        if ($userid == '15075119' || $userid == '15051141') {//开发者跳过验证
+                        if ($userid == '15075119' || $userid == '16271110') {//开发者跳过验证
                             goto fuck;
                         }
                         if ($unit != "网络空间安全学院、浙江保密学院" || $idtype == '1' || $idtype == '2') {
