@@ -57,7 +57,9 @@ class WechatInfoController extends Controller
     }
 
     public function getDetail($id){//通知系统详情页
-        $content = Info_Content::find($id);
+        $content = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
+            ->select('info_contents.*','accounts.name')
+            ->find($id);
         if (!$content){
             return Response::json(['status' => 405,'msg' => '该通知已被删除，请联系管理员']);
         }

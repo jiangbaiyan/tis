@@ -11,10 +11,9 @@ class TestController extends Controller//单元测试控制器
 {
     public function test()
     {
-        $infos = Info_Content::where([
-            ['time','!=',''],
-            ['is_send','=',0]
-        ])->get();
-        dd($infos);
+        $content = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
+            ->select('info_contents.*','accounts.name')
+            ->find(230);
+        dd($content);
     }
 }
