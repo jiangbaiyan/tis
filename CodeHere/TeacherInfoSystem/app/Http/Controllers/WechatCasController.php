@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use App\Graduate;
 use App\Student;
 use Illuminate\Support\Facades\Session;
 
@@ -11,6 +12,22 @@ class WechatCasController extends LoginAndAccount\Controller
     public function cas()
     {
         $openid = Session::get('openid');
+        $student = Student::where('openid',$openid)->first();
+        $graduate = Graduate::where('openid',$openid)->first();
+        $teacher = Account::where('openid',$openid)->first();
+        if (isset($student)||isset($graduate)||isset($teacher)){
+            //有数据，有cookie且相等（未更换设备）
+            if (isset($_COOKIE['openid'])&&$openid==$_COOKIE['openid']){
+                echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+                die("您已经绑定了信息，无需再次绑定！".'<br>'."若想修改您已填写的个人信息，请在公众号上留言");
+            }
+            else{//有数据，无cookie（cookie过期，说明非首次绑定），重新设置cookie即可
+                setcookie('openid',$openid, time()+31536000);
+                echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+                die("重新绑定信息成功！");
+            }
+        }
+        //没有数据，需要绑定信息
         $loginServer = "http://cas.hdu.edu.cn/cas/login";
         //CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
