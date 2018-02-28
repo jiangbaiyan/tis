@@ -15,25 +15,18 @@ class WechatCasController extends LoginAndAccount\Controller
         $student = Student::where('openid',$openid)->first();
         $graduate = Graduate::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();
-        if (isset($student)||isset($graduate)||isset($teacher)){
-            //有数据，有cookie且相等（未更换设备）
-            if (isset($_COOKIE['openid'])&&$openid==$_COOKIE['openid']){
-                echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                die("您已经绑定了信息，无需再次绑定！".'<br>'."若想修改您已填写的个人信息，请在公众号上留言");
-            }
-            else{//有数据，无cookie（cookie过期，说明非首次绑定），重新设置cookie即可
-                setcookie('openid',$openid, time()+31536000);
-                echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-                die("重新绑定信息成功！");
-            }
+        //如果数据库中有数据，那么直接重新设置cookie即可，不需要重新走CAS认证
+        if (isset($student)||isset($graduate)||isset($teacher)) {
+            setcookie('openid', $openid, time() + 31536000);
+            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+            die("<strong>恭喜您，绑定信息成功！</strong>" .'<br>' . '<br>' . "若想修改您已填写的个人信息，请与辅导员联系，或在公众号上留言，谢谢。");
         }
-        //没有数据，需要绑定信息
+        //数据库中没有数据，需要重新录入信息
         $loginServer = "http://cas.hdu.edu.cn/cas/login";
         //CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
         //$Rurl = "https://cbsjs.hdu.edu.cn/qingjia_mobile";
         //如果已经认证完毕且token也匹配，那么直接跳到系统首页
-
 
         //当前集成系统所在的服务器和端口号，服务器可以是机器名、域名或ip，建议使用域名。端口不指定的话默认是80
         //以及新增加的集成登录入口
