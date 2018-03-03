@@ -233,6 +233,29 @@ class WeChatController extends LoginAndAccount\Controller
         die('教师信息绑定成功!');
     }
 
+    //公众号个人中心页面（未完成）
+    public function userIndex(){
+        if (!isset($_COOKIE['openid'])){
+            return view('choose',['isBind' => 0]);
+        }
+        $openid = $_COOKIE['openid'];
+        $student = Student::where('openid',$openid)->first();
+        $graduate = Graduate::where('openid',$openid)->first();
+        $teacher = Account::where('openid',$openid)->first();
+        if (isset($student)){
+            return view('choose',['isBind' => 1,'student' => $student]);
+        }
+        else if (isset($teacher)){
+            return view('choose',['isBind' => 1,'teacher' => $teacher]);
+        }
+        else if (isset($graduate)){
+            return view('choose',['isBind' => 1,'graduate' => $graduate]);
+        }
+        else{
+            return view('choose',['isBind' => 0]);
+        }
+    }
+
     //JS SDK签名认证逻辑（请假定位用）
     public function jsSDK(){
         $access_token = $this->getAccessToken();//获取access_token

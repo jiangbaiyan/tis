@@ -177,6 +177,7 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
                     Route::post('createdailyleave','DailyLeaveController@studentCreate');
                     Route::get('getdailyleave','DailyLeaveController@studentGet');
                     Route::get('deletedailyleave/{id}/{location}','DailyLeaveController@studentDelete');
+                    Route::get('history','DailyLeaveController@getHistory');
                     Route::post('createholidayleave','HolidayLeaveController@studentCreate');
                     Route::get('getholidayleave','HolidayLeaveController@studentGet');
                     Route::get('deleteholidayleave/{id}','HolidayLeaveController@studentDelete');

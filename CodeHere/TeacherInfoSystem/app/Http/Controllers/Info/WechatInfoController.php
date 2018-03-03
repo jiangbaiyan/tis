@@ -23,32 +23,32 @@ class WechatInfoController extends Controller
         $student = Student::where('openid',$openid)->first();
         $graduate = Graduate::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();
-        if ($teacher){//如果是老师
+        if (isset($teacher)){//如果是老师
             $data = Info_Content::join('teacher_info_feedbacks','teacher_info_feedbacks.info_content_id','=','info_contents.id')
                 ->join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
                 ->where('teacher_info_feedbacks.account_id','=',$teacher->id)
-                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+/*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
                 ->orderByDesc('info_contents.created_at')
-                ->get();
+                ->paginate(8);
         }
-        else if ($graduate){//如果是研究生，查研究生反馈表
+        else if (isset($graduate)){//如果是研究生，查研究生反馈表
             $data = Info_Content::join('graduate_info_feedbacks','graduate_info_feedbacks.info_content_id','=','info_contents.id')
                 ->join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
                 ->where('graduate_info_feedbacks.graduate_id','=',$graduate->id)
-                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+/*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
                 ->orderByDesc('info_contents.created_at')
-                ->get();
+                ->paginate(8);
         }
-        else if ($student){//如果是学生，查学生反馈表
+        else if (isset($student)){//如果是学生，查学生反馈表
             $data = Info_Content::join('info_feedbacks','info_feedbacks.info_content_id','=','info_contents.id')
                 ->join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
                 ->where('info_feedbacks.student_id','=',$student->id)
-                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+/*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
                 ->orderByDesc('info_contents.created_at')
-                ->get();
+                ->paginate(8);
         }
         else{//如果两张表都没找到用户信息
             return Response::json(['status' => 404,'msg' => '用户信息未找到，请重新绑定']);
@@ -67,17 +67,17 @@ class WechatInfoController extends Controller
         $student = Student::where('openid',$openid)->first();
         $graduate = Graduate::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();
-        if ($teacher) {//如果是老师，查教师反馈表
+        if (isset($teacher)) {//如果是老师，查教师反馈表
             $feedback = Teacher_Info_Feedback::where('info_content_id','=',$id)
                 ->where('account_id','=',$teacher->id)
                 ->first();
         }
-        else if ($graduate){//如果是学生，查学生反馈表
+        else if (isset($graduate)){//如果是学生，查学生反馈表
             $feedback = Graduate_Info_Feedback::where('info_content_id','=',$id)
                 ->where('graduate_id','=',$student->id)
                 ->first();
         }
-        else if ($student){//如果是学生，查学生反馈表
+        else if (isset($student)){//如果是学生，查学生反馈表
             $feedback = Info_Feedback::where('info_content_id','=',$id)
                 ->where('student_id','=',$student->id)
                 ->first();

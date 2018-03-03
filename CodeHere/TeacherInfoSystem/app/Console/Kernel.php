@@ -241,12 +241,6 @@ class Kernel extends ConsoleKernel
             }
         })->everyMinute();
 
-        //定期清理三张反馈表的冗余记录，防止查询性能变差
-        $schedule->call(function (){
-            Info_Feedback::where('created_at','<',date('Y-m-d H:i:s',time()-31536000))->delete();
-            Teacher_Info_Feedback::where('created_at','<',date('Y-m-d H:i:s',time()-31536000))->delete();
-            Graduate_Info_Feedback::where('created_at','<',date('Y-m-d H:i:s',time()-31536000))->delete();
-        })->monthly();
     }
 
     /**

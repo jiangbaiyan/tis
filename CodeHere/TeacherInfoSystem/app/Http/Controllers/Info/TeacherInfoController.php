@@ -221,8 +221,8 @@ class TeacherInfoController extends Controller
         curl_close($ch);
     }
 
-
-    public function send(Request $request){//教师创建一条通知并携带附件，针对不同群体发送不同的微信模板消息
+    //教师创建一条通知（可带附件），针对不同群体发送不同的微信模板消息
+    public function send(Request $request){
         $userid = Cache::get($_COOKIE['userid']);
         $data = $request->all();
         $title = $request->input('title');
@@ -252,6 +252,7 @@ class TeacherInfoController extends Controller
         }
         $info = Info_Content::create($data);
         $info->account_id = $userid;
+        $info->save();
         if ($request->hasFile('file')){//如果上传了附件，那么进行格式判断与文件存储
             $files = $request->file('file');
             foreach($files as $file){//遍历请求中的多个文件
@@ -325,7 +326,8 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);
     }
 
-    public function getReceivers($info_level){//获取通知对象
+    //获取通知对象
+    public function getReceivers($info_level){
         $data = Student::all();
         $grade = $data->groupBy('grade');
         $class = $data->groupBy('class_num');
@@ -341,39 +343,42 @@ class TeacherInfoController extends Controller
         }
     }
 
-    public function getReceiveInfo(){//教师在PC端查看自己收到的信息
+    //教师在PC端查看自己收到的信息
+    public function getReceiveInfo(){
         $userid = Cache::get($_COOKIE['userid']);
         $teacher = Account::where('userid','=',$userid)->first();
         $data = Info_Content::join('teacher_info_feedbacks','teacher_info_feedbacks.info_content_id','=','info_contents.id')
             ->join('accounts','info_contents.account_id','=','accounts.userid')
             ->select('info_contents.*','accounts.name')
             ->where('teacher_info_feedbacks.account_id','=',$teacher->id)
-            ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+/*            ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
             ->orderByDesc('info_contents.created_at')
             ->get();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
 
-    public function getInfoContent($info_level){//教师查看所发通知列表
+    //教师端查看通知列表
+    public function getInfoContent($info_level){
         if ($info_level == 1){//如果是辅导员，可查看type为1-8（发给学生和研究生的通知）
             $data = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.*','accounts.name')
-                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+/*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
                 ->whereBetween('info_contents.type', [1,8])
                 ->orderByDesc('info_contents.created_at')
-                ->get();
+                ->paginate(5);
         }
         else{//如果是教务老师，可以查看所有通知（type为1-10）
             $data = Info_Content::join('accounts','info_contents.account_id','=','accounts.userid')
                 ->select('info_contents.*','accounts.name')
-                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))
+/*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
                 ->orderByDesc('info_contents.created_at')
-                ->get();
+                ->paginate(5);
         }
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
 
-    public function getFeedback($id){//教师查看学生反馈情况
+    //教师端查看学生反馈情况
+    public function getFeedback($id){
         $content = Info_Content::find($id);
         if (!$content){
             return Response::json(['status' => 404,'msg' => '通知id不存在']);

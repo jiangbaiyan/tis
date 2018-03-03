@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>请选择您要进行的操作</title>
+    <style type="text/css">
+        input{
+            width: 100px;
+            height: 50px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<input type="button" value="修改信息" id="change">
+<input type="button" value="绑定信息" id="bind">
+</body>
+<script type="text/javascript">
+    var changeBtn = document.getElementById("change");
+    var bindBtn = document.getElementById("bind");
+    changeBtn.onclick = function () {
+        window.location.href = "/change";
+    };
+    bindBtn.onclick = function () {
+        window.location.href = "/bind";
+    };
+</script>
+</html>

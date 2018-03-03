@@ -15,7 +15,8 @@ use App\Http\Controllers\WeChatController;
 class DailyLeaveController extends Controller
 {
 //-------------------------学生端--------------------------------------
-    public function studentCreate(Request $request){//创建请假信息
+    //创建一条请假信息
+    public function studentCreate(Request $request){
         $data = $request->all();
         $openid = $_COOKIE['openid'];
         $dailyLeave = new Daily_leave($data);
@@ -27,7 +28,8 @@ class DailyLeaveController extends Controller
         return Response::json(['status' => 200,'msg' => 'create successfully']);
     }
 
-    public function studentGet(){//获取所有未销假的信息
+    //获取所有未销假的请假
+    public function studentGet(){
         $openid = $_COOKIE['openid'];
         $student = Student::where('openid',$openid)->first();
         if (!$student){
@@ -42,7 +44,8 @@ class DailyLeaveController extends Controller
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
     }
 
-    public function studentDelete($id,$location){//销假
+    //销假
+    public function studentDelete($id,$location){
         $daily_leave = Daily_leave::find($id);
         if (!$daily_leave){
             return Response::json(['status' => 404,'msg' => 'daily_leave not found']);
@@ -54,6 +57,19 @@ class DailyLeaveController extends Controller
             return Response::json(['status' => 402,'msg' => 'cancel failed']);
         }
         return Response::json(['status' => 200,'msg' => 'cancel successfully']);
+    }
+
+    //获取请假历史记录
+    public function getHistory(){
+        $openid = $_COOKIE['openid'];
+        $student = Student::where('openid',$openid)->first();
+        if (!$student){
+            return Response::json(['status' => 404 ,'msg' => 'student not found']);
+        }
+        $daily_leaves = $student->daily_leaves()
+            ->orderByDesc('created_at')
+            ->paginate(5);
+        return Response::json(['status' => 200,'msg' => 'leave history required successfully','data' => $daily_leaves]);
     }
 //-------------------------教师端--------------------------------------
 
@@ -79,8 +95,7 @@ class DailyLeaveController extends Controller
         curl_setopt($ch2,CURLOPT_RETURNTRANSFER,1);
         curl_setopt($ch2,CURLOPT_HTTPHEADER,$header);
         if (!$id){//批量同意逻辑，根据浏览器是否传id来判断，传id则更新单条记录，不传则更新多条记录
-            $daily_leaves = Daily_leave//筛选出符合条件的未审核的请假信息
-            ::join('students','daily_leaves.student_id','=','students.id')
+            $daily_leaves = Daily_leave::join('students','daily_leaves.student_id','=','students.id')//筛选出符合条件的未审核的请假信息
                 ->where('students.account_id','=', $teacherid)
                 ->where('daily_leaves.is_pass','=',0)
                 ->get();
