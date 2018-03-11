@@ -22,4 +22,7 @@ class Account extends Model
         return $this->hasMany('App\Reach_result');
     }
 
+    public function files(){
+        return $this->hasMany('App\File');
+    }
 }

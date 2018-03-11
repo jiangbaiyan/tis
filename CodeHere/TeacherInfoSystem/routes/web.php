@@ -216,3 +216,19 @@ Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
         });
     });
 });
+
+//文件系统模块
+Route::group(['prefix' => 'api','namespace' => 'File'],function (){//教师端
+    Route::group(['middleware'=>'EnableCrossRequest'],function (){
+        Route::group(['prefix' => 'v1.0'],function (){
+
+            //教师PC端
+            Route::group(['middleware'=>'TeacherCheckLogin'],function (){
+                Route::post('file','FileController@uploadFiles');
+                Route::get('file','FileController@getMyFiles');
+                Route::delete('file/{id}','FileController@deleteFile');
+                Route::get('file/{id}','FileController@getTeachersFiles');
+            });
+        });
+    });
+});

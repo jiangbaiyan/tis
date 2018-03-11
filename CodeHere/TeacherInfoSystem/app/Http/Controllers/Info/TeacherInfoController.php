@@ -338,7 +338,10 @@ class TeacherInfoController extends Controller
             return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'graduate_grade' => $graduateGrade]]);
         }
         else{//如果是教务老师，那么可以给学生和老师发通知
-            $teachers = Account::where('openid','!=',null)->orderBy('name')->get();
+/*            $teachers = \DB::select('select * from accounts where openid is not null order by convert (name using gbk)');*/
+            $teachers = Account::where('openid','!=',null)
+                ->orderByDesc('name')
+                ->get();
             return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'teacher' => $teachers,'graduate_grade' => $graduateGrade]]);
         }
     }
