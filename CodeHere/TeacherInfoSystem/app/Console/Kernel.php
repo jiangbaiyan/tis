@@ -34,9 +34,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call(function (){//每天定时给辅导员发送未审批的请假统计信息
-            $bgx = 'oTkqI0c8ZdHkCIFB_0vrrhfUgvcI';
-            $fwj = 'oTkqI0au9nEEghhsvyR_wWYaS2V0';
-            $sj =  'oTkqI0TdZYu-9rFkR1EboBvfcbfY';
+            $bgx = Account::find(41)->openid;
+            $fwj = Account::find(36)->openid;
+            $sj = Account::find(35)->openid;
             $bgxCount = 0;
             $fwjCount = 0;
             $sjCount = 0;
