@@ -19,8 +19,11 @@ class FileController extends Controller
         if (!$teacher) {
             return Response::json(['status' => 404, 'msg' => 'user not exists']);
         }
-        $name = $request->input('filename ');
+        $name = $request->input('filename');
         $url = $request->input('url');
+        if (!$name||!$url){
+            return Response::json(['status' => 400,'msg' => 'missing parameters']);
+        }
         $teacher->files()->create(['name' => $name, 'url' => $url]);
         return Response::json(['status' => 200, 'msg' => 'success']);
     }
