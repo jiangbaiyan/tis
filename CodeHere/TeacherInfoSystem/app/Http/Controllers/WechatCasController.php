@@ -18,9 +18,11 @@ class WechatCasController extends LoginAndAccount\Controller
         //如果数据库中有数据，那么直接重新设置cookie即可，不需要重新走CAS认证
         if (isset($student)||isset($graduate)||isset($teacher)) {
             setcookie('openid', $openid, time() + 31536000);
-            return view('WeChat/choose',['student' => $student,'graduate' => $graduate,'teacher' => $teacher]);
-/*            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";*/
-            /*die("<strong>恭喜您，绑定信息成功！</strong>" .'<br>' . '<br>' . "若想修改您已填写的个人信息，请在公众号上留言。如有对平台改进的建议和bug也可以提出，我们会及时处理，谢谢！");*/
+            return view('WeChat/choose',[
+                'student' => $student,
+                'graduate' => $graduate,
+                'teacher' => $teacher
+            ]);
         }
         //数据库中没有数据，需要重新录入信息
         $loginServer = "http://cas.hdu.edu.cn/cas/login";

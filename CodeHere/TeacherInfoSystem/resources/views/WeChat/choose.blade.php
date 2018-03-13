@@ -8,33 +8,30 @@
     <meta name="format-detection" content="telephone=no">
     <title>绑定成功</title>
     <style type="text/css">
-        body{
-            background: lightskyblue;
-        }
         p{
-            font-size: 22px;
+            font-size: 20px;
         }
         #success{
             text-align: center;
-            font-size: 32px;
+            font-size: 28px;
             color: red;
             font-weight: bold;
         }
         li{
-            font-size: 24px;
+            font-size: 23px;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
 <p id="success">恭喜您，信息绑定成功！</p>
-<p>若想修改您已填写的个人信息，请在公众号上留言。
-<p>如有对平台改进的建议和bug也可以提出，我们会及时处理，谢谢！</p>
+<hr>
 <p>您目前已录入的信息：</p>
 @if(isset($student))
 <ul>
     <li>学号：{{$student->userid}}</li>
     <li>姓名：{{$student->name}}</li>
+    <li>班级：{{$student->class_num}}</li>
     <li>手机号：{{$student->phone}}</li>
     <li>邮箱：{{$student->email}}</li>
     <li>辅导员：
@@ -66,5 +63,8 @@
     </li>
 </ul>
 @endif
+<hr>
+<p>若想修改您已填写的个人信息，请在公众号上留言。备注您的姓名学号，以及要修改的内容。
+<p>如有对平台改进的建议和bug也可以提出，我们会及时处理，谢谢！</p>
 </body>
 </html>
