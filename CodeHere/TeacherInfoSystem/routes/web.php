@@ -228,6 +228,9 @@ Route::group(['prefix' => 'api','namespace' => 'File'],function (){//教师端
                 Route::get('file','FileController@getMyFiles');
                 Route::delete('file/{id}','FileController@deleteFile');
                 Route::get('file/{id}','FileController@getTeachersFiles');
+
+                //获取教师列表
+                Route::get('teachers','FileController@getTeachers');
            });
         });
     });

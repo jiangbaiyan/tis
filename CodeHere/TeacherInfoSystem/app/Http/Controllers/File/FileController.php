@@ -45,8 +45,9 @@ class FileController extends Controller
         if (!$teacher) {
             return Response::json(['status' => 404, 'msg' => 'user not exists']);
         }
-        $data = $teacher->files()->get();
-        return Response::json(['status' => 200,'msg' => 'success','data' => $data]);
+        $data = $teacher->files();
+        $count = $data->count();
+        return Response::json(['status' => 200,'msg' => 'success','data' => $data->get(),'count' => $count]);
     }
 
     //删除文件
@@ -58,5 +59,11 @@ class FileController extends Controller
             return Response::json(['status' => 402,'msg' => 'file deleted failed']);
         }
         return Response::json(['status' => 200,'msg' => 'success']);
+    }
+
+    //获取教师列表
+    public function getTeachers(){
+        $teachers = Account::where('openid','!=',null)->get();
+        return Response::json(['status' => 200,'msg' => 'success','data' => $teachers]);
     }
 }
