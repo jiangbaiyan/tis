@@ -11,7 +11,7 @@
 |
 */
 
-$app = new Illuminate\Foundation\Application(
+$app = new Illuminate\Foundation\Application(//新建一个容器对象
     realpath(__DIR__.'/../')
 );
 

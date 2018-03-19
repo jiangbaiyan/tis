@@ -33,7 +33,7 @@ require __DIR__.'/../bootstrap/autoload.php';
 |
 */
 
-$app = require_once __DIR__.'/../bootstrap/app.php';//容器
+$app = require_once __DIR__.'/../bootstrap/app.php';//加载容器，进行容器实例化
 
 /*
 |--------------------------------------------------------------------------
@@ -50,9 +50,9 @@ $app = require_once __DIR__.'/../bootstrap/app.php';//容器
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);//使用容器中的字符串并解析
 
 $response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
+    $request = Illuminate\Http\Request::capture()//请求实例化并进行请求处理
 );
 
-$response->send();
+$response->send();//发送相应
 
-$kernel->terminate($request, $response);
+$kernel->terminate($request, $response);//终止

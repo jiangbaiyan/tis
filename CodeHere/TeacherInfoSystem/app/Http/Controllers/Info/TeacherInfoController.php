@@ -155,7 +155,7 @@ class TeacherInfoController extends Controller
                 }
                 break;
             case 'allTeacher': //case 10
-                $teachers = Account::where('openid','!=',null)->get();
+                $teachers = Account::where('openid','!=','')->get();
                 foreach ($teachers as $teacher){
                     $openid = $teacher->openid;
                     $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
@@ -339,7 +339,7 @@ class TeacherInfoController extends Controller
         }
         else{//如果是教务老师，那么可以给学生和老师发通知
 /*            $teachers = \DB::select('select * from accounts where openid is not null order by convert (name using gbk)');*/
-            $teachers = Account::where('openid','!=',null)
+            $teachers = Account::where('openid','!=','')
                 ->orderByDesc('name')
                 ->get();
             return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'teacher' => $teachers,'graduate_grade' => $graduateGrade]]);
@@ -391,7 +391,7 @@ class TeacherInfoController extends Controller
             $data = $content->info_feedbacks()
                 ->join('students','info_feedbacks.student_id','=','students.id')
                 ->join('info_contents','info_feedbacks.info_content_id','=','info_contents.id')
-                ->select('students.userid','students.name','students.phone','students.grade','students.class','students.class_num','students.major','info_feedbacks.status','info_contents.title','info_contents.content','info_contents.send_to')
+                ->select('students.userid','students.name','info_feedbacks.status','info_contents.title')
                 ->orderBy('students.userid')
                 ->get();
         }
@@ -399,7 +399,7 @@ class TeacherInfoController extends Controller
             $data = $content->graduate_info_feedbacks()
                 ->join('graduates','graduate_info_feedbacks.graduate_id','=','graduates.id')
                 ->join('info_contents','graduate_info_feedbacks.info_content_id','=','info_contents.id')
-                ->select('graduates.userid','graduates.name','graduates.phone','graduates.grade','graduate_info_feedbacks.status','info_contents.title','info_contents.content','info_contents.send_to')
+                ->select('graduates.userid','graduates.name','graduate_info_feedbacks.status','info_contents.title')
                 ->orderBy('graduates.userid')
                 ->get();
         }
@@ -407,7 +407,7 @@ class TeacherInfoController extends Controller
             $data = $content->teacher_info_feedbacks()
                 ->join('accounts','teacher_info_feedbacks.account_id','=','accounts.id')
                 ->join('info_contents','teacher_info_feedbacks.info_content_id','=','info_contents.id')
-                ->select('accounts.userid','accounts.name','teacher_info_feedbacks.status','info_contents.title','info_contents.content','info_contents.send_to')
+                ->select('accounts.userid','accounts.name','teacher_info_feedbacks.status','info_contents.title')
                 ->orderBy('accounts.userid')
                 ->get();
         }

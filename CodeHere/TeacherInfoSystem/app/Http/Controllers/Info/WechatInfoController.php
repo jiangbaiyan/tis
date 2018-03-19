@@ -85,7 +85,6 @@ class WechatInfoController extends Controller
         else{//如果两张表都没找到用户信息
             return Response::json(['status' => 404,'msg' => '用户信息未找到，请重新绑定']);
         }
-
         if (!$feedback){
             return Response::json(['status' => 404,'msg' => '您无权限查看该通知']);
         }
@@ -140,7 +139,7 @@ class WechatInfoController extends Controller
             return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'graduate_grade' => $graduateGrade]]);
         }
         else{//如果是教务老师
-            $teachers = Account::where('openid','!=',null)->orderBy('name')->get();
+            $teachers = Account::where('openid','!=','')->orderBy('name')->get();
             return Response::json(['status' => 200,'msg' => 'data requried successfully','data' => ['grade' => $grade,'class' => $class,'major' =>$major,'teacher' => $teachers,'graduate_grade' => $graduateGrade]]);
         }
     }
