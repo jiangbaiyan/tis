@@ -282,16 +282,16 @@ class TeacherInfoController extends Controller
     //获取通知对象
     public function getReceivers($info_level)
     {
-        $data = Student::select('id', 'userid', 'openid','grade', 'class_num', 'major')->get();
+        $data = Student::select('id', 'userid', 'name','grade', 'class_num', 'major')->get();
         $grade = $data->groupBy('grade');
         $class = $data->groupBy('class_num');
         $major = $data->groupBy('major');
-        $graduateData = Graduate::select('id', 'userid', 'openid','grade')->get();
+        $graduateData = Graduate::select('id', 'userid', 'name','grade')->get();
         $graduateGrade = $graduateData->groupBy('grade');
         if ($info_level == 1) {//如果是辅导员，那么只能给学生发通知
             return Response::json(['status' => 200, 'msg' => 'data requried successfully', 'data' => ['grade' => $grade, 'class' => $class, 'major' => $major, 'graduate_grade' => $graduateGrade]]);
         } else {//如果是教务老师，那么可以给学生和老师发通知
-            $teachers = Account::select('id', 'userid', 'openid', 'name')
+            $teachers = Account::select('id', 'userid', 'name')
                 ->where('openid', '!=', '')
                 ->get();
             return Response::json(['status' => 200, 'msg' => 'data requried successfully', 'data' => ['grade' => $grade, 'class' => $class, 'major' => $major, 'teacher' => $teachers, 'graduate_grade' => $graduateGrade]]);
