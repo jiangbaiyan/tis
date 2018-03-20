@@ -63,7 +63,9 @@ class FileController extends Controller
 
     //获取教师列表
     public function getTeachers(){
-        $teachers = Account::where('openid','!=','')->get();
+        $teachers = Account::select('id','userid','name')
+            ->where('openid','!=','')
+            ->get();
         return Response::json(['status' => 200,'msg' => 'success','data' => $teachers]);
     }
 }

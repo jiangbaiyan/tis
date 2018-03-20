@@ -182,34 +182,34 @@ class WechatInfoController extends Controller
         $info->save();
         switch ($type) {
             case 1://年级
-                $sendModelInfo->sendModelInfo('grade', $info,0);
+                $sendModelInfo->sendModelInfo(1, $info,0);
                 break;
             case 2://班级
-                $sendModelInfo->sendModelInfo('class_num', $info,0);
+                $sendModelInfo->sendModelInfo(2, $info,0);
                 break;
             case 3://专业
-                $sendModelInfo->sendModelInfo('major', $info,0);
+                $sendModelInfo->sendModelInfo(3, $info,0);
                 break;
             case 4://特定学生
-                $sendModelInfo->sendModelInfo('userid',$info,0);
+                $sendModelInfo->sendModelInfo(4,$info,0);
                 break;
             case 5: //发给全体学生
-                $sendModelInfo->sendModelInfo('all', $info,0);
+                $sendModelInfo->sendModelInfo(5, $info,0);
                 break;
             case 6: //研究生年级
-                $sendModelInfo->sendModelInfo('graduateGrade',$info,0);
+                $sendModelInfo->sendModelInfo(6,$info,0);
                 break;
             case 7: //研究生学号
-                $sendModelInfo->sendModelInfo('graduateUserid',$info,0);
+                $sendModelInfo->sendModelInfo(7,$info,0);
                 break;
             case 8://全体研究生
-                $sendModelInfo->sendModelInfo('allGraduate', $info,0);
+                $sendModelInfo->sendModelInfo(8, $info,0);
                 break;
             case 9: //发给单个教师
-                $sendModelInfo->sendModelInfo('teacher', $info,0);
+                $sendModelInfo->sendModelInfo(9, $info,0);
                 break;
             case 10: //发给全体教师
-                $sendModelInfo->sendModelInfo('allTeacher', $info,0);
+                $sendModelInfo->sendModelInfo(10, $info,0);
                 break;
         }
         return Response::json(['status' => 200,'msg' => 'send model messages successfully']);

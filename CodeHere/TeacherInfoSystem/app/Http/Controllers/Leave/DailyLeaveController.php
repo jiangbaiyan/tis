@@ -266,7 +266,7 @@ class DailyLeaveController extends Controller
         $datas = Daily_leave::join('students','daily_leaves.student_id','=','students.id')
             ->select('daily_leaves.*','students.userid','students.name','students.phone','students.class','students.major')
             ->where('students.account_id','=', $userid)
-            //->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-604800))
+            ->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-604800))
             ->where('daily_leaves.is_pass','=',0)
             ->orderByDesc('daily_leaves.created_at')
             ->get();
