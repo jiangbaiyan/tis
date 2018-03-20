@@ -28,16 +28,16 @@ class TeacherInfoController extends Controller
     //教师PC端与微信端公用发送通知模板消息方法
     public function sendModelInfo($type, $info, $isPC)
     {
-        //提取循环外公用的变量
-        if ($isPC) {
+        if ($isPC) {//PC端发通知
             $userid = $info->account_id;
             $userTeacher = Account::where('userid', $userid)->first();
-        } else {
+        } else {//手机端发通知
             $openid = $_COOKIE['openid'];
             $userTeacher = Account::where('openid', $openid)->first();
         }
         $wechat = new WeChatController();
         $this->access_token = $wechat->getAccessToken();//获取accesstoken
+        $url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token";
         $receivers = $info->send_to;
         $post_data = [//模板消息相关
             'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
@@ -70,101 +70,101 @@ class TeacherInfoController extends Controller
             $client = new Client();
             switch ($type) {
                 case 5:
-                    $students = Student::select('id', 'openid')->get();
-                    foreach ($students as $student) {
-                        $openid = $student->openid;
-                        $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
-                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                    $users = Student::select('id', 'openid')->get();
+                    foreach ($users as $user) {
+                        $openid = $user->openid;
+                        $post_data['touser'] = $openid;
+                        $client->request('POST', $url, [
                             'json' => $post_data
                         ]);
-                        Info_Feedback::create(['student_id' => $student->id, 'info_content_id' => $info->id]);
+                        Info_Feedback::create(['student_id' => $user->id, 'info_content_id' => $info->id]);
                     }
                     break;
                 case 6:
                     $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
                     foreach ($receivers as $receiver) {
-                        $graduates = Graduate::select('id', 'openid')
+                        $users = Graduate::select('id', 'openid')
                             ->where('grade', $receiver)
                             ->get();
-                        foreach ($graduates as $graduate) {//遍历该年级/班级/专业的所有学生
-                            $openid = $graduate->openid;
+                        foreach ($users as $user) {//遍历该年级/班级/专业的所有学生
+                            $openid = $user->openid;
                             $post_data['touser'] = $openid;
-                            $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                            $client->request('POST', $url, [
                                 'json' => $post_data
                             ]);
-                            Graduate_Info_Feedback::create(['graduate_id' => $graduate->id, 'info_content_id' => $info->id]);
+                            Graduate_Info_Feedback::create(['graduate_id' => $user->id, 'info_content_id' => $info->id]);
                         }
                     }
                     break;
                 case 7:
                     $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
                     foreach ($receivers as $receiver) {
-                        $graduates = Graduate::select('id', 'openid')
+                        $users = Graduate::select('id', 'openid')
                             ->where('userid', $receiver)
                             ->get();
-                        foreach ($graduates as $graduate) {//遍历该年级/班级/专业的所有学生
-                            $openid = $graduate->openid;
+                        foreach ($users as $user) {//遍历该年级/班级/专业的所有学生
+                            $openid = $user->openid;
                             $post_data['touser'] = $openid;
-                            $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                            $client->request('POST', $url, [
                                 'json' => $post_data
                             ]);
-                            Graduate_Info_Feedback::create(['graduate_id' => $graduate->id, 'info_content_id' => $info->id]);
+                            Graduate_Info_Feedback::create(['graduate_id' => $user->id, 'info_content_id' => $info->id]);
                         }
                     }
                     break;
                 case 8:
-                    $graduates = Graduate::select('id', 'openid')->get();
-                    foreach ($graduates as $graduate) {
-                        $openid = $graduate->openid;
-                        $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
-                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                    $users = Graduate::select('id', 'openid')->get();
+                    foreach ($users as $user) {
+                        $openid = $user->openid;
+                        $post_data['touser'] = $openid;
+                        $client->request('POST', $url, [
                             'json' => $post_data
                         ]);
-                        Graduate_Info_Feedback::create(['graduate_id' => $graduate->id, 'info_content_id' => $info->id]);
+                        Graduate_Info_Feedback::create(['graduate_id' => $user->id, 'info_content_id' => $info->id]);
                     }
                     break;
                 case 9:
                     $receivers = explode(' ', $receivers);//前端传递参数40365 41451需要进行字符串分割
                     foreach ($receivers as $receiver) {
-                        $teachers = Account::select('id', 'openid')
+                        $users = Account::select('id', 'openid')
                             ->where('userid', $receiver)
                             ->get();
-                        foreach ($teachers as $teacher) {//遍历该年级/班级/专业的所有学生
-                            $openid = $teacher->openid;
+                        foreach ($users as $user) {//遍历该年级/班级/专业的所有学生
+                            $openid = $user->openid;
                             $post_data['touser'] = $openid;
-                            $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                            $client->request('POST', $url, [
                                 'json' => $post_data
                             ]);
-                            Teacher_Info_Feedback::create(['account_id' => $teacher->id, 'info_content_id' => $info->id]);
+                            Teacher_Info_Feedback::create(['account_id' => $user->id, 'info_content_id' => $info->id]);
                         }
                     }
                     break;
                 case 10:
-                    $teachers = Account::select('id', 'openid')
+                    $users = Account::select('id', 'openid')
                         ->where('openid', '!=', '')
                         ->get();
-                    foreach ($teachers as $teacher) {
-                        $openid = $teacher->openid;
-                        $post_data['touser'] = $openid;//模板消息每个人的openid不一样，在循环中加入请求数组
-                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                    foreach ($users as $user) {
+                        $openid = $user->openid;
+                        $post_data['touser'] = $openid;
+                        $client->request('POST', $url, [
                             'json' => $post_data
                         ]);
-                        Teacher_Info_Feedback::create(['account_id' => $teacher->id, 'info_content_id' => $info->id]);
+                        Teacher_Info_Feedback::create(['account_id' => $user->id, 'info_content_id' => $info->id]);
                     }
                     break;
                 default: //case 1、2、3、4
                     $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
                     foreach ($receivers as $receiver) {
-                        $students = Student::select('id', 'openid')
+                        $users = Student::select('id', 'openid')
                             ->where("$type", $receiver)
                             ->get();
-                        foreach ($students as $student) {//遍历该年级/班级/专业的所有学生
-                            $openid = $student->openid;
+                        foreach ($users as $user) {//遍历该年级/班级/专业的所有学生
+                            $openid = $user->openid;
                             $post_data['touser'] = $openid;
                             $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
                                 'json' => $post_data
                             ]);
-                            Info_Feedback::create(['student_id' => $student->id, 'info_content_id' => $info->id]);
+                            Info_Feedback::create(['student_id' => $user->id, 'info_content_id' => $info->id]);
                         }
                     }
                     break;
@@ -282,16 +282,16 @@ class TeacherInfoController extends Controller
     //获取通知对象
     public function getReceivers($info_level)
     {
-        $data = Student::select('id', 'userid', 'grade', 'class_num', 'major')->get();
+        $data = Student::select('id', 'userid', 'openid','grade', 'class_num', 'major')->get();
         $grade = $data->groupBy('grade');
         $class = $data->groupBy('class_num');
         $major = $data->groupBy('major');
-        $graduateData = Graduate::select('id', 'userid', 'grade')->get();
+        $graduateData = Graduate::select('id', 'userid', 'openid','grade')->get();
         $graduateGrade = $graduateData->groupBy('grade');
         if ($info_level == 1) {//如果是辅导员，那么只能给学生发通知
             return Response::json(['status' => 200, 'msg' => 'data requried successfully', 'data' => ['grade' => $grade, 'class' => $class, 'major' => $major, 'graduate_grade' => $graduateGrade]]);
         } else {//如果是教务老师，那么可以给学生和老师发通知
-            $teachers = Account::select('id', 'userid', 'name')
+            $teachers = Account::select('id', 'userid', 'openid', 'name')
                 ->where('openid', '!=', '')
                 ->get();
             return Response::json(['status' => 200, 'msg' => 'data requried successfully', 'data' => ['grade' => $grade, 'class' => $class, 'major' => $major, 'teacher' => $teachers, 'graduate_grade' => $graduateGrade]]);

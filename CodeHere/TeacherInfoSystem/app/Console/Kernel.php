@@ -63,9 +63,10 @@ class Kernel extends ConsoleKernel
             }
             $wechat = new WeChatController();
             $access_token = $wechat->getAccessToken();
+            $url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token";
             $client = new Client();
             if ($bgxCount){//如果卞广旭的未审核请假信息不为0，那么发送模板消息
-                $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token",[
+                $client->request('POST',$url,[
                     'json' => [
                         'touser' => $bgx,
                         'template_id' => 'zja03P3aWNkEb-XYo9HwKQMWwUY2zJMhd9k6AxAjvS8',
@@ -86,7 +87,7 @@ class Kernel extends ConsoleKernel
                 ]);
             }
             if ($fwjCount){
-                $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token",[
+                $client->request('POST',$url,[
                     'json' => [
                         'touser' => $fwj,
                         'template_id' => 'zja03P3aWNkEb-XYo9HwKQMWwUY2zJMhd9k6AxAjvS8',
@@ -113,7 +114,7 @@ class Kernel extends ConsoleKernel
                 ]);
             }
             if ($sjCount){
-                $client->request('POST',"https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token",[
+                $client->request('POST',$url,[
                     'json' => [
                         'touser' => $sj,
                         'template_id' => 'zja03P3aWNkEb-XYo9HwKQMWwUY2zJMhd9k6AxAjvS8',
@@ -216,22 +217,22 @@ class Kernel extends ConsoleKernel
                                 $teacherInfoController->sendModelInfo('userid', $info, 1);
                                 break;
                             case 5: //发给全体学生
-                                $teacherInfoController->sendModelInfo('all', $info, 1);
+                                $teacherInfoController->sendModelInfo(5, $info, 1);
                                 break;
                             case 6: //研究生年级
-                                $teacherInfoController->sendModelInfo('graduateGrade', $info, 1);
+                                $teacherInfoController->sendModelInfo(6, $info, 1);
                                 break;
                             case 7: //研究生学号
-                                $teacherInfoController->sendModelInfo('graduateUserid', $info, 1);
+                                $teacherInfoController->sendModelInfo(7, $info, 1);
                                 break;
                             case 8://全体研究生
-                                $teacherInfoController->sendModelInfo('allGraduate', $info, 1);
+                                $teacherInfoController->sendModelInfo(8, $info, 1);
                                 break;
                             case 9: //发给单个教师
-                                $teacherInfoController->sendModelInfo('teacher', $info, 1);
+                                $teacherInfoController->sendModelInfo(9, $info, 1);
                                 break;
                             case 10: //发给全体教师
-                                $teacherInfoController->sendModelInfo('allTeacher', $info, 1);
+                                $teacherInfoController->sendModelInfo(10, $info, 1);
                                 break;
                         }
                         $info->is_send = 1;
