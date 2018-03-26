@@ -27,7 +27,6 @@ class WeChatController extends LoginAndAccount\Controller
 
     public function getType(){//获取微信端用户类型（0-普通/1-辅导员/2-教务老师/3-学生）
         $openid = $_COOKIE['openid'];
-        //$openid = 'oTkqI0XMZFPldSWRrKvnOUpLYN9o';
         $user = Account::where('openid',$openid)->first();//先去教师表查找
         if ($user){//教师表找到了一条记录，那么是老师
             return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => $user->info_level]]);
@@ -54,16 +53,27 @@ class WeChatController extends LoginAndAccount\Controller
     }
 
 
-    public function studentBind(){//绑定信息按钮入口
-        return redirect('/openid');//跳转到下面的bind方法获取openid
+    public function bind(){//绑定信息按钮入口
+        return redirect('/openid/1');//跳转到下面的bind方法获取openid
     }
 
-    public function openid(){//微信网页授权获取openid
-        $callback = urlencode('https://tis.cloudshm.com/callback');
+    public function modify(){//绑定信息按钮入口
+        return redirect('/openid/2');//跳转到下面的bind方法获取openid
+    }
+
+    public function openid($type){//微信网页授权获取openid
+        switch ($type){
+            case 1://绑定信息回调
+                $callback = urlencode('https://tis.cloudshm.com/bind_callback');
+                break;
+            case 2://修改信息回调
+                $callback = urlencode('https://tis.cloudshm.com/modify_callback');
+                break;
+        }
         return redirect("https://open.weixin.qq.com/connect/oauth2/authorize?appid=$this->appid&redirect_uri=$callback&response_type=code&scope=snsapi_base&state=123#wechat_redirect");//回调到callback方法
     }
 
-    public function callback(Request $request){//微信内部回调
+    public function bindCallback(Request $request){//绑定信息内部回调
         $code = $request->code;
         $ch = curl_init();
         curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/sns/oauth2/access_token?appid=$this->appid&secret=$this->secret&code=$code&grant_type=authorization_code ");
@@ -77,6 +87,71 @@ class WeChatController extends LoginAndAccount\Controller
         return redirect('/api/v1.0/wechatcas');//跳转到杭电CAS逻辑
     }
 
+    public function modifyCallback(Request $request){//修改信息内部回调
+        $code = $request->code;
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/sns/oauth2/access_token?appid=$this->appid&secret=$this->secret&code=$code&grant_type=authorization_code ");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        $result = curl_exec($ch);
+        $arr = json_decode($result,true);
+        $openid = $arr['openid'];
+        $student = Student::where('openid',$openid)->first();
+        $graduate = Graduate::where('openid',$openid)->first();
+        $teacher = Account::where('openid',$openid)->first();
+        if (isset($student)){
+            return view('WeChat/modify',['student' => $student]);
+        }
+        else if (isset($teacher)){
+            return view('WeChat/modify',['teacher' => $teacher]);
+        }
+        else if (isset($graduate)){
+            return view('WeChat/modify',['graduate' => $graduate]);
+        }
+        else{
+            return redirect('/bind');
+        }
+    }
+
+    //修改信息具体逻辑
+    public function modifyLogic($id,Request $request){
+        $validator = Validator::make($request->all(),[
+            'phone' => 'numeric',
+            'email' => 'email'
+        ],[
+            'numeric' => ':attribute格式不正确',
+            'email' => ':attribute格式不正确'
+        ],[
+            'phone' => '联系电话',
+            'email' => '邮箱'
+        ]);
+        if ($validator->fails()){
+            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+            die("您输入的信息格式有误，请重试");
+        }
+        $userType = $request->type;
+        switch ($userType){
+            case 1://学生修改信息
+                Student::find($id)->update($request->all());
+                break;
+            case 2://教师修改信息
+                Account::find($id)->update($request->all());
+                break;
+            case 3://研究生修改信息
+                Graduate::find($id)->update($request->all());
+                break;
+        }
+        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+        die('恭喜您，信息修改成功！');
+    }
+
+    public function cancel(){
+        echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+        die('抱歉，该功能正在维护中！');
+        setcookie('openid','',time()-3600);
+    }
+
+    //————————————————————————错误信息展示——————————————————————————————
     public function showError(){//本科生模板渲染
         return view('WeChat/getMessage');
     }
@@ -89,6 +164,8 @@ class WeChatController extends LoginAndAccount\Controller
         return view('WeChat/teacherGetMessage');
     }
 
+
+    //————————————————————————绑定信息表单提交————————————————————————————
     public function submit(Request $request){//获取本科生提交的表单信息并验证
         $validator = Validator::make($request->all(),[
             'phone' => 'required|numeric',
@@ -233,28 +310,8 @@ class WeChatController extends LoginAndAccount\Controller
         die('教师信息绑定成功!');
     }
 
-    //公众号个人中心页面（未完成）
-    public function userIndex(){
-        if (!isset($_COOKIE['openid'])){
-            return view('choose',['isBind' => 0]);
-        }
-        $openid = $_COOKIE['openid'];
-        $student = Student::where('openid',$openid)->first();
-        $graduate = Graduate::where('openid',$openid)->first();
-        $teacher = Account::where('openid',$openid)->first();
-        if (isset($student)){
-            return view('choose',['isBind' => 1,'student' => $student]);
-        }
-        else if (isset($teacher)){
-            return view('choose',['isBind' => 1,'teacher' => $teacher]);
-        }
-        else if (isset($graduate)){
-            return view('choose',['isBind' => 1,'graduate' => $graduate]);
-        }
-        else{
-            return view('choose',['isBind' => 0]);
-        }
-    }
+
+    //————————————————————————————其他业务逻辑————————————————————————————————————————
 
     //JS SDK签名认证逻辑（请假定位用）
     public function jsSDK(){

@@ -26,9 +26,13 @@ Route::group(['middleware'=>'EnableCrossRequest'],function () {
 
 //微信相关
 Route::group(['middleware' => 'web'],function (){
-    Route::any('bind','WeChatController@studentBind');//微信绑定信息入口url
-    Route::any('openid','WeChatController@openid');//bind接口后跳转地址
-    Route::any('callback','WeChatController@callback');//从微信回调中获取openid
+    Route::any('bind','WeChatController@bind');//微信绑定信息入口url
+    Route::any('openid/{type}','WeChatController@openid');//bind接口后跳转地址
+    Route::any('modify','WeChatController@modify');//修改信息入口url
+    Route::any('modify/{id}','WeChatController@modifyLogic');//修改信息逻辑
+    Route::any('bind_callback','WeChatController@bindCallback');//授权回调
+    Route::any('modify_callback','WeChatController@modifyCallback');//授权回调
+    Route::any('cancel','WeChatController@cancel');//解除绑定按钮入口url
     Route::any('showError','WeChatController@showError');//本科生填写信息
     Route::any('graduateShowError','WeChatController@graduateShowError');//研究生填写信息
     Route::any('teacherShowError','WeChatController@teacherShowError');//教师填写信息

@@ -8,7 +8,7 @@ class Account extends Model
 {
     protected $table = 'accounts';
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id','type'];
 
     public function students(){
         return $this->hasMany('App\Student','account_id','userid');

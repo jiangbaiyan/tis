@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
-    protected $guarded = ['id'];
+    protected $guarded = ['id','type'];
 
     public function daily_leaves(){
         return $this->hasMany('App\Daily_leave','student_id');
