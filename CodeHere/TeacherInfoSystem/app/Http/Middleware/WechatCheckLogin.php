@@ -38,11 +38,13 @@ class WechatCheckLogin
                     'user' => $graduate,
                     'type' => 2
                 ],525600);//缓存研究生模型
-            }else{
+            }else if (isset($teacher)){
                 Cache::put($openid,[
                     'user' => $teacher,
                     'type' => 3
                 ],525600);//缓存教师模型
+            }else{
+                die('请先绑定信息！');
             }
         }
 /*        else{

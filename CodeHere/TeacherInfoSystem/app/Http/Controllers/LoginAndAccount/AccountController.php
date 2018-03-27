@@ -29,6 +29,11 @@ class AccountController extends Controller
                 return Response::json(['status' => 431,'msg' => 'account not found']);
             }
             $account->update($data);
+            $account->save();
+            Cache::put($account->openid,[
+                'user' => $account,
+                'type' => 3
+            ],525600);
             return Response::json(['status' => 200,'msg' => 'account updated successfully']);
         }
     }

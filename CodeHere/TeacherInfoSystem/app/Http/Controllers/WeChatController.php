@@ -132,13 +132,31 @@ class WeChatController extends LoginAndAccount\Controller
         $userType = $request->type;
         switch ($userType){
             case 1://学生修改信息
-                Student::find($id)->update($request->all());
+                $user = Student::find($id);
+                $user->update($request->all());
+                $user->save();
+                Cache::put($user->openid,[
+                    'user' => $user,
+                    'type' => 1,
+                ],525600);//覆盖缓存中的模型
                 break;
             case 2://教师修改信息
-                Account::find($id)->update($request->all());
+                $user = Account::find($id);
+                $user->update($request->all());
+                $user->save();
+                Cache::put($user->openid,[
+                    'user' => $user,
+                    'type' => 3,
+                ],525600);//覆盖缓存中的模型
                 break;
             case 3://研究生修改信息
-                Graduate::find($id)->update($request->all());
+                $user = Graduate::find($id);
+                $user->update($request->all());
+                $user->save();
+                Cache::put($user->openid,[
+                    'user' => $user,
+                    'type' => 2,
+                ],525600);//覆盖缓存中的模型
                 break;
         }
         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
@@ -207,8 +225,7 @@ class WeChatController extends LoginAndAccount\Controller
         $class = Session::get('class');
         $grade = Session::get('grade');
         setcookie('openid',$openid, time()+31536000);
-        Student::updateOrCreate(
-            ['userid' => $userid],
+        Student::create(
             [
                 'userid' => $userid,
                 'name' => $username,
@@ -259,8 +276,7 @@ class WeChatController extends LoginAndAccount\Controller
         $unit = Session::get('unit');
         $grade = Session::get('grade');
         setcookie('openid',$openid, time()+31536000);
-        Graduate::updateOrCreate(
-            ['userid' => $userid],
+        Graduate::create(
             [
                 'userid' => $userid,
                 'name' => $username,
@@ -296,9 +312,9 @@ class WeChatController extends LoginAndAccount\Controller
         $openid = Session::get('openid');
         $unit = Session::get('unit');
         setcookie('openid',$openid, time()+31536000);
-        Account::updateOrCreate(//查找是否有教师工号为userid的记录，如果有则更新openid与email，没有则创建
-            ['userid' => $userid],
+        Account::create(//查找是否有教师工号为userid的记录，如果有则更新openid与email，没有则创建
             [
+                'userid' => $userid,
                 'openid' => $openid,
                 'email' => $email,
                 'academy' => $unit,
