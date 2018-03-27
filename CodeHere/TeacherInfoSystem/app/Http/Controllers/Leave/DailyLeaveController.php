@@ -31,7 +31,7 @@ class DailyLeaveController extends Controller
             ->where('cancel_time','=',null)
             ->where('is_leave','=',1)
             ->where('is_pass','=',1)
-            ->orderByDesc('created_at')
+            ->latest()
             ->get();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
     }
@@ -55,10 +55,19 @@ class DailyLeaveController extends Controller
     public function getHistory(){
         $user = Cache::get($_COOKIE['openid'])['user'];
         $daily_leaves = $user->daily_leaves()
-            ->orderByDesc('created_at')
+            ->latest()
             ->paginate(5);
         return Response::json(['status' => 200,'msg' => 'leave history required successfully','data' => $daily_leaves]);
     }
+
+    public function cancel($id){
+        try {
+            Daily_leave::destroy($id);
+        } catch (\Exception $e) {
+            return Response::json(['status' => 402,'msg' => 'daily_leave canceled failed']);
+        }
+    }
+
 //-------------------------教师端--------------------------------------
 
 

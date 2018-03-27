@@ -181,6 +181,7 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
                     Route::post('createdailyleave','DailyLeaveController@studentCreate');
                     Route::get('getdailyleave','DailyLeaveController@studentGet');
                     Route::get('deletedailyleave/{id}/{location}','DailyLeaveController@studentDelete');
+                    Route::get('cancel/{id}','DailyLeaveController@cancel');
                     Route::get('history','DailyLeaveController@getHistory');
                     Route::post('createholidayleave','HolidayLeaveController@studentCreate');
                     Route::get('getholidayleave','HolidayLeaveController@studentGet');
@@ -206,6 +207,7 @@ Route::group(['prefix' => 'api','namespace' => 'Info'],function (){//教师端
                     Route::post('send', 'TeacherInfoController@send');
                     Route::get('infocontent/{info_level}', 'TeacherInfoController@getInfoContent');
                     Route::get('infofeedback/{id}', 'TeacherInfoController@getFeedback');
+                    Route::get('notify/{id}','TeacherInfoController@notify');
                 });
             });
 

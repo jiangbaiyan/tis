@@ -25,7 +25,9 @@ class TeacherInfoController extends Controller
     private $url = 'https://cloudfiles.cloudshm.com/';//又拍云存储地址
     private $allowedFormat = ['doc', 'docx', 'pdf', 'DOC', 'DOCX', 'PDF', 'rar', 'zip', 'RAR', 'ZIP', 'xls', 'xlsx', 'XLS', 'XLSX'];//规定允许上传的文件格式
 
-    //教师PC端与微信端公用发送通知模板消息方法
+    /*
+     * 教师PC端与微信端公用发送通知模板消息方法
+     */
     public function sendModelInfo($type, $info, $isPC)
     {
         if ($isPC) {//PC端发通知
@@ -173,7 +175,9 @@ class TeacherInfoController extends Controller
         }
     }
 
-    //教师创建一条通知（可带附件），针对不同群体发送不同的微信模板消息
+    /*
+     * 教师创建一条通知（可带附件），针对不同群体发送不同的微信模板消息
+     */
     public function send(Request $request)
     {
         $userid = Cache::get($_COOKIE['userid']);
@@ -278,7 +282,9 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200, 'msg' => 'send model messages successfully']);
     }
 
-    //获取通知对象
+    /*
+     * 获取通知对象
+     */
     public function getReceivers($info_level)
     {
         $data = Student::select('id', 'userid', 'name','grade', 'class_num', 'major')->get();
@@ -297,7 +303,9 @@ class TeacherInfoController extends Controller
         }
     }
 
-    //教师在PC端查看自己收到的信息
+    /*
+     * 教师在PC端查看自己收到的信息
+     */
     public function getReceiveInfo()
     {
         $userid = Cache::get($_COOKIE['userid']);
@@ -312,7 +320,9 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200, 'msg' => 'data required successfully', 'data' => $data]);
     }
 
-    //教师端查看通知列表
+    /*
+     * 教师端查看通知列表
+     */
     public function getInfoContent($info_level)
     {
         if ($info_level == 1) {//如果是辅导员，可查看type为1-8（发给学生和研究生的通知）
@@ -332,7 +342,9 @@ class TeacherInfoController extends Controller
         return Response::json(['status' => 200, 'msg' => 'data required successfully', 'data' => $data]);
     }
 
-    //教师端查看学生反馈情况
+    /*
+     * 教师端查看学生反馈情况
+     */
     public function getFeedback($id)
     {
         $content = Info_Content::find($id);
@@ -363,5 +375,86 @@ class TeacherInfoController extends Controller
                 ->get();
         }
         return Response::json(['status' => 200, 'msg' => 'data required successfully', 'data' => $data]);
+    }
+
+    /**
+     * 批量给未阅读的人发送提醒
+     */
+    public function notify($id){
+        $info = Info_Content::find($id);
+        if (!$info) {
+            return Response::json(['status' => 404, 'msg' => '通知id不存在']);
+        }
+        $url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token";
+        $post_data = [//模板消息相关
+            'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
+            'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
+            'data' => [
+                'first' => [
+                    'value' => '老师提醒你查看通知啦！',
+                    'color' => '#FF0000'
+                ],
+                'keyword1' => [
+                    'value' => '网安学院'
+                ],
+                'keyword2' => [
+                    'value' => $info->teacher->name
+                ],
+                'keyword3' => [
+                    'value' => date('Y-m-d H:i')
+                ],
+                'keyword4' => [
+                    'value' => '《' . "$info->title" . '》',
+                    'color' => '#00B642'
+                ],
+                'remark' => [
+                    'value' => '点我立即阅读☝',
+                ],
+            ]
+        ];
+        $client = new Client();
+        $type = $info->type;//查询通知对象类型
+        try{
+            if ($type >=1 && $type<=5){//本科生
+                $notReads = $info->info_feedbacks()
+                    ->where('status','=',0)
+                    ->get();
+                foreach ($notReads as $notRead){
+                    $student_id = $notRead->student_id;
+                    $openid = Student::find($student_id)->openid;
+                    $post_data['touser'] = $openid;
+                    $client->request('POST', $url, [
+                        'json' => $post_data
+                    ]);
+                }
+            } else if ($type >= 6 && $type <=8){//研究生
+                $notReads= $info->graduate_info_feedbacks()
+                    ->where('status','=',0)
+                    ->get();
+                foreach ($notReads as $notRead){
+                    $graduate_id = $notRead->graduate_id;
+                    $openid = Graduate::find($graduate_id)->openid;
+                    $post_data['touser'] = $openid;
+                    $client->request('POST', $url, [
+                        'json' => $post_data
+                    ]);
+                }
+            } else{//教师
+                $notReads = $info->teacher_info_feedbacks()
+                    ->where('status','=',0)
+                    ->get();
+                foreach ($notReads as $notRead){
+                    $account_id = $notRead->account_id;
+                    $openid = Account::find($account_id)->openid;
+                    $post_data['touser'] = $openid;
+                    $client->request('POST', $url, [
+                        'json' => $post_data
+                    ]);
+                }
+            }
+        } catch (GuzzleException $e) {
+            return Response::json(['status' => 402, 'msg' => $e->getMessage()]);
+        }
+        return Response::json(['status' => 200, 'msg' => 'success']);
     }
 }
