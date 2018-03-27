@@ -226,7 +226,6 @@ Route::group(['prefix' => 'api','namespace' => 'File'],function (){//教师端
     Route::group(['middleware'=>'EnableCrossRequest'],function (){
         Route::group(['prefix' => 'v1.0'],function (){
 
-            //教师PC端
             Route::group(['middleware'=>'TeacherCheckLogin'],function (){
                 Route::post('file','FileController@uploadFiles');
                 Route::get('file','FileController@getMyFiles');

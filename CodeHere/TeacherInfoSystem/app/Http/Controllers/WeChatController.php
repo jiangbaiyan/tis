@@ -26,9 +26,9 @@ class WeChatController extends LoginAndAccount\Controller
     }
 
     public function getType(){//获取微信端用户类型（0-普通/1-辅导员/2-教务老师/3-学生）
-        $openid = $_COOKIE['openid'];
-        $user = Account::where('openid',$openid)->first();//先去教师表查找
-        if ($user){//教师表找到了一条记录，那么是老师
+        $type = Cache::get($_COOKIE['openid'])['type'];
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        if ($type == 3){//教师表找到了一条记录，那么是老师
             return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => $user->info_level]]);
         }
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => 3]]);//如果教师表中查不到数据，那么该用户是学生

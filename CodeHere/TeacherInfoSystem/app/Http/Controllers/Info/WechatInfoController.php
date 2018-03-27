@@ -12,6 +12,7 @@ use App\Student;
 use App\Http\Controllers\LoginAndAccount\Controller;
 use App\Teacher_Info_Feedback;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Mail;
 use Illuminate\Support\Facades\Response;
 
@@ -19,39 +20,36 @@ class WechatInfoController extends Controller
 {
     //——————————————————————————教师、学生微信端接收通知————————————————————————
     public function getIndex(){//通知系统首页
-        $openid = $_COOKIE['openid'];
-        $student = Student::where('openid',$openid)->first();
-        $graduate = Graduate::where('openid',$openid)->first();
-        $teacher = Account::where('openid',$openid)->first();
-        if (isset($teacher)){//如果是老师
-            $data = Info_Content::join('teacher_info_feedbacks','teacher_info_feedbacks.info_content_id','=','info_contents.id')
-                ->join('accounts','info_contents.account_id','=','accounts.userid')
-                ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
-                ->where('teacher_info_feedbacks.account_id','=',$teacher->id)
-/*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
-                ->orderByDesc('info_contents.created_at')
-                ->paginate(8);
-        }
-        else if (isset($graduate)){//如果是研究生，查研究生反馈表
-            $data = Info_Content::join('graduate_info_feedbacks','graduate_info_feedbacks.info_content_id','=','info_contents.id')
-                ->join('accounts','info_contents.account_id','=','accounts.userid')
-                ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
-                ->where('graduate_info_feedbacks.graduate_id','=',$graduate->id)
-/*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
-                ->orderByDesc('info_contents.created_at')
-                ->paginate(8);
-        }
-        else if (isset($student)){//如果是学生，查学生反馈表
-            $data = Info_Content::join('info_feedbacks','info_feedbacks.info_content_id','=','info_contents.id')
-                ->join('accounts','info_contents.account_id','=','accounts.userid')
-                ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
-                ->where('info_feedbacks.student_id','=',$student->id)
-/*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
-                ->orderByDesc('info_contents.created_at')
-                ->paginate(8);
-        }
-        else{//如果两张表都没找到用户信息
-            return Response::json(['status' => 404,'msg' => '用户信息未找到，请重新绑定']);
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        $userType = Cache::get($_COOKIE['openid'])['type'];
+        switch ($userType){
+            case 1://当前用户是学生
+                $data = Info_Content::join('info_feedbacks','info_feedbacks.info_content_id','=','info_contents.id')
+                    ->join('accounts','info_contents.account_id','=','accounts.userid')
+                    ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
+                    ->where('info_feedbacks.student_id','=',$user->id)
+                    /*->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
+                    ->latest()
+                    ->paginate(8);
+                break;
+            case 2://当前用户是研究生
+                $data = Info_Content::join('graduate_info_feedbacks','graduate_info_feedbacks.info_content_id','=','info_contents.id')
+                    ->join('accounts','info_contents.account_id','=','accounts.userid')
+                    ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
+                    ->where('graduate_info_feedbacks.graduate_id','=',$user->id)
+                    /*->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
+                    ->latest()
+                    ->paginate(8);
+                break;
+            case 3://当前用户是教师
+                $data = Info_Content::join('teacher_info_feedbacks','teacher_info_feedbacks.info_content_id','=','info_contents.id')
+                    ->join('accounts','info_contents.account_id','=','accounts.userid')
+                    ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
+                    ->where('teacher_info_feedbacks.account_id','=',$teacher->id)
+                    /*->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
+                    ->latest()
+                    ->paginate(8);
+                break;
         }
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $data]);
     }
@@ -63,27 +61,24 @@ class WechatInfoController extends Controller
         if (!$content){
             return Response::json(['status' => 405,'msg' => '该通知已被删除，请联系管理员']);
         }
-        $openid = $_COOKIE['openid'];
-        $student = Student::where('openid',$openid)->first();
-        $graduate = Graduate::where('openid',$openid)->first();
-        $teacher = Account::where('openid',$openid)->first();
-        if (isset($teacher)) {//如果是老师，查教师反馈表
-            $feedback = Teacher_Info_Feedback::where('info_content_id','=',$id)
-                ->where('account_id','=',$teacher->id)
-                ->first();
-        }
-        else if (isset($graduate)){//如果是学生，查学生反馈表
-            $feedback = Graduate_Info_Feedback::where('info_content_id','=',$id)
-                ->where('graduate_id','=',$student->id)
-                ->first();
-        }
-        else if (isset($student)){//如果是学生，查学生反馈表
-            $feedback = Info_Feedback::where('info_content_id','=',$id)
-                ->where('student_id','=',$student->id)
-                ->first();
-        }
-        else{//如果两张表都没找到用户信息
-            return Response::json(['status' => 404,'msg' => '用户信息未找到，请重新绑定']);
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        $userType = Cache::get($_COOKIE['openid'])['type'];
+        switch ($userType){
+            case 1://学生
+                $feedback = Info_Feedback::where('info_content_id','=',$id)
+                    ->where('student_id','=',$user->id)
+                    ->first();
+                break;
+            case 2://研究生
+                $feedback = Graduate_Info_Feedback::where('info_content_id','=',$id)
+                    ->where('graduate_id','=',$user->id)
+                    ->first();
+                break;
+            case 3://教师
+                $feedback = Teacher_Info_Feedback::where('info_content_id','=',$id)
+                    ->where('account_id','=',$user->id)
+                    ->first();
+                break;
         }
         if (!$feedback){
             return Response::json(['status' => 404,'msg' => '您无权限查看该通知']);
@@ -94,25 +89,9 @@ class WechatInfoController extends Controller
     }
 
     public function sendEmail($id){//把附件发送到学生邮箱
-        $openid = $_COOKIE['openid'];
-        $student = Student::where('openid',$openid)->first();
-        $graduate = Graduate::where('openid',$openid)->first();
-        $teacher = Account::where('openid',$openid)->first();
-        if ($teacher) {//如果是老师
-            $name = $teacher->name;
-            $email = $teacher->email;
-        }
-        else if ($graduate){
-            $name = $graduate->name;
-            $email = $graduate->email;
-        }
-        else if ($student){
-            $name = $student->name;
-            $email = $student->email;
-        }
-        else{
-            return Response::json(['status' => 404,'msg' => '用户信息未找到，请重新绑定']);
-        }
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        $name = $user->name;
+        $email = $user->email;
         if (!$email){
             return Response::json(['status' => 404,'msg' => '请先绑定您的邮箱信息']);
         }
@@ -145,9 +124,8 @@ class WechatInfoController extends Controller
     }
 
     public function send(Request $request){
-        $openid = $_COOKIE['openid'];
-        $teacher = Account::where('openid',$openid)->first();
-        $userid = $teacher->userid;
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        $userid = $user->userid;
         $data = $request->all();
         $title = $request->input('title');
         $content = $request->input('content');

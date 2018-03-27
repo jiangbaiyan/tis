@@ -43,15 +43,10 @@ class HolidayLeaveController extends Controller
     public function studentCreate(Request $request){//创建请假信息
         $data = $request->all();
         $id = $request->input('id');
-        $openid = $_COOKIE['openid'];
-        //$holidayLeave = new Holiday_leave($data);
-        $student = Student::where('openid',$openid)->first();
-        if (!$student){
-            return Response::json(['status' => 404 ,'msg' => 'student not found']);
-        }
-        $student_id = $student->id;
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        $student_id = $user->id;
         $leave_info = Leave_info::find($id);
-        if ($student->holiday_leaves()){
+        if ($user->holiday_leaves()){
             $leave_info->holiday_leaves()->where('student_id','=',$student_id)->delete();
         }//如果该学生已经请假过,那么删除该模板下该学生之前的请假信息
         $holidayLeave = Holiday_leave::create($data);
@@ -62,13 +57,9 @@ class HolidayLeaveController extends Controller
     }
 
     public function studentGet(){//获取请假信息
-        $openid = $_COOKIE['openid'];
-        $student = Student::where('openid',$openid)->first();
-        if (!$student){
-            return Response::json(['status' => 404 ,'msg' => 'student not found']);
-        }
-        $userid = $student->account_id;
-        $datas = $student->holiday_leaves()
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        $teacher_id = $user->account_id;
+        $datas = $user->holiday_leaves()
             ->join('leave_infos','holiday_leaves.leave_info_id','=','leave_infos.id')
             /*->where([
                 ['leave_infos.from','<=',date('Y-m-d')],
@@ -76,7 +67,7 @@ class HolidayLeaveController extends Controller
             ])*/
             ->select('holiday_leaves.*','leave_infos.userid','leave_infos.title','leave_infos.from','leave_infos.to')
             ->where('cancel_time' ,'=',null)
-            ->where('leave_infos.userid','=',$userid)
+            ->where('leave_infos.userid','=',$teacher_id)
             ->orderByDesc('holiday_leaves.created_at')
             ->get();
         foreach ($datas as $data){
@@ -87,7 +78,10 @@ class HolidayLeaveController extends Controller
                 $data->end_time = '';
             }
         }
-            $datas = $datas->where('from','<=',date('Y-m-d'))->where('to','>=',date('Y-m-d'));
+            $datas = $datas
+                ->where('from','<=',date('Y-m-d'))
+                ->where('to','>=',date('Y-m-d'));
+
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
     }
 

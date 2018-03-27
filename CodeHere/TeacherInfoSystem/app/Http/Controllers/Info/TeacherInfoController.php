@@ -32,8 +32,7 @@ class TeacherInfoController extends Controller
             $userid = $info->account_id;
             $userTeacher = Account::where('userid', $userid)->first();
         } else {//手机端发通知
-            $openid = $_COOKIE['openid'];
-            $userTeacher = Account::where('openid', $openid)->first();
+            $userTeacher = Cache::get($_COOKIE['openid'])['user'];
         }
         $wechat = new WeChatController();
         $this->access_token = $wechat->getAccessToken();//获取accesstoken

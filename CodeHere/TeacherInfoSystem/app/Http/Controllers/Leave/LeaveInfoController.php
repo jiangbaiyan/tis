@@ -24,10 +24,9 @@ class LeaveInfoController extends Controller
 
 
     public function get(){
-        $openid = $_COOKIE['openid'];
-        $student = Student::where('openid',$openid)->first();
-        $userid = $student->account_id;
-        $datas = Leave_info::where('userid','=',$userid)->get();
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        $teacher_id = $user->account_id;
+        $datas = Leave_info::where('userid','=',$teacher_id)->get();
         $datas = $datas->where('from','<=',date('Y-m-d'))->where('to','>=',date('Y-m-d'));
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
     }

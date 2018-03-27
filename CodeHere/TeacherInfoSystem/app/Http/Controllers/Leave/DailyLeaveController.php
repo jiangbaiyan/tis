@@ -18,24 +18,16 @@ class DailyLeaveController extends Controller
     //创建一条请假信息
     public function studentCreate(Request $request){
         $data = $request->all();
-        $openid = $_COOKIE['openid'];
+        $user = Cache::get($_COOKIE['openid'])['user'];
         $dailyLeave = new Daily_leave($data);
-        $student = Student::where('openid',$openid)->first();
-        if (!$student){
-            return Response::json(['status' => 404 ,'msg' => 'student not found']);
-        }
-        $student->daily_leaves()->save($dailyLeave);
+        $user->daily_leaves()->save($dailyLeave);
         return Response::json(['status' => 200,'msg' => 'create successfully']);
     }
 
     //获取所有未销假的请假
     public function studentGet(){
-        $openid = $_COOKIE['openid'];
-        $student = Student::where('openid',$openid)->first();
-        if (!$student){
-            return Response::json(['status' => 404 ,'msg' => 'student not found']);
-        }
-        $datas = $student->daily_leaves()
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        $datas = $user->daily_leaves()
             ->where('cancel_time','=',null)
             ->where('is_leave','=',1)
             ->where('is_pass','=',1)
@@ -61,12 +53,8 @@ class DailyLeaveController extends Controller
 
     //获取请假历史记录
     public function getHistory(){
-        $openid = $_COOKIE['openid'];
-        $student = Student::where('openid',$openid)->first();
-        if (!$student){
-            return Response::json(['status' => 404 ,'msg' => 'student not found']);
-        }
-        $daily_leaves = $student->daily_leaves()
+        $user = Cache::get($_COOKIE['openid'])['user'];
+        $daily_leaves = $user->daily_leaves()
             ->orderByDesc('created_at')
             ->paginate(5);
         return Response::json(['status' => 200,'msg' => 'leave history required successfully','data' => $daily_leaves]);
