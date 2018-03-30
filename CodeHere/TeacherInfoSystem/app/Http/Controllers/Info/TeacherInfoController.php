@@ -71,7 +71,9 @@ class TeacherInfoController extends Controller
             $client = new Client();
             switch ($type) {
                 case 5:
-                    $users = Student::select('id', 'openid')->get();
+                    $users = Student::select('id', 'openid')
+                        ->where('is_bind','=',1)
+                        ->get();
                     foreach ($users as $user) {
                         $openid = $user->openid;
                         $post_data['touser'] = $openid;
@@ -86,6 +88,7 @@ class TeacherInfoController extends Controller
                     foreach ($receivers as $receiver) {
                         $users = Graduate::select('id', 'openid')
                             ->where('grade', $receiver)
+                            ->where('is_bind','=',1)
                             ->get();
                         foreach ($users as $user) {//遍历该年级/班级/专业的所有学生
                             $openid = $user->openid;
@@ -102,6 +105,7 @@ class TeacherInfoController extends Controller
                     foreach ($receivers as $receiver) {
                         $users = Graduate::select('id', 'openid')
                             ->where('userid', $receiver)
+                            ->where('is_bind','=',1)
                             ->get();
                         foreach ($users as $user) {//遍历该年级/班级/专业的所有学生
                             $openid = $user->openid;
@@ -114,7 +118,9 @@ class TeacherInfoController extends Controller
                     }
                     break;
                 case 8:
-                    $users = Graduate::select('id', 'openid')->get();
+                    $users = Graduate::select('id', 'openid')
+                        ->where('is_bind','=',1)
+                        ->get();
                     foreach ($users as $user) {
                         $openid = $user->openid;
                         $post_data['touser'] = $openid;
@@ -129,6 +135,7 @@ class TeacherInfoController extends Controller
                     foreach ($receivers as $receiver) {
                         $users = Account::select('id', 'openid')
                             ->where('userid', $receiver)
+                            ->where('is_bind','=',1)
                             ->get();
                         foreach ($users as $user) {//遍历该年级/班级/专业的所有学生
                             $openid = $user->openid;
@@ -143,6 +150,7 @@ class TeacherInfoController extends Controller
                 case 10:
                     $users = Account::select('id', 'openid')
                         ->where('openid', '!=', '')
+                        ->where('is_bind','=',1)
                         ->get();
                     foreach ($users as $user) {
                         $openid = $user->openid;
@@ -158,6 +166,7 @@ class TeacherInfoController extends Controller
                     foreach ($receivers as $receiver) {
                         $users = Student::select('id', 'openid')
                             ->where("$type", $receiver)
+                            ->where('is_bind','=',1)
                             ->get();
                         foreach ($users as $user) {//遍历该年级/班级/专业的所有学生
                             $openid = $user->openid;
@@ -383,8 +392,10 @@ class TeacherInfoController extends Controller
     public function notify($id){
         $info = Info_Content::find($id);
         if (!$info) {
-            return Response::json(['status' => 404, 'msg' => '通知id不存在']);
+            return Response::json(['status' => 404, 'msg' => 'info not found']);
         }
+        $wechat = new WeChatController();
+        $this->access_token = $wechat->getAccessToken();//获取accesstoken
         $url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token";
         $post_data = [//模板消息相关
             'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
@@ -421,11 +432,14 @@ class TeacherInfoController extends Controller
                     ->get();
                 foreach ($notReads as $notRead){
                     $student_id = $notRead->student_id;
-                    $openid = Student::find($student_id)->openid;
-                    $post_data['touser'] = $openid;
-                    $client->request('POST', $url, [
-                        'json' => $post_data
-                    ]);
+                    $student = Student::find($student_id);
+                    if ($student->is_bind){
+                        $openid = $student->openid;
+                        $post_data['touser'] = $openid;
+                        $client->request('POST', $url, [
+                            'json' => $post_data
+                        ]);
+                    }
                 }
             } else if ($type >= 6 && $type <=8){//研究生
                 $notReads= $info->graduate_info_feedbacks()
@@ -433,11 +447,14 @@ class TeacherInfoController extends Controller
                     ->get();
                 foreach ($notReads as $notRead){
                     $graduate_id = $notRead->graduate_id;
-                    $openid = Graduate::find($graduate_id)->openid;
-                    $post_data['touser'] = $openid;
-                    $client->request('POST', $url, [
-                        'json' => $post_data
-                    ]);
+                    $graduate = Graduate::find($graduate_id);
+                    if ($graduate->is_bind){
+                        $openid = $graduate->openid;
+                        $post_data['touser'] = $openid;
+                        $client->request('POST', $url, [
+                            'json' => $post_data
+                        ]);
+                    }
                 }
             } else{//教师
                 $notReads = $info->teacher_info_feedbacks()
@@ -445,11 +462,14 @@ class TeacherInfoController extends Controller
                     ->get();
                 foreach ($notReads as $notRead){
                     $account_id = $notRead->account_id;
-                    $openid = Account::find($account_id)->openid;
-                    $post_data['touser'] = $openid;
-                    $client->request('POST', $url, [
-                        'json' => $post_data
-                    ]);
+                    $teacher = Account::find($account_id);
+                    if ($teacher->is_bind){
+                        $openid = $teacher->openid;
+                        $post_data['touser'] = $openid;
+                        $client->request('POST', $url, [
+                            'json' => $post_data
+                        ]);
+                    }
                 }
             }
         } catch (GuzzleException $e) {

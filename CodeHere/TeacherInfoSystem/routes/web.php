@@ -30,9 +30,10 @@ Route::group(['middleware' => 'web'],function (){
     Route::any('openid/{type}','WeChatController@openid');//bind接口后跳转地址
     Route::any('modify','WeChatController@modify');//修改信息入口url
     Route::any('modify/{id}','WeChatController@modifyLogic');//修改信息逻辑
+    Route::any('cancel','WeChatController@cancel');//解除绑定按钮入口url
     Route::any('bind_callback','WeChatController@bindCallback');//授权回调
     Route::any('modify_callback','WeChatController@modifyCallback');//授权回调
-    Route::any('cancel','WeChatController@cancel');//解除绑定按钮入口url
+    Route::any('cancel_callback','WeChatController@cancelCallback');//授权回调
     Route::any('showError','WeChatController@showError');//本科生填写信息
     Route::any('graduateShowError','WeChatController@graduateShowError');//研究生填写信息
     Route::any('teacherShowError','WeChatController@teacherShowError');//教师填写信息

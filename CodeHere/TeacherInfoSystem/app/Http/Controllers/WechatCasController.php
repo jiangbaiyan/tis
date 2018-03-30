@@ -12,19 +12,6 @@ class WechatCasController extends LoginAndAccount\Controller
     public function cas()
     {
         $openid = Session::get('openid');
-        $student = Student::where('openid',$openid)->first();
-        $graduate = Graduate::where('openid',$openid)->first();
-        $teacher = Account::where('openid',$openid)->first();
-        //如果数据库中有数据，那么直接重新设置cookie即可，不需要重新走CAS认证
-        if (isset($student)||isset($graduate)||isset($teacher)) {
-            setcookie('openid', $openid, time() + 31536000);
-            return view('WeChat/choose',[
-                'student' => $student,
-                'graduate' => $graduate,
-                'teacher' => $teacher
-            ]);
-        }
-        //数据库中没有数据，需要重新录入信息
         $loginServer = "http://cas.hdu.edu.cn/cas/login";
         //CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
@@ -88,6 +75,32 @@ class WechatCasController extends LoginAndAccount\Controller
                     if ($unit!="网络空间安全学院、浙江保密学院"){
                         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
                         die('您不是网络空间安全学院的学生或教师，无操作权限！');
+                    }
+                    $student = Student::where('openid',$openid)->first();
+                    $graduate = Graduate::where('openid',$openid)->first();
+                    $teacher = Account::where('openid',$openid)->first();
+                    if (isset($student)||isset($graduate)||isset($teacher)) {
+                        if (isset($student)){
+                            $student->is_bind = 1;
+                            $student->save();
+                        }
+                        else if (isset($teacher)){
+                            $teacher->is_bind = 1;
+                            $teacher->save();
+                        }
+                        else if (isset($graduate)){
+                            $graduate->is_bind = 1;
+                            $graduate->save();
+                        }
+                        else{
+                            return redirect('/bind');
+                        }
+                        setcookie('openid', $openid, time() + 31536000);
+                        return view('WeChat/choose',[
+                            'student' => $student,
+                            'graduate' => $graduate,
+                            'teacher' => $teacher
+                        ]);
                     }
                     if ($sex == '1'){
                         $sex = '男';

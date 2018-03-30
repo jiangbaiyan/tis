@@ -25,7 +25,21 @@ class WeChatController extends LoginAndAccount\Controller
         setcookie('openid','oTkqI0XMZFPldSWRrKvnOUpLYN9o',time()+15552000);
     }
 
-    public function getType(){//获取微信端用户类型（0-普通/1-辅导员/2-教务老师/3-学生）
+    //获取openid
+    public function getOpenid($code){
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/sns/oauth2/access_token?appid=$this->appid&secret=$this->secret&code=$code&grant_type=authorization_code ");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        $result = curl_exec($ch);
+        $arr = json_decode($result,true);
+        $openid = $arr['openid'];
+        curl_close($ch);
+        return $openid;
+    }
+
+    //获取微信端用户类型（0-普通/1-辅导员/2-教务老师/3-学生）
+    public function getType(){
         $type = Cache::get($_COOKIE['openid'])['type'];
         $user = Cache::get($_COOKIE['openid'])['user'];
         if ($type == 3){//教师表找到了一条记录，那么是老师
@@ -34,7 +48,8 @@ class WeChatController extends LoginAndAccount\Controller
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => ['type' => 3]]);//如果教师表中查不到数据，那么该用户是学生
     }
 
-    public function getAccessToken(){//公用获取access_token方法
+    //公用获取access_token方法
+    public function getAccessToken(){
         if (Cache::has('access_token')){
             $access_token = Cache::get('access_token');
         }
@@ -61,6 +76,10 @@ class WeChatController extends LoginAndAccount\Controller
         return redirect('/openid/2');//跳转到下面的bind方法获取openid
     }
 
+    public function cancel(){
+        return redirect('/openid/3');//跳转到下面的bind方法获取openid
+    }
+
     public function openid($type){//微信网页授权获取openid
         switch ($type){
             case 1://绑定信息回调
@@ -69,33 +88,23 @@ class WeChatController extends LoginAndAccount\Controller
             case 2://修改信息回调
                 $callback = urlencode('https://tis.cloudshm.com/modify_callback');
                 break;
+            case 3://取消绑定回调
+                $callback = urlencode('https://tis.cloudshm.com/cancel_callback');
+                break;
         }
         return redirect("https://open.weixin.qq.com/connect/oauth2/authorize?appid=$this->appid&redirect_uri=$callback&response_type=code&scope=snsapi_base&state=123#wechat_redirect");//回调到callback方法
     }
 
     public function bindCallback(Request $request){//绑定信息内部回调
         $code = $request->code;
-        $ch = curl_init();
-        curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/sns/oauth2/access_token?appid=$this->appid&secret=$this->secret&code=$code&grant_type=authorization_code ");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        $result = curl_exec($ch);
-        $arr = json_decode($result,true);
-        $openid = $arr['openid'];
+        $openid = $this->getOpenid($code);
         Session::put('openid',$openid);
-        curl_close($ch);
         return redirect('/api/v1.0/wechatcas');//跳转到杭电CAS逻辑
     }
 
     public function modifyCallback(Request $request){//修改信息内部回调
         $code = $request->code;
-        $ch = curl_init();
-        curl_setopt($ch,CURLOPT_URL,"https://api.weixin.qq.com/sns/oauth2/access_token?appid=$this->appid&secret=$this->secret&code=$code&grant_type=authorization_code ");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        $result = curl_exec($ch);
-        $arr = json_decode($result,true);
-        $openid = $arr['openid'];
+        $openid = $this->getOpenid($code);
         $student = Student::where('openid',$openid)->first();
         $graduate = Graduate::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();
@@ -160,13 +169,32 @@ class WeChatController extends LoginAndAccount\Controller
                 break;
         }
         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-        die('恭喜您，信息修改成功！');
+        die('信息修改成功！');
     }
 
-    public function cancel(){
+    public  function cancelCallback(Request $request){
+        $code = $request->code;
+        $openid = $this->getOpenid($code);
+        $student = Student::where('openid',$openid)->first();
+        $graduate = Graduate::where('openid',$openid)->first();
+        $teacher = Account::where('openid',$openid)->first();
+        if (isset($student)){
+            $student->is_bind = 0;
+            $student->save();
+        }
+        else if (isset($teacher)){
+            $teacher->is_bind = 0;
+            $teacher->save();
+        }
+        else if (isset($graduate)){
+            $graduate->is_bind = 0;
+            $graduate->save();
+        }
+        else{
+            return redirect('/bind');
+        }
         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-        die('抱歉，该功能正在维护中！');
-        setcookie('openid','',time()-3600);
+        die('取消绑定成功！');
     }
 
     //————————————————————————错误信息展示——————————————————————————————
@@ -238,7 +266,8 @@ class WeChatController extends LoginAndAccount\Controller
                 'grade' => $grade,
                 'phone' => $phone,
                 'email' => $email,
-                'account_id' => $account_id
+                'account_id' => $account_id,
+                'is_bind' => 1
             ]
         );
         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
@@ -286,7 +315,8 @@ class WeChatController extends LoginAndAccount\Controller
                 'grade' => $grade,
                 'phone' => $phone,
                 'email' => $email,
-                'account_id' => $account_id
+                'account_id' => $account_id,
+                'is_bind' => 1
             ]
         );
         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
@@ -319,7 +349,8 @@ class WeChatController extends LoginAndAccount\Controller
                 'email' => $email,
                 'academy' => $unit,
                 'name' => $username,
-                'sex' => $sex
+                'sex' => $sex,
+                'is_bind' => 1
             ]
         );
         echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
