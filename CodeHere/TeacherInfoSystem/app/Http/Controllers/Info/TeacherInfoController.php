@@ -383,6 +383,7 @@ class TeacherInfoController extends Controller
                 ->orderBy('accounts.userid')
                 ->get();
         }
+        $data->add(['account_id' => $content->account_id]);
         return Response::json(['status' => 200, 'msg' => 'data required successfully', 'data' => $data]);
     }
 
@@ -402,7 +403,7 @@ class TeacherInfoController extends Controller
             'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
             'data' => [
                 'first' => [
-                    'value' => '老师提醒你查看通知啦！',
+                    'value' => '有重要通知等待您查收！',
                     'color' => '#FF0000'
                 ],
                 'keyword1' => [

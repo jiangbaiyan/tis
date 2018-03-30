@@ -12,11 +12,6 @@ class TestController extends Controller//单元测试控制器
 
     public function test(Request $request)
     {
-        $teachers = Account::select('openid')
-            ->where('userid','40365')
-            ->get();
-        foreach ($teachers as $teacher){
-            dd($teacher->openid);
-        }
+        dd($request['test']);
     }
 }

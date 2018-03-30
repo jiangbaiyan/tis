@@ -175,6 +175,7 @@ class WeChatController extends LoginAndAccount\Controller
     public  function cancelCallback(Request $request){
         $code = $request->code;
         $openid = $this->getOpenid($code);
+        setcookie('openid','',time()-999999);
         $student = Student::where('openid',$openid)->first();
         $graduate = Graduate::where('openid',$openid)->first();
         $teacher = Account::where('openid',$openid)->first();

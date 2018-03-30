@@ -66,6 +66,7 @@ class DailyLeaveController extends Controller
         } catch (\Exception $e) {
             return Response::json(['status' => 402,'msg' => 'daily_leave canceled failed']);
         }
+        return Response::json(['status' => 200,'msg' => 'success']);
     }
 
 //-------------------------教师端--------------------------------------
