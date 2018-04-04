@@ -15,6 +15,7 @@ class HolidayLeaveController extends Controller
 
     //----------------------教师端-------------------------------------------
     public function teacherGet(){
+        $userid = Cache::get($_COOKIE['userid']);
         $leaveInfo = Leave_info::orderByDesc('updated_at')->first();
         if (!$leaveInfo){
             return Response::json(['status' => 200,'msg' => 'no model','data' => []]);
@@ -23,6 +24,7 @@ class HolidayLeaveController extends Controller
             ->join('leave_infos','leave_infos.id','=','holiday_leaves.leave_info_id')
             ->join('students','holiday_leaves.student_id','=','students.id')
             ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','holiday_leaves.begin_time','holiday_leaves.end_time','holiday_leaves.is_leave','holiday_leaves.where','holiday_leaves.cancel_time','leave_infos.title')
+            ->where('students.account_id',$userid)
             ->orderBy('students.userid')
             ->get();
         foreach ($datas as $data){

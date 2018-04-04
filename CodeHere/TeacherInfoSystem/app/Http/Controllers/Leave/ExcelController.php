@@ -23,7 +23,6 @@ class ExcelController extends Controller
             ->select('students.userid','students.name','students.phone','students.class','students.class_num','daily_leaves.leave_reason','daily_leaves.begin_time','daily_leaves.end_time','daily_leaves.is_leave','daily_leaves.where','daily_leaves.cancel_time','daily_leaves.is_pass')
             ->where('students.account_id',$userid)
             ->where('daily_leaves.created_at','>',date('Y-m-d H:i:s',time()-2592000))
-            ->orderByDesc('class_num')
             ->orderByDesc('daily_leaves.begin_time')
             ->get();
         foreach($datas as $data){
