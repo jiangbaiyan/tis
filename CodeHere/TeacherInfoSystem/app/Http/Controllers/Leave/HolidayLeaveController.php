@@ -58,12 +58,10 @@ class HolidayLeaveController extends Controller
 
     public function studentGet(){//获取请假信息
         $user = Cache::get($_COOKIE['openid'])['user'];
-        $teacher_id = $user->account_id;
         $datas = $user->holiday_leaves()
             ->join('leave_infos','holiday_leaves.leave_info_id','=','leave_infos.id')
             ->select('holiday_leaves.*','leave_infos.userid','leave_infos.title','leave_infos.from','leave_infos.to')
             ->where('cancel_time' ,'=',null)
-            ->where('leave_infos.userid','=',$teacher_id)
             ->orderByDesc('holiday_leaves.created_at')
             ->get();
         foreach ($datas as $data){
