@@ -15,8 +15,7 @@ class HolidayLeaveController extends Controller
 
     //----------------------教师端-------------------------------------------
     public function teacherGet(){
-        $userid = Cache::get($_COOKIE['userid']);
-        $leaveInfo = Leave_info::where('userid',$userid)->orderByDesc('updated_at')->first();
+        $leaveInfo = Leave_info::orderByDesc('updated_at')->first();
         if (!$leaveInfo){
             return Response::json(['status' => 200,'msg' => 'no model','data' => []]);
         }
@@ -24,8 +23,7 @@ class HolidayLeaveController extends Controller
             ->join('leave_infos','leave_infos.id','=','holiday_leaves.leave_info_id')
             ->join('students','holiday_leaves.student_id','=','students.id')
             ->select('students.userid','students.name','students.phone','students.class','students.class_num','students.major','holiday_leaves.begin_time','holiday_leaves.end_time','holiday_leaves.is_leave','holiday_leaves.where','holiday_leaves.cancel_time','leave_infos.title')
-            ->orderByDesc('holiday_leaves.updated_at')
-            ->where('students.account_id','=',$userid)
+            ->orderBy('students.userid')
             ->get();
         foreach ($datas as $data){
             if ($data->begin_time == null){
@@ -61,10 +59,6 @@ class HolidayLeaveController extends Controller
         $teacher_id = $user->account_id;
         $datas = $user->holiday_leaves()
             ->join('leave_infos','holiday_leaves.leave_info_id','=','leave_infos.id')
-            /*->where([
-                ['leave_infos.from','<=',date('Y-m-d')],
-                ['leave_infos.to','>='.date('Y-m-d')]
-            ])*/
             ->select('holiday_leaves.*','leave_infos.userid','leave_infos.title','leave_infos.from','leave_infos.to')
             ->where('cancel_time' ,'=',null)
             ->where('leave_infos.userid','=',$teacher_id)
@@ -90,11 +84,8 @@ class HolidayLeaveController extends Controller
         if (!$holiday_leave){
             return Response::json(['status' => 404,'msg' => 'holiday_leave not found']);
         }
-        $now = date('Y-m-d');
-        $holiday_leave->cancel_time = $now;
-        if (!$holiday_leave->save()){
-            return Response::json(['status' => 402,'msg' => 'cancel failed']);
-        }
+        $holiday_leave->cancel_time = date('Y-m-d');
+        $holiday_leave->save();
         return Response::json(['status' => 200,'msg' => 'cancel successfully']);
     }
 }

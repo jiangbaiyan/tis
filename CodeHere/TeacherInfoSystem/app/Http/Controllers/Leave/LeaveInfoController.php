@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Response;
 
 class LeaveInfoController extends Controller
 {
+    //教师创建一条节假日请假
     public function create(Request $request){
-        $data = $request->all();
         $userid = Cache::get($_COOKIE['userid']);
         $leave_info = Leave_info::create(['userid' => $userid,'title' => $request->input('title'),'from' => $request->input('from'),'to' => $request->input('to')]);
         if (!$leave_info){
@@ -22,12 +22,12 @@ class LeaveInfoController extends Controller
         return Response::json(['status' => 200,'msg' => 'created successfully']);
     }
 
-
+    //学生端获取所有教师创建的请假信息
     public function get(){
-        $user = Cache::get($_COOKIE['openid'])['user'];
-        $teacher_id = $user->account_id;
-        $datas = Leave_info::where('userid','=',$teacher_id)->get();
-        $datas = $datas->where('from','<=',date('Y-m-d'))->where('to','>=',date('Y-m-d'));
+        $datas = Leave_info::all();
+        $datas = $datas
+            ->where('from','<=',date('Y-m-d'))
+            ->where('to','>=',date('Y-m-d'));
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
     }
 

@@ -90,9 +90,9 @@ class ExcelController extends Controller
         if (!$account){
             return response()->json(['status' => 404,'msg' => 'user not exists']);
         }
-        $leaveInfo = Leave_info::where('userid',$userid)->orderByDesc('updated_at')->first();
+        $leaveInfo = Leave_info::latest()->first();
         if (!$leaveInfo){
-            return Response::json(['status' => 404,'msg' => 'no leave data']);
+            return Response::json(['status' => 404,'msg' => 'no student leave data']);
         }
         $datas = $leaveInfo->holiday_leaves()
             ->join('leave_infos','leave_infos.id','=','holiday_leaves.leave_info_id')
