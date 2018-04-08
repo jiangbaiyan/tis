@@ -72,10 +72,6 @@ class HolidayLeaveController extends Controller
                 $data->end_time = '';
             }
         }
-            $datas = $datas
-                ->where('from','<=',date('Y-m-d'))
-                ->where('to','>=',date('Y-m-d'));
-
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
     }
 
