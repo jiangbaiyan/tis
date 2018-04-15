@@ -41,6 +41,7 @@ class TeacherInfoController extends Controller
         $url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token";
         $receivers = $info->send_to;
         $post_data = [//模板消息相关
+            'touser' => '',
             'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
             'url' => "https://teacher.cloudshm.com/tongzhi_mobile/detail.html?id=$info->id",
             'data' => [
@@ -228,7 +229,7 @@ class TeacherInfoController extends Controller
                     return response()->json(['status' => 402, 'msg' => 'wrong file format']);
                 }
                 //如果不是doc(x)格式，直接存储
-                $path = Storage::disk('upyun')->putFileAs('info/' . date('Y') . '/' . date('md'), $file, $fname, 'public');
+                $path = Storage::disk('upyun')->putFileAs('Info/' . date('Y') . '/' . date('md'), $file, $fname, 'public');
                 //向数据库写入文件地址
                 $url = $this->url . "$path";
                 if (!$info->attach_url) {
@@ -245,7 +246,7 @@ class TeacherInfoController extends Controller
                     $unoconv->transcode($file, 'pdf', $file);//用unoconv转码
                     $nameArray = explode('.', $fname);
                     $name = $nameArray[0];//取出不带后缀的文件名
-                    $path = Storage::disk('upyun')->putFileAs('info/' . date('Y') . '/' . date('md'), $file, "$name" . '.pdf', 'public');
+                    $path = Storage::disk('upyun')->putFileAs('Info/' . date('Y') . '/' . date('md'), $file, "$name" . '.pdf', 'public');
                     $url = $this->url . "$path";
                     $info->attach_url .= ',' . $url;
                 }
@@ -254,7 +255,7 @@ class TeacherInfoController extends Controller
         }
         //如果是定时通知，直接返回
         if ($request->has('time')) {//发送定时预约通知。业务逻辑说明：把预约时间先存到数据库中（精确到分钟），然后设置定时任务：查询所有未发送的预约通知，循环遍历每条预约通知，每一分钟检查一次当前时间和通知预约时间是否相同，如果相同则发送通知
-            return Response::json(['status' => 200, 'msg' => "schedule info saved successfully"]);
+            return Response::json(['status' => 200, 'msg' => "schedule Info saved successfully"]);
         }
         switch ($type) {
             case 1://年级

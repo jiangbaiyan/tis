@@ -73,7 +73,7 @@ return array(
     'magic' => array(
         'Log' => array(
             'debug'     => 'Monolog\Logger::addDebug',
-            'info'      => 'Monolog\Logger::addInfo',
+            'Info'      => 'Monolog\Logger::addInfo',
             'notice'    => 'Monolog\Logger::addNotice',
             'warning'   => 'Monolog\Logger::addWarning',
             'error'     => 'Monolog\Logger::addError',

@@ -276,7 +276,7 @@ return array(
 
             /*
             |--------------------------------------------------------------------------
-            | Return info
+            | Return Info
             |--------------------------------------------------------------------------
             |
             | Whether we want to return information about the stored file or not

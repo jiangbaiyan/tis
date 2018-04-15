@@ -1,7 +1,7 @@
 <?php
 /**
  * A helper file for Laravel 5, to provide autocomplete information to your IDE
- * Generated for Laravel 5.5.40 on 2018-04-08 11:25:06.
+ * Generated for Laravel 5.5.40 on 2018-04-11 12:23:36.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -6872,7 +6872,7 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Get the current path info for the request.
+         * Get the current path Info for the request.
          *
          * @return string 
          * @static 
@@ -6883,7 +6883,7 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Get the current decoded path info for the request.
+         * Get the current decoded path Info for the request.
          *
          * @return string 
          * @static 
@@ -7631,7 +7631,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Returns the path being requested relative to the executed script.
          * 
-         * The path info always starts with a /.
+         * The path Info always starts with a /.
          * 
          * Suppose this request is instantiated from /mysite on localhost:
          * 
@@ -7743,7 +7743,7 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Gets the user info.
+         * Gets the user Info.
          *
          * @return string A user name and, optionally, scheme-specific information about how to gain authorization to access the server
          * @static 
