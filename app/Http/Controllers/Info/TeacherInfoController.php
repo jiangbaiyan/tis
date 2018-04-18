@@ -25,8 +25,13 @@ class TeacherInfoController extends Controller
     private $url = 'https://cloudfiles.cloudshm.com/';//又拍云存储地址
     private $allowedFormat = ['doc', 'docx', 'pdf', 'DOC', 'DOCX', 'PDF', 'rar', 'zip', 'RAR', 'ZIP', 'xls', 'xlsx', 'XLS', 'XLSX'];//规定允许上传的文件格式
 
-    /*
-     * 教师PC端与微信端公用发送通知模板消息方法
+    /**
+     * 发送模板消息具体逻辑
+     * @param $type
+     * @param $info
+     * @param $isPC
+     * @throws GuzzleException
+     * @throws \Exception
      */
     public function sendModelInfo($type, $info, $isPC)
     {
@@ -38,7 +43,6 @@ class TeacherInfoController extends Controller
         }
         $wechat = new WeChatController();
         $this->access_token = $wechat->getAccessToken();//获取accesstoken
-        $url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token";
         $receivers = $info->send_to;
         $post_data = [//模板消息配置
             'touser' => '',
@@ -112,7 +116,7 @@ class TeacherInfoController extends Controller
                     ->where('is_bind', '=', 1)
                     ->get();
                 break;
-            default: //case 1、2、3、4
+            default: //其他case
                 $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
                 foreach ($receivers as $receiver) {
                     $users = Student::select('id', 'openid')
@@ -123,7 +127,6 @@ class TeacherInfoController extends Controller
                 break;
         }
         //发送通知
-        try {
             if (isset($users)) {
                 $client = new Client();
                 //发送通知
@@ -133,14 +136,14 @@ class TeacherInfoController extends Controller
                     $res = $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
                         'json' => $post_data
                     ]);
-                    $res = json_decode($res);
+                    $res = json_decode($res->getBody(),true);
                     if ($res['errmsg'] != 'ok') {
                         \Log::error('用户' . $user->name . '发送通知失败', '错误信息为:' . $res['errmsg']);
-                        return Response::json(['status' => 402, 'msg' => $res['errmsg']]);
+                        throw new \Exception($res['errmsg']);
                     }
                 }
                 //存储反馈表
-                if ($type >= 1 && $type <= 5) {//本科生
+                if ($type=='grade' ||$type == 'class_num' ||$type == 'major' || $type =='userid' || $type == 5) {//本科生
                     foreach ($users as $user) {
                         Info_Feedback::create(['student_id' => $user->id, 'info_content_id' => $info->id]);
                     }
@@ -154,17 +157,13 @@ class TeacherInfoController extends Controller
                     }
                 }
             }
-        } catch (GuzzleException $e) {
-            \Log::error($e->getMessage());
-            return Response::json(['status' => 402, 'msg' => $e->getMessage()]);
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            return Response::json(['status' => 402, 'msg' => $e->getMessage()]);
         }
-    }
 
-    /*
-     * 教师创建一条通知（可带附件），针对不同群体发送不同的微信模板消息
+    /**
+     * 发送模板消息
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws GuzzleException
      */
     public function send(Request $request)
     {
@@ -402,6 +401,7 @@ class TeacherInfoController extends Controller
                 ],
                 'remark' => [
                     'value' => '点我立即阅读☝',
+                    'color' => '#FF0000'
                 ],
             ]
         ];
