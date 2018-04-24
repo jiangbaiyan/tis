@@ -16,7 +16,7 @@ class HolidayLeaveController extends Controller
     //----------------------教师端-------------------------------------------
     public function teacherGet(){
         $userid = Cache::get($_COOKIE['userid']);
-        $leaveInfo = Leave_info::orderByDesc('updated_at')->first();
+        $leaveInfo = Leave_info::latest()->first();
         if (!$leaveInfo){
             return Response::json(['status' => 200,'msg' => 'no model','data' => []]);
         }

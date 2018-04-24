@@ -24,10 +24,7 @@ class LeaveInfoController extends Controller
 
     //学生端获取所有教师创建的请假信息
     public function get(){
-        $datas = Leave_info::all();
-        $datas = $datas
-            ->where('from','<=',date('Y-m-d'))
-            ->where('to','>=',date('Y-m-d'));
+        $datas = Leave_info::latest()->get();
         return Response::json(['status' => 200,'msg' => 'data required successfully','data' => $datas]);
     }
 

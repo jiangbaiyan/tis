@@ -133,14 +133,9 @@ class TeacherInfoController extends Controller
                 foreach ($users as $user) {
                     $openid = $user->openid;
                     $post_data['touser'] = $openid;
-                    $res = $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                    $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
                         'json' => $post_data
                     ]);
-                    $res = json_decode($res->getBody(),true);
-                    if ($res['errmsg'] != 'ok') {
-                        \Log::error('用户' . $user->name . '发送通知失败', '错误信息为:' . $res['errmsg']);
-                        throw new \Exception($res['errmsg']);
-                    }
                 }
                 //存储反馈表
                 if ($type=='grade' ||$type == 'class_num' ||$type == 'major' || $type =='userid' || $type == 5) {//本科生
