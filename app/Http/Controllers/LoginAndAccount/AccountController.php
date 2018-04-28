@@ -107,7 +107,6 @@ class AccountController extends Controller
             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
         }
         $user = Account::where('userid','=',$inputUser)->first();
-        $path = 'storage/'.$path;
         $user->icon_path = $path;//将路径写入数据库
         if(!$user->save()){
             return response()->json(['status' => 463,'msg' => 'database path written failed']);
