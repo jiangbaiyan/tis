@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Account;
 use App\Http\Controllers\LoginAndAccount\Controller;
-use App\Leave_info;
 use App\Student;
 use Illuminate\Http\Request;
 

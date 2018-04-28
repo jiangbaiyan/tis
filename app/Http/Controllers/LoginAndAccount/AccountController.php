@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Response;
 
 class AccountController extends Controller
 {
+
+    private $url = 'https://cloudfiles.cloudshm.com/';//又拍云存储地址
+
     /**
      * 更新教师信息
      * @param Request $request
@@ -99,7 +102,7 @@ class AccountController extends Controller
         if($ext!='jpg' && $ext!='png' && $ext!='jpeg'&& $ext!='JPG'&&$ext!='PNG'&&$ext!='JPEG'){
             return response()->json(['status' =>461,'msg' => 'wrong file format']);
         }
-        $path = Storage::disk('upyun')->putFileAs('Avatar/' . date('Y') . '/' . date('md'), $file, $file->getClientOriginalName(), 'public');
+        $path = $this->url.Storage::disk('upyun')->putFileAs('avatar/' . date('Y') . '/' . date('md'), $file, $file->getClientOriginalName(), 'public');
         if (!$path){
             return response()->json(['status' => 462,'msg' => 'file uploaded failed']);
         }

@@ -110,7 +110,7 @@ class TeacherInfoController extends Controller
                     ->where('is_bind', '=', 1)
                     ->get();
                 break;
-            default: //其他case
+            default:
                 $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割并存入数组
                     $users = Student::select('id', 'openid')
                         ->whereIn("$type", $receivers)
