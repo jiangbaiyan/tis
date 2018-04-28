@@ -80,21 +80,17 @@ class TeacherInfoController extends Controller
                 break;
             case 6:
                 $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
-                foreach ($receivers as $receiver) {
                     $users = Graduate::select('id', 'openid')
-                        ->where('grade', $receiver)
+                        ->where('grade', $receivers)
                         ->where('is_bind', '=', 1)
                         ->get();
-                }
                 break;
             case 7:
                 $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
-                foreach ($receivers as $receiver) {
                     $users = Graduate::select('id', 'openid')
-                        ->where('userid', $receiver)
+                        ->whereIn('userid', $receivers)
                         ->where('is_bind', '=', 1)
                         ->get();
-                }
                 break;
             case 8:
                 $users = Graduate::select('id', 'openid')
@@ -103,12 +99,10 @@ class TeacherInfoController extends Controller
                 break;
             case 9:
                 $receivers = explode(' ', $receivers);//前端传递参数40365 41451需要进行字符串分割
-                foreach ($receivers as $receiver) {
                     $users = Account::select('id', 'openid')
-                        ->where('userid', $receiver)
+                        ->whereIn('userid', $receivers)
                         ->where('is_bind', '=', 1)
                         ->get();
-                }
                 break;
             case 10:
                 $users = Account::select('id', 'openid')
