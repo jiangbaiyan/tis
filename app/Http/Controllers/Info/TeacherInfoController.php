@@ -115,7 +115,7 @@ class TeacherInfoController extends Controller
                     ->where('openid', '!=', '')
                     ->where('is_bind', '=', 1)
                     ->get();
-                break;s
+                break;
             default: //其他case
                 $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割并存入数组
                     $users = Student::select('id', 'openid')
