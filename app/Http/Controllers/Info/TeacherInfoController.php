@@ -115,15 +115,13 @@ class TeacherInfoController extends Controller
                     ->where('openid', '!=', '')
                     ->where('is_bind', '=', 1)
                     ->get();
-                break;
+                break;s
             default: //其他case
-                $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割
-                foreach ($receivers as $receiver) {
+                $receivers = explode(' ', $receivers);//前端传递参数2015 2016，需要进行字符串分割并存入数组
                     $users = Student::select('id', 'openid')
-                        ->where("$type", $receiver)
+                        ->whereIn("$type", $receivers)
                         ->where('is_bind', '=', 1)
                         ->get();
-                }
                 break;
         }
         //发送通知
@@ -311,14 +309,12 @@ class TeacherInfoController extends Controller
         if ($info_level == 1) {//如果是辅导员，可查看type为1-8（发给学生和研究生的通知）
             $data = Info_Content::join('accounts', 'info_contents.account_id', '=', 'accounts.userid')
                 ->select('info_contents.*', 'accounts.name')
-                /*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
                 ->whereBetween('info_contents.type', [1, 8])
                 ->orderByDesc('info_contents.created_at')
                 ->paginate(5);
         } else {//如果是教务老师，可以查看所有通知（type为1-10）
             $data = Info_Content::join('accounts', 'info_contents.account_id', '=', 'accounts.userid')
                 ->select('info_contents.*', 'accounts.name')
-                /*                ->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
                 ->orderByDesc('info_contents.created_at')
                 ->paginate(5);
         }
