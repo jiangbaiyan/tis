@@ -35,6 +35,7 @@ class TeacherInfoController extends Controller
      */
     public function sendModelInfo($type, $info, $isPC)
     {
+        \DB::beginTransaction();
         if ($isPC) {//PC端发通知
             $userid = $info->account_id;
             $userTeacher = Account::where('userid', $userid)->first();
@@ -118,32 +119,38 @@ class TeacherInfoController extends Controller
                         ->get();
                 break;
         }
-        //发送通知
             if (isset($users)) {
                 $client = new Client();
-                //发送通知
-                foreach ($users as $user) {
-                    $openid = $user->openid;
-                    $post_data['touser'] = $openid;
-                    $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
-                        'json' => $post_data
-                    ]);
-                }
-                //存储反馈表
                 if ($type=='grade' ||$type == 'class_num' ||$type == 'major' || $type =='userid' || $type == 5) {//本科生
                     foreach ($users as $user) {
                         Info_Feedback::create(['student_id' => $user->id, 'info_content_id' => $info->id]);
+                        $openid = $user->openid;
+                        $post_data['touser'] = $openid;
+                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                            'json' => $post_data
+                        ]);
                     }
                 } else if ($type >= 6 && $type <= 8) {//研究生
                     foreach ($users as $user) {
                         Graduate_Info_Feedback::create(['graduate_id' => $user->id, 'info_content_id' => $info->id]);
+                        $openid = $user->openid;
+                        $post_data['touser'] = $openid;
+                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                            'json' => $post_data
+                        ]);
                     }
                 } else {//教师
                     foreach ($users as $user) {
                         Teacher_Info_Feedback::create(['account_id' => $user->id, 'info_content_id' => $info->id]);
+                        $openid = $user->openid;
+                        $post_data['touser'] = $openid;
+                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                            'json' => $post_data
+                        ]);
                     }
                 }
             }
+            \DB::commit();
         }
 
     /**
