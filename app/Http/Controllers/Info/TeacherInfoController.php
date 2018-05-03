@@ -126,7 +126,7 @@ class TeacherInfoController extends Controller
                         Info_Feedback::create(['student_id' => $user->id, 'info_content_id' => $info->id]);
                         $openid = $user->openid;
                         $post_data['touser'] = $openid;
-                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                        $client->requestAsync('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
                             'json' => $post_data
                         ]);
                     }
@@ -135,7 +135,7 @@ class TeacherInfoController extends Controller
                         Graduate_Info_Feedback::create(['graduate_id' => $user->id, 'info_content_id' => $info->id]);
                         $openid = $user->openid;
                         $post_data['touser'] = $openid;
-                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                        $client->requestAsync('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
                             'json' => $post_data
                         ]);
                     }
@@ -144,7 +144,7 @@ class TeacherInfoController extends Controller
                         Teacher_Info_Feedback::create(['account_id' => $user->id, 'info_content_id' => $info->id]);
                         $openid = $user->openid;
                         $post_data['touser'] = $openid;
-                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                        $client->requestAsync('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
                             'json' => $post_data
                         ]);
                     }
