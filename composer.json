@@ -13,6 +13,7 @@
         "laravel/tinker": "~1.0",
         "maatwebsite/excel": "~2.1.0",
         "php-unoconv/php-unoconv": "^0.3.0",
+        "phpoffice/phpspreadsheet": "^1.2",
         "predis/predis": "^1.1",
         "yangyifan/upload": "^0.2.1"
     },

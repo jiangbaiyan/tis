@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Reach;
+namespace App\Http\Controllers\Teach;
 
 use App\Account;
 use App\Reach_result;
-use Exception;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LoginAndAccount\Controller;
 use Illuminate\Support\Facades\Response;

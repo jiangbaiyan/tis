@@ -11,7 +11,19 @@ Route::group(['prefix' => 'api'],function (){
             Route::get('teachercas', 'TeacherCasController@cas');//教师PC端CAS认证
             Route::get('wechatcas', 'WechatCasController@cas');//教师学生微信端CAS认证
             Route::get('jssdk', 'WeChatController@jsSDK');
-            Route::post('calculate','Reach\ReachCalculateController@calculate');
+
+            //计算达成度
+            Route::post('calculate','Teach\ReachCalculateController@calculate');
+
+            //计算工作量
+            Route::post('workload','Teach\WorkLoadController@calculate');
+
+            //教务老师查看所有工作量
+            Route::get('allWorkload','Teach\WorkLoadController@getAllWorkload');
+
+            //普通教师查看自己的工作量
+            Route::get('ownWorkLoad','Teach\WorkLoadController@getOwnWorkload');
+
             Route::group(['middleware' => 'WechatCheckLogin'],function (){
                 Route::get('type','WeChatController@getType');//判断用户信息
             });
