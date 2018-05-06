@@ -22,7 +22,7 @@ Route::group(['prefix' => 'api'],function (){
             Route::get('allWorkload','Teach\WorkLoadController@getAllWorkload');
 
             //普通教师查看自己的工作量
-            Route::get('ownWorkLoad','Teach\WorkLoadController@getOwnWorkload');
+            Route::get('ownWorkload','Teach\WorkLoadController@getOwnWorkload');
 
             Route::group(['middleware' => 'WechatCheckLogin'],function (){
                 Route::get('type','WeChatController@getType');//判断用户信息
