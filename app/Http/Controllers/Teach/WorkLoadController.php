@@ -14,7 +14,6 @@ use App\WorkLoadModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Session;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
@@ -36,7 +35,7 @@ class WorkLoadController extends Controller
         $md5 = md5_file($file);
         $sameFile = WorkLoadModel::where('md5',$md5)->first();
         if ($sameFile){
-            throw new \Exception('data exists');
+            throw new \Exception('您已计算过,请勿重复计算');
         }
         $reader = new Xlsx();
         $spreadSheet = $reader->load($file);
@@ -93,7 +92,6 @@ class WorkLoadController extends Controller
         }
         $writer = IOFactory::createWriter($spreadSheet, 'Xlsx');
         $writer->save('result.xlsx');
-        Cache::forever('md5',$md5);
         return Response::json(['status' => 200,'msg' => 'success','data' => '/result.xlsx']);
     }
 
@@ -147,7 +145,7 @@ class WorkLoadController extends Controller
      * @throws \Exception
      */
     public function getAllWorkload(){
-        $newestMd5 = Cache::get('md5');
+        $newestMd5 = WorkLoadModel::latest()->value('md5');
         if (!$newestMd5){
             throw new \Exception('请先上传工作量表格进行计算');
         }
@@ -162,7 +160,7 @@ class WorkLoadController extends Controller
      * @throws \Exception
      */
     public function getOwnWorkload(){
-        $newestMd5 = Cache::get('md5');
+        $newestMd5 = WorkLoadModel::latest()->value('md5');
         $userid = Cache::get($_COOKIE['userid']);
         $userName = Account::where('userid',$userid)->value('name');
         if (!$newestMd5){
