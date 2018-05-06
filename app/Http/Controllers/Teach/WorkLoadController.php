@@ -31,6 +31,9 @@ class WorkLoadController extends Controller
      */
     public function calculate(Request $request)
     {
+        if (!$request->hasFile('file')){
+            throw new \Exception('请上传文件');
+        }
         $file = $request->file('file');
         $md5 = md5_file($file);
         $sameFile = WorkLoadModel::where('md5',$md5)->first();
@@ -71,7 +74,7 @@ class WorkLoadController extends Controller
         $workSheet = $spreadSheet->getActiveSheet();
         $data = $workSheet->toArray();
         //计算标准课时和工作量
-        for ($i = 0, $j = 2; $j < $row; $j += $count[$i], $i++) {
+        for ($i = 0, $j = 2; $j <= $row; $j += $count[$i], $i++) {
             $totalHour = 0;
             $workload = 0;
             for ($k = $j-1;$k<$j + $count[$i]-1;$k++){
@@ -161,11 +164,11 @@ class WorkLoadController extends Controller
      */
     public function getOwnWorkload(){
         $newestMd5 = WorkLoadModel::latest()->value('md5');
-        $userid = Cache::get($_COOKIE['userid']);
-        $userName = Account::where('userid',$userid)->value('name');
         if (!$newestMd5){
             throw new \Exception('暂时还没有数据');
         }
+        $userid = Cache::get($_COOKIE['userid']);
+        $userName = Account::where('userid',$userid)->value('name');
         $selectData = ['id','name','year','term','totalHour','workload'];
         $data = WorkLoadModel::select($selectData)->where('md5',$newestMd5)->where('name','like','%'.$userName.'%')->get();
         return Response::json(['status' => 200,'msg' => 'success','data' => $data]);
