@@ -152,12 +152,14 @@ class WorkLoadController extends Controller
      * @throws \Exception
      */
     public function getAllWorkload(){
-        $newestMd5 = WorkLoadModel::latest()->value('md5');
+        $newest = WorkLoadModel::latest()->first();
+        $newestMd5 = $newest->md5;
+        $time = $newest->time;
         if (!$newestMd5){
             throw new \Exception('请先上传工作量表格进行计算');
         }
         $selectData = ['id','name','year','term','totalHour','workload'];
-        $data = WorkLoadModel::where('md5',$newestMd5)->select($selectData)->get();
+        $data = WorkLoadModel::where(['md5' => $newestMd5,'created_at' => $time])->select($selectData)->get();
         return Response::json(['status' => 200,'msg' => 'success','data' => $data]);
     }
 
@@ -167,14 +169,16 @@ class WorkLoadController extends Controller
      * @throws \Exception
      */
     public function getOwnWorkload(){
-        $newestMd5 = WorkLoadModel::latest()->value('md5');
+        $newest = WorkLoadModel::latest()->first();
+        $newestMd5 = $newest->md5;
+        $time = $newest->time;
         if (!$newestMd5){
-            throw new \Exception('暂时还没有数据');
+            throw new \Exception('暂时没有您的数据');
         }
         $userid = Cache::get($_COOKIE['userid']);
         $userName = Account::where('userid',$userid)->value('name');
         $selectData = ['id','name','year','term','totalHour','workload'];
-        $data = WorkLoadModel::select($selectData)->where('md5',$newestMd5)->where('name','like','%'.$userName.'%')->get();
+        $data = WorkLoadModel::select($selectData)->where(['md5' => $newestMd5,'created_at' => $time])->where('name','like','%'.$userName.'%')->get();
         return Response::json(['status' => 200,'msg' => 'success','data' => $data]);
     }
 }
