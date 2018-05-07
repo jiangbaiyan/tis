@@ -51,7 +51,11 @@ class WorkLoadController extends Controller
         for ($i = 1; $i < $row; $i++) {
             $names[] = $data[$i][2];
         }
-        $names = array_count_values($names);
+        try{
+            $names = array_count_values($names);
+        }catch (\Exception $e){
+            throw new \Exception('请检查您的单元格,不要有空的带样式或者多余的单元格');
+        }
         foreach ($names as $key => $value) {
             $count[] = $value;
         }
