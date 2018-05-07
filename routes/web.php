@@ -159,7 +159,6 @@ Route::group(['prefix' => 'api','namespace' => 'Science'],function(){
 Route::group(['prefix' => 'api'],function (){
     Route::group(['middleware' => 'EnableCrossRequest'],function (){
         Route::group(['prefix' => 'v1.0'],function(){
-            Route::group(['middleware' => 'TeacherCheckLogin'],function (){
 
                 //计算达成度
                 Route::post('calculate','Teach\ReachCalculateController@calculate');
@@ -172,7 +171,7 @@ Route::group(['prefix' => 'api'],function (){
 
                 //普通教师查看自己的工作量
                 Route::get('ownWorkload','Teach\WorkLoadController@getOwnWorkload');
-            });
+
         });
     });
 });
