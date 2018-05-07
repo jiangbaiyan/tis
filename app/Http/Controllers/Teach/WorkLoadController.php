@@ -153,11 +153,11 @@ class WorkLoadController extends Controller
      */
     public function getAllWorkload(){
         $newest = WorkLoadModel::latest()->first();
-        $newestMd5 = $newest->md5;
-        $time = $newest->created_at;
-        if (!$newestMd5){
+        if (!$newest){
             throw new \Exception('请先上传工作量表格进行计算');
         }
+        $newestMd5 = $newest->md5;
+        $time = $newest->created_at;
         $selectData = ['id','name','year','term','totalHour','workload'];
         $data = WorkLoadModel::where(['md5' => $newestMd5,'created_at' => $time])->select($selectData)->get();
         return Response::json(['status' => 200,'msg' => 'success','data' => $data]);
@@ -170,11 +170,11 @@ class WorkLoadController extends Controller
      */
     public function getOwnWorkload(){
         $newest = WorkLoadModel::latest()->first();
-        $newestMd5 = $newest->md5;
-        $time = $newest->created_at;
-        if (!$newestMd5){
+        if (!$newest){
             throw new \Exception('暂时没有您的数据');
         }
+        $newestMd5 = $newest->md5;
+        $time = $newest->created_at;
         $userid = Cache::get($_COOKIE['userid']);
         $userName = Account::where('userid',$userid)->value('name');
         $selectData = ['id','name','year','term','totalHour','workload'];
