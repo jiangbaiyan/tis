@@ -168,7 +168,7 @@ Route::group(['prefix' => 'api'],function (){
                 Route::post('workload','Teach\WorkLoadController@calculate');
 
                 //教务老师查看所有工作量
-                Route::get('allWorkload','Teach\WorkLoadController@getlAllWorkload');
+                Route::get('allWorkload','Teach\WorkLoadController@getAllWorkload');
 
                 //普通教师查看自己的工作量
                 Route::get('ownWorkload','Teach\WorkLoadController@getOwnWorkload');
