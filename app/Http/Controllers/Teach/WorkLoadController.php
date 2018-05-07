@@ -154,7 +154,7 @@ class WorkLoadController extends Controller
     public function getAllWorkload(){
         $newest = WorkLoadModel::latest()->first();
         $newestMd5 = $newest->md5;
-        $time = $newest->time;
+        $time = $newest->created_at;
         if (!$newestMd5){
             throw new \Exception('请先上传工作量表格进行计算');
         }
@@ -171,7 +171,7 @@ class WorkLoadController extends Controller
     public function getOwnWorkload(){
         $newest = WorkLoadModel::latest()->first();
         $newestMd5 = $newest->md5;
-        $time = $newest->time;
+        $time = $newest->created_at;
         if (!$newestMd5){
             throw new \Exception('暂时没有您的数据');
         }
