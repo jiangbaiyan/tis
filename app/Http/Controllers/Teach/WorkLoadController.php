@@ -36,9 +36,9 @@ class WorkLoadController extends Controller
         }
         $file = $request->file('file');
         $md5 = md5_file($file);
-        $sameFile = WorkLoadModel::where('md5',$md5)->first();
-        if ($sameFile){
-            throw new \Exception('您已计算过,请勿重复计算');
+        $oldMd5 = WorkLoadModel::latest()->value('md5');
+        if ($md5 == $oldMd5){
+            throw new \Exception('您刚刚已计算过,请勿重复计算');
         }
         $reader = new Xlsx();
         $spreadSheet = $reader->load($file);
