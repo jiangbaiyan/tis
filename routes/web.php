@@ -185,7 +185,7 @@ Route::group(['prefix' => 'api','namespace' => 'Leave'],function (){//教师端
             Route::group(['middleware'=>'TeacherCheckLogin'],function (){
                 Route::group(['middleware'=>'LeaveMiddleware'],function () {
                     Route::get('notVerifiedLeaves', 'DailyLeaveController@getNotVerifiedLeaves');
-                    Route::put('dailyleave', 'DailyLeaveController@teacherUpdate');
+                    Route::post('dailyleave', 'DailyLeaveController@teacherUpdate');
                     Route::get('holidayleave', 'HolidayLeaveController@teacherGet');
                     Route::post('leaveinfo', 'LeaveInfoController@create');
                     Route::get('dailyleave', 'DailyLeaveController@teacherGet');
