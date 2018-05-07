@@ -87,7 +87,7 @@ class WorkLoadController extends Controller
                 'workload' => $workload,
                 'totalHour' => $totalHour,
                 'year' => $request->input('year') ? $request->input('year') : date('Y'),
-                'term' => $request->input('term') ? $request->input('term') : (date('m') > 7 ? 2 : 1),
+                'term' => $request->input('term') ? $request->input('term') : (date('m') > 7 ? 1 : 2),
                 'md5' => $md5
             ]);
             $workSheet->setCellValueByColumnAndRow(12,$j,$totalHour);
