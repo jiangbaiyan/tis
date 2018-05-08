@@ -153,13 +153,13 @@ class WorkLoadController extends Controller
      */
     public function getAllWorkload(){
         $newest = WorkLoadModel::latest()->first();
-        if (!$newest){
-            throw new \Exception('请先上传工作量表格进行计算');
+        $data = [];
+        if (isset($newest)){
+            $newestMd5 = $newest->md5;
+            $time = $newest->created_at;
+            $selectData = ['id','name','year','term','totalHour','workload'];
+            $data = WorkLoadModel::where(['md5' => $newestMd5,'created_at' => $time])->select($selectData)->get();
         }
-        $newestMd5 = $newest->md5;
-        $time = $newest->created_at;
-        $selectData = ['id','name','year','term','totalHour','workload'];
-        $data = WorkLoadModel::where(['md5' => $newestMd5,'created_at' => $time])->select($selectData)->get();
         return Response::json(['status' => 200,'msg' => 'success','data' => $data]);
     }
 
