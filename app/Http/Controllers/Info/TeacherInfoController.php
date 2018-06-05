@@ -119,6 +119,7 @@ class TeacherInfoController extends Controller
                         ->get();
                 break;
         }
+        $sendUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token";
             if (isset($users)) {
                 $client = new Client();
                 if ($type=='grade' ||$type == 'class_num' ||$type == 'major' || $type =='userid' || $type == 5) {//本科生
@@ -126,7 +127,7 @@ class TeacherInfoController extends Controller
                         Info_Feedback::create(['student_id' => $user->id, 'info_content_id' => $info->id]);
                         $openid = $user->openid;
                         $post_data['touser'] = $openid;
-                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                        $client->request('POST', $sendUrl, [
                             'json' => $post_data
                         ]);
                     }
@@ -135,7 +136,7 @@ class TeacherInfoController extends Controller
                         Graduate_Info_Feedback::create(['graduate_id' => $user->id, 'info_content_id' => $info->id]);
                         $openid = $user->openid;
                         $post_data['touser'] = $openid;
-                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                        $client->request('POST', $sendUrl, [
                             'json' => $post_data
                         ]);
                     }
@@ -144,7 +145,7 @@ class TeacherInfoController extends Controller
                         Teacher_Info_Feedback::create(['account_id' => $user->id, 'info_content_id' => $info->id]);
                         $openid = $user->openid;
                         $post_data['touser'] = $openid;
-                        $client->request('POST', "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token", [
+                        $client->request('POST', $sendUrl, [
                             'json' => $post_data
                         ]);
                     }
@@ -161,7 +162,6 @@ class TeacherInfoController extends Controller
      */
     public function send(Request $request)
     {
-
         $userid = Cache::get($_COOKIE['userid']);
         $data = $request->all();
         $title = $request->input('title');
