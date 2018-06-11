@@ -59,7 +59,7 @@ class WechatInfoController extends Controller
             ->select('info_contents.*','accounts.name')
             ->find($id);
         if (!$content){
-            return Response::json(['status' => 405,'msg' => '该通知已被删除，请联系管理员']);
+            return Response::json(['status' => 402,'msg' => '该通知内容正在生成中，请过几秒再来']);
         }
         $user = Cache::get($_COOKIE['openid'])['user'];
         $userType = Cache::get($_COOKIE['openid'])['type'];
