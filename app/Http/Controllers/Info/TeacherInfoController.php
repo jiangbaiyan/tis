@@ -189,6 +189,7 @@ class TeacherInfoController extends Controller
                 }
             }
         }
+
         $info = Info_Content::create($data);
         $info->account_id = $userid;
         $info->save();

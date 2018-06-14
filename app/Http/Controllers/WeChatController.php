@@ -254,7 +254,8 @@ class WeChatController extends LoginAndAccount\Controller
         $class = Session::get('class');
         $grade = Session::get('grade');
         setcookie('openid',$openid, time()+31536000);
-        Student::create(
+        Student::updateOrCreate(
+            ['userid' => $userid],
             [
                 'userid' => $userid,
                 'name' => $username,
@@ -306,7 +307,8 @@ class WeChatController extends LoginAndAccount\Controller
         $unit = Session::get('unit');
         $grade = Session::get('grade');
         setcookie('openid',$openid, time()+31536000);
-        Graduate::create(
+        Graduate::updateOrCreate(
+            ['userid' => $userid],
             [
                 'userid' => $userid,
                 'name' => $username,
@@ -343,7 +345,8 @@ class WeChatController extends LoginAndAccount\Controller
         $openid = Session::get('openid');
         $unit = Session::get('unit');
         setcookie('openid',$openid, time()+31536000);
-        Account::create(//查找是否有教师工号为userid的记录，如果有则更新openid与email，没有则创建
+        Account::updateOrCreate(//查找是否有教师工号为userid的记录，如果有则更新openid与email，没有则创建
+            ['userid' => $userid],
             [
                 'userid' => $userid,
                 'openid' => $openid,
