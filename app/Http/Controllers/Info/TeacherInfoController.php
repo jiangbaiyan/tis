@@ -122,33 +122,28 @@ class TeacherInfoController extends Controller
         $sendUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$this->access_token";
             if (isset($users)) {
                 $client = new Client();
+                $insert = [];
+                $sendData = [];
+                $userNum = count($users);
+                //初始化发送信息
+                for ($i = 0;$i<$userNum;$i++){
+                    $post_data['touser'] = $users[$i]->openid;
+                    $insert[$i] = ['student_id' => $users[$i]->id, 'info_content_id' => $info->id];
+                    $sendData[$i] = $post_data;
+                }
+                //批量写入到不同数据库
                 if ($type=='grade' ||$type == 'class_num' ||$type == 'major' || $type =='userid' || $type == 5) {//本科生
-                    foreach ($users as $user) {
-                        Info_Feedback::create(['student_id' => $user->id, 'info_content_id' => $info->id]);
-                        $openid = $user->openid;
-                        $post_data['touser'] = $openid;
-                        $client->request('POST', $sendUrl, [
-                            'json' => $post_data
-                        ]);
-                    }
+                    \DB::table('info_feedbacks')->insert($insert);
                 } else if ($type >= 6 && $type <= 8) {//研究生
-                    foreach ($users as $user) {
-                        Graduate_Info_Feedback::create(['graduate_id' => $user->id, 'info_content_id' => $info->id]);
-                        $openid = $user->openid;
-                        $post_data['touser'] = $openid;
-                        $client->request('POST', $sendUrl, [
-                            'json' => $post_data
-                        ]);
-                    }
+                    \DB::table('graduate_info_feedbacks')->insert($insert);
                 } else {//教师
-                    foreach ($users as $user) {
-                        Teacher_Info_Feedback::create(['account_id' => $user->id, 'info_content_id' => $info->id]);
-                        $openid = $user->openid;
-                        $post_data['touser'] = $openid;
-                        $client->request('POST', $sendUrl, [
-                            'json' => $post_data
-                        ]);
-                    }
+                    \DB::table('teacher_info_feedbacks')->insert($insert);
+                }
+                //发送微信通知
+                foreach ($sendData as $item){
+                    $client->request('POST', $sendUrl, [
+                        'json' => $item
+                    ]);
                 }
             }
             \DB::commit();
