@@ -35,7 +35,6 @@ class TeacherInfoController extends Controller
      */
     public function sendModelInfo($type, $info, $isPC)
     {
-        \DB::beginTransaction();
         if ($isPC) {//PC端发通知
             $userid = $info->account_id;
             $userTeacher = Account::where('userid', $userid)->first();
@@ -146,7 +145,6 @@ class TeacherInfoController extends Controller
                     ]);
                 }
             }
-            \DB::commit();
         }
 
     /**

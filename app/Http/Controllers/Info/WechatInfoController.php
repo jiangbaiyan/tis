@@ -59,7 +59,7 @@ class WechatInfoController extends Controller
             ->select('info_contents.*','accounts.name')
             ->find($id);
         if (!$content){
-            return Response::json(['status' => 402,'msg' => '该通知内容正在生成中，请过几秒再来']);
+            return Response::json(['status' => 402,'msg' => '该通知内容正在生成中...请过几秒再来']);
         }
         $user = Cache::get($_COOKIE['openid'])['user'];
         $userType = Cache::get($_COOKIE['openid'])['type'];
@@ -81,7 +81,7 @@ class WechatInfoController extends Controller
                 break;
         }
         if (!$feedback){
-            return Response::json(['status' => 404,'msg' => '您无权限查看该通知']);
+            return Response::json(['status' => 404,'msg' => '该通知内容正在生成中...请过几秒再来']);
         }
         $feedback->status = 1;
         $feedback->save();
