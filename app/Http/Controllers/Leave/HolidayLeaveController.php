@@ -45,10 +45,6 @@ class HolidayLeaveController extends Controller
         $id = $request->input('id');
         $user = Cache::get($_COOKIE['openid'])['user'];
         $student_id = $user->id;
-        $leave_info = Leave_info::find($id);
-        if ($user->holiday_leaves()){
-            $leave_info->holiday_leaves()->where('student_id','=',$student_id)->delete();
-        }//如果该学生已经请假过,那么删除该模板下该学生之前的请假信息
         $holidayLeave = Holiday_leave::create($data);
         $holidayLeave->student_id = $student_id;
         $holidayLeave->leave_info_id = $id;
