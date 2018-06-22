@@ -124,26 +124,28 @@ class TeacherInfoController extends Controller
                 $insert = [];
                 $sendData = [];
                 $userNum = count($users);
+                for ($i = 0;$i<$userNum;$i++){
+                    $openid = $users[$i]->openid;
+                    if ($openid == null || $openid == ''){
+                        continue;
+                    }
+                    $post_data['touser'] = $openid;
+                    $sendData[$i] = $post_data;
+                }
                 //批量写入到不同数据库
                 if ($type=='grade' ||$type == 'class_num' ||$type == 'major' || $type =='userid' || $type == 5) {//本科生
                     for ($i = 0;$i<$userNum;$i++){
-                        $post_data['touser'] = $users[$i]->openid;
                         $insert[$i] = ['info_content_id' => $info->id,'student_id' => $users[$i]->id];
-                        $sendData[$i] = $post_data;
                     }
                     \DB::table('info_feedbacks')->insert($insert);
                 } else if ($type >= 6 && $type <= 8) {//研究生
                     for ($i = 0;$i<$userNum;$i++){
-                        $post_data['touser'] = $users[$i]->openid;
                         $insert[$i] = [ 'info_content_id' => $info->id,'graduate_id' => $users[$i]->id];
-                        $sendData[$i] = $post_data;
                     }
                     \DB::table('graduate_info_feedbacks')->insert($insert);
                 } else {//教师
                     for ($i = 0;$i<$userNum;$i++){
-                        $post_data['touser'] = $users[$i]->openid;
                         $insert[$i] = ['info_content_id' => $info->id,'account_id' => $users[$i]->id];
-                        $sendData[$i] = $post_data;
                     }
                     \DB::table('teacher_info_feedbacks')->insert($insert);
                 }
