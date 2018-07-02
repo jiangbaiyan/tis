@@ -45,7 +45,7 @@ class WechatInfoController extends Controller
                 $data = Info_Content::join('teacher_info_feedbacks','teacher_info_feedbacks.info_content_id','=','info_contents.id')
                     ->join('accounts','info_contents.account_id','=','accounts.userid')
                     ->select('info_contents.id','info_contents.title','info_contents.created_at','accounts.name')
-                    ->where('teacher_info_feedbacks.account_id','=',$teacher->id)
+                    ->where('teacher_info_feedbacks.account_id','=',$user->id)
                     /*->where('info_contents.created_at','>',date('Y-m-d H:i:s',time()-2592000))*/
                     ->latest()
                     ->paginate(8);
