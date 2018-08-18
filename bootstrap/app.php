@@ -11,7 +11,7 @@
 |
 */
 
-$app = new Illuminate\Foundation\Application(//新建一个容器对象
+$app = new Illuminate\Foundation\Application(
     realpath(__DIR__.'/../')
 );
 
@@ -26,17 +26,17 @@ $app = new Illuminate\Foundation\Application(//新建一个容器对象
 |
 */
 
-$app->singleton(//将字符串与对象绑定
+$app->singleton(
     Illuminate\Contracts\Http\Kernel::class,
     App\Http\Kernel::class
 );
 
-$app->singleton(//绑定
+$app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
 
-$app->singleton(//绑定
+$app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
 );
