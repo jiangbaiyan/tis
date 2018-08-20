@@ -114,8 +114,8 @@ class HduLogin extends Controller {
     private function saveUserInfo($openid){
         $userInfo = Session::get('userInfo','');
         if (empty($openid) || empty($userInfo)){
-            Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . array_merge($openid,$userInfo));
-            throw new OperateFailedException();
+            Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . json_encode(array_merge(['openid' => $openid],$userInfo)));
+            return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
         }
         $arr = array_merge(['openid' => $openid],$userInfo);
         //用户还要输入一些信息
