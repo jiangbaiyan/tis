@@ -11,7 +11,7 @@
 |
 */
 
-Route::group(['prefix' => 'v1'], function () {
+Route::group(['prefix' => 'v1','middleware' => 'web'], function () {
 
     Route::group(['prefix' => 'login'],function (){
 
