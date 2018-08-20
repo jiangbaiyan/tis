@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Login;
 
 use App\Http\Config\ComConf;
+use App\Http\Config\WxConf;
 use App\Http\Controller;
 use App\Http\Model\Wx;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +18,10 @@ use Illuminate\Support\Facades\Session;
 use src\Exceptions\OperateFailedException;
 
 class HduLogin extends Controller {
+
+    //获取微信code URL
+    const GET_WX_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base#wechat_redirect';
+
 
     public function casLogin(){
         $loginServer = "http://cas.hdu.edu.cn/cas/login";
@@ -62,7 +67,7 @@ class HduLogin extends Controller {
                             break;
                         case 'user_sex'://性别 1-男 其他-女
                             $data['sex'] = $attribute['@attributes']['value'];
-                            break;
+                      x      break;
                         case 'unit_name'://学院
                             $data['unit'] = $attribute['@attributes']['value'];
                             break;
@@ -73,7 +78,11 @@ class HduLogin extends Controller {
                 }
 
                 Session::put('userInfo',json_encode($data));
-                Wx::getCode();//进入微信获取openid逻辑
+
+                $redirectUrl = sprintf(self::GET_WX_CODE_URL,WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL));
+
+                //跳到微信授权
+                header('location:' . $redirectUrl);
 
             }
             catch (\Exception $e) {
