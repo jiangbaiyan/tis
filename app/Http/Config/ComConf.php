@@ -9,6 +9,6 @@ namespace App\Http\Config;
 
 class ComConf{
 
-    //const HOST = 'https://tis.cloudshm.com';
-    const HOST = 'http://localhost:8888';
+    const HOST = 'https://tis.cloudshm.com';
+    //const HOST = 'http://localhost:8888';
 }
