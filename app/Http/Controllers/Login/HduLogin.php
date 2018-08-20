@@ -67,7 +67,7 @@ class HduLogin extends Controller {
                             break;
                         case 'user_sex'://性别 1-男 其他-女
                             $data['sex'] = $attribute['@attributes']['value'];
-                      x      break;
+                            break;
                         case 'unit_name'://学院
                             $data['unit'] = $attribute['@attributes']['value'];
                             break;
