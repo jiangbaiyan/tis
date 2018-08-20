@@ -20,7 +20,7 @@ use src\Exceptions\OperateFailedException;
 class HduLogin extends Controller {
 
     //获取微信code URL
-    const GET_WX_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base#wechat_redirect';
+    const GET_WX_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s#wechat_redirect';
 
 
     //杭电CAS登录页
@@ -78,10 +78,7 @@ class HduLogin extends Controller {
                     }
                 }
 
-                Session::put('userInfo',json_encode($data));
-                Session::save();
-
-                $redirectUrl = sprintf(self::GET_WX_CODE_URL,WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL));
+                $redirectUrl = sprintf(self::GET_WX_CODE_URL,WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL),base64_encode(json_encode($data)));
 
                 //跳到微信授权
                 return redirect($redirectUrl);
@@ -102,12 +99,12 @@ class HduLogin extends Controller {
      * @throws \src\Exceptions\OperateFailedException
      */
     public function getCodeCallback(){
-        if (!Request::has('code')){
-            Log::notice('get_wx_code_failed|params:' . Request::all());
+        if (!Request::has('code') || !Request::has('state')){
+            Log::notice('get_wx_code_or_data_failed|params:' . Request::all());
         }
         $code = Request::get('code');
         $openid = Wx::getOpenid($code);
-        $userInfo = json_decode(Session::get('userInfo'));
+        $userInfo = base64_decode(Request::get('state'));
         if (empty($openid) || empty($userInfo)){
             Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . json_encode($userInfo));
             return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
