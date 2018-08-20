@@ -23,7 +23,7 @@ class HduLogin extends Controller {
         //杭电CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
 
-        $thisURL = ComConf::HOST . "/bind";
+        $thisURL = ComConf::HOST . "/api/v1/login/bind";
 
         //判断是否已经登录，如果ticket为空，则未登录
         if (!empty($_REQUEST["ticket"])) {
