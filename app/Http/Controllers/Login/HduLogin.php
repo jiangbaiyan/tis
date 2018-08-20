@@ -8,9 +8,14 @@
 
 namespace App\Http\Controllers\Login;
 
+use App\Http\Config\ComConf;
 use App\Http\Controller;
 use App\Http\Model\Wx;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
+use src\Exceptions\OperateFailedException;
 
 class HduLogin extends Controller {
 
@@ -19,7 +24,7 @@ class HduLogin extends Controller {
         //杭电CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
 
-        $thisURL = "http://localhost:8888/wxbind";
+        $thisURL = ComConf::HOST . "/wxbind";
 
         //判断是否已经登录，如果ticket为空，则未登录
         if (!empty($_REQUEST["ticket"])) {
@@ -68,6 +73,7 @@ class HduLogin extends Controller {
                     }
                 }
 
+                Session::put('userInfo',json_encode($data));
                 Wx::getCode();//进入微信获取openid逻辑
 
             }
@@ -81,5 +87,30 @@ class HduLogin extends Controller {
             //确保重定向后，后续代码不会被执行
             exit;
         }
+    }
+
+    /**
+     * 第一步getCode回调到这里，会传过来一个code，用来获取access_token
+     * @throws \src\Exceptions\OperateFailedException
+     */
+    public function getCodeCallback(){
+        if (!Request::has('code')){
+            Log::notice('get_wx_code_failed|params:' . Request::all());
+        }
+        $code = Request::get('code');
+        $openid = Wx::getOpenid($code);
+        $this->saveUserInfo($openid);
+    }
+
+    //存储用户信息
+    private function saveUserInfo($openid){
+        $userInfo = Session::get('userInfo','');
+        if (empty($openid) || empty($userInfo)){
+            Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . array_merge($openid,$userInfo));
+            throw new OperateFailedException();
+        }
+        $arr = array_merge(['openid' => $openid],$userInfo);
+        //用户还要输入一些信息
+        //存储数据库
     }
 }
