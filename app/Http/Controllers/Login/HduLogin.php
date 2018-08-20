@@ -80,9 +80,14 @@ class HduLogin extends Controller {
                     }
                 }
 
-                $uniqid = uniqid();
+                //模拟Session（laravel的Session有bug获取不到）
+                $uniqid = uniqid();//根据uniqid唯一标识一个用户
 
-                Redis::hset(self::REDIS_GET_HDU_USER_INFO_KEY,$uniqid,json_encode($data));
+                $res = Redis::hset(self::REDIS_GET_HDU_USER_INFO_KEY,$uniqid,json_encode($data));//用户信息存入redis
+
+                if (empty($res)){
+                    Log::notice('hdu_cas_set_user_info_to_redis_failed|data:' . json_encode($data));
+                }
 
                 $redirectUrl = sprintf(self::GET_WX_CODE_URL , WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL) , $uniqid);
 
@@ -109,9 +114,9 @@ class HduLogin extends Controller {
             Log::notice('get_wx_code_or_data_failed|params:' . Request::all());
         }
         $code = Request::get('code');
-        $state = Request::get('state');
+        $state = Request::get('state');//这个就是uniqid
         $openid = Wx::getOpenid($code);
-        $userInfo = json_decode(Redis::hget(self::REDIS_GET_HDU_USER_INFO_KEY,$state));
+        $userInfo = json_decode(Redis::hget(self::REDIS_GET_HDU_USER_INFO_KEY,$state));//根据uniqid从redis中取得对应用户的信息
         if (empty($openid) || empty($userInfo)){
             Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . json_encode($userInfo));
             return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
