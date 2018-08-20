@@ -79,6 +79,7 @@ class HduLogin extends Controller {
                 }
 
                 Session::put('userInfo',json_encode($data));
+                Session::save();
 
                 $redirectUrl = sprintf(self::GET_WX_CODE_URL,WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL));
 
