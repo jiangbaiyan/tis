@@ -92,9 +92,7 @@ class HduLogin extends Controller {
         }
         else//没有ticket，说明没有登录，需要重定向到登录服务器
         {
-            header("Location: " . $loginServer . "?service=" . $thisURL);
-            //确保重定向后，后续代码不会被执行
-            exit;
+            return redirect($loginServer . "?service=" . $thisURL);
         }
     }
 
