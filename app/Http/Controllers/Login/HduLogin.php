@@ -107,17 +107,16 @@ class HduLogin extends Controller {
         }
         $code = Request::get('code');
         $openid = Wx::getOpenid($code);
-        $this->saveUserInfo($openid);
+        $userInfo = json_decode(Session::get('userInfo'));
+        if (empty($openid) || empty($userInfo)){
+            Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . json_encode($userInfo));
+            return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
+        }
+        $this->saveUserInfo($openid,$userInfo);
     }
 
     //存储用户信息
-    private function saveUserInfo($openid){
-        $userInfo = Session::get('userInfo','');
-        if (empty($openid) || empty($userInfo)){
-            Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . json_encode(array_merge(['openid' => $openid],$userInfo)));
-            return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
-        }
-        $arr = array_merge(['openid' => $openid],$userInfo);
+    private function saveUserInfo($openid,$userInfo){
         //用户还要输入一些信息
         //存储数据库
     }
