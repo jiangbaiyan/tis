@@ -13,6 +13,7 @@ use App\Http\Config\WxConf;
 use App\Http\Controller;
 use App\Http\Model\Wx;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use src\Exceptions\OperateFailedException;
@@ -22,6 +23,7 @@ class HduLogin extends Controller {
     //获取微信code URL
     const GET_WX_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s#wechat_redirect';
 
+    const REDIS_GET_HDU_USER_INFO_KEY = 'tis_get_hdu_user_info';
 
     //杭电CAS登录页
     public function casLogin(){
@@ -78,7 +80,11 @@ class HduLogin extends Controller {
                     }
                 }
 
-                $redirectUrl = sprintf(self::GET_WX_CODE_URL,WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL),base64_encode(json_encode($data)));
+                $uniqid = uniqid();
+
+                Redis::hset(self::REDIS_GET_HDU_USER_INFO_KEY,$uniqid,json_encode($data));
+
+                $redirectUrl = sprintf(self::GET_WX_CODE_URL , WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL) , $uniqid);
 
                 //跳到微信授权
                 return redirect($redirectUrl);
@@ -86,9 +92,9 @@ class HduLogin extends Controller {
             }
             catch (\Exception $e) {
                 Log::notice('get_user_info_from_hdu_api_failed|msg:' . $e->getMessage());
+                return redirect($loginServer . "?service=" . $thisURL);
             }
-        }
-        else//没有ticket，说明没有登录，需要重定向到登录服务器
+        } else//没有ticket，说明没有登录，需要重定向到登录服务器
         {
             return redirect($loginServer . "?service=" . $thisURL);
         }
@@ -103,8 +109,9 @@ class HduLogin extends Controller {
             Log::notice('get_wx_code_or_data_failed|params:' . Request::all());
         }
         $code = Request::get('code');
+        $state = Request::get('state');
         $openid = Wx::getOpenid($code);
-        $userInfo = base64_decode(Request::get('state'));
+        $userInfo = json_decode(Redis::hget(self::REDIS_GET_HDU_USER_INFO_KEY,$state));
         if (empty($openid) || empty($userInfo)){
             Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . json_encode($userInfo));
             return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
