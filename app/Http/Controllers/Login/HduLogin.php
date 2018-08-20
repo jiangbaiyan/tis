@@ -23,6 +23,7 @@ class HduLogin extends Controller {
     const GET_WX_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base#wechat_redirect';
 
 
+    //杭电CAS登录页
     public function casLogin(){
         $loginServer = "http://cas.hdu.edu.cn/cas/login";
         //杭电CAS Server的验证URL
@@ -82,7 +83,7 @@ class HduLogin extends Controller {
                 $redirectUrl = sprintf(self::GET_WX_CODE_URL,WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL));
 
                 //跳到微信授权
-                header('location:' . $redirectUrl);
+                return redirect($redirectUrl);
 
             }
             catch (\Exception $e) {
