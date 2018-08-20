@@ -12,7 +12,6 @@ use App\Http\Config\ComConf;
 use App\Http\Controller;
 use App\Http\Model\Wx;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use src\Exceptions\OperateFailedException;
@@ -24,7 +23,7 @@ class HduLogin extends Controller {
         //杭电CAS Server的验证URL
         $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
 
-        $thisURL = ComConf::HOST . "/wxbind";
+        $thisURL = ComConf::HOST . "/bind";
 
         //判断是否已经登录，如果ticket为空，则未登录
         if (!empty($_REQUEST["ticket"])) {
