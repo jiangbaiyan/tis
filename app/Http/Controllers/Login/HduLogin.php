@@ -127,8 +127,7 @@ class HduLogin extends Controller {
         $validator = Validator::make(Request::all(),[
             'email' => 'required|email',
             'phone' => 'required|numeric|max:11',
-            'dean' => 'required',
-            'uniqid' => 'required'
+            'dean' => 'required'
         ]);
         if ($validator->fails()){
             return back()->withErrors($validator)->withInput();
