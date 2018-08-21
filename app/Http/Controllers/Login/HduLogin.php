@@ -121,12 +121,12 @@ class HduLogin extends Controller {
         $data = array_merge(['openid' => $openid],$userInfo);
         Session::put('userInfo',$data);
         Session::save();
-        return redirect(ComConf::HOST . '/api/v1/login/geterror');
+        return view('bind');
     }
 
     //获取错误的时候要加一个中间跳转
     public function getError(){
-        return view('bind');
+        return redirect(ComConf::HOST . '/api/v1/login/savedata');
     }
 
     //存储用户信息
