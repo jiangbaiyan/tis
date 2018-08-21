@@ -23,5 +23,7 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
         //渲染视图提交路由，进行后续存储操作
         Route::post('savedata','Login\HduLogin@dealAllData');
+
+        Route::get('geterror','Login\HduLogin@getError');
     });
 });

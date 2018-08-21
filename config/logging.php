@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'daily'),
+    'default' => env('LOG_CHANNEL', 'stack'),
 
     /*
     |--------------------------------------------------------------------------
@@ -47,7 +47,7 @@ return [
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/tis.log'),
-            'level' => 'debug',
+            'level' => 'notice',
             'days' => 15,
         ],
 

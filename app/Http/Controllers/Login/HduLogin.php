@@ -12,12 +12,12 @@ use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
 use App\Http\Controller;
 use App\Http\Model\Wx;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
+use Util\Logger\Logger;
 
 class HduLogin extends Controller {
 
@@ -50,7 +50,7 @@ class HduLogin extends Controller {
                 $nodeArr = json_decode(json_encode($validateXML),true);
 
                 if (empty($nodeArr['authenticationSuccess'])){//登录失败
-                    Log::notice('get_user_info_from_hdu_api_failed|msg:' . json_encode($validateXML));
+                    Logger::notice('login|get_user_info_from_hdu_api_failed|msg:' . json_encode($validateXML));
                     die('登录失败，杭电官方系统异常，请稍后重试');
                 }
 
@@ -91,7 +91,7 @@ class HduLogin extends Controller {
 
             }
             catch (\Exception $e) {
-                Log::notice('get_user_info_from_hdu_api_failed|msg:' . $e->getMessage());
+                Logger::notice('login|get_user_info_from_hdu_api_failed|msg:' . json_encode($e->getMessage()));
                 return redirect($loginServer . "?service=" . $thisURL);
             }
         } else//没有ticket，说明没有登录，需要重定向到登录服务器
@@ -108,18 +108,25 @@ class HduLogin extends Controller {
      */
     public function getCodeCallback(){
         if (!Request::has('code')){
-            Log::notice('get_wx_code_or_data_failed|params:' . json_encode(Request::all()));
+            Logger::notice('login|get_wx_code_or_data_failed|msg:' . json_encode(Request::all()));
             return redirect(ComConf::HDU_CAS_URL);
         }
         $code = Request::get('code');
         $openid = Wx::getOpenid($code);
         $userInfo = json_decode(Session::get('userInfo'),true);//根据uniqid从redis中取得对应用户的信息
         if (empty($openid) || empty($userInfo)){
-            Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . json_encode($userInfo));
+            Logger::notice('login|get_openid_or_hduInfo_from_session_failed|msg:' . json_encode($userInfo));
             return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
         }
         $data = array_merge(['openid' => $openid],$userInfo);
-        return view('bind',$data);//渲染继续填写信息模板
+        Session::put('userInfo',$data);
+        Session::save();
+        return redirect(ComConf::HOST . '/api/v1/login/geterror');
+    }
+
+    //获取错误的时候要加一个中间跳转
+    public function getError(){
+        return view('bind');
     }
 
     //存储用户信息
