@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use src\Exceptions\OperateFailedException;
+use src\Exceptions\ParamValidateFailedException;
 
 class HduLogin extends Controller {
 
@@ -83,6 +84,8 @@ class HduLogin extends Controller {
                 //模拟Session（laravel的Session有bug获取不到）
                 $uniqid = uniqid();//根据uniqid唯一标识一个用户
 
+                $data['uniqid'] = $uniqid;
+
                 $res = Redis::hset(self::REDIS_GET_HDU_USER_INFO_KEY,$uniqid,json_encode($data));//用户信息存入redis
 
                 if (empty($res)){
@@ -107,25 +110,30 @@ class HduLogin extends Controller {
 
     /**
      * 第一步getCode回调到这里，会传过来一个code，用来获取access_token
-     * @throws \src\Exceptions\OperateFailedException
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws OperateFailedException
+     * @throws ParamValidateFailedException
      */
     public function getCodeCallback(){
         if (!Request::has('code') || !Request::has('state')){
             Log::notice('get_wx_code_or_data_failed|params:' . Request::all());
+            return redirect(ComConf::HDU_CAS_URL);
         }
         $code = Request::get('code');
         $state = Request::get('state');//这个就是uniqid
         $openid = Wx::getOpenid($code);
-        $userInfo = json_decode(Redis::hget(self::REDIS_GET_HDU_USER_INFO_KEY,$state));//根据uniqid从redis中取得对应用户的信息
+        $userInfo = json_decode(Redis::hget(self::REDIS_GET_HDU_USER_INFO_KEY,$state),true);//根据uniqid从redis中取得对应用户的信息
         if (empty($openid) || empty($userInfo)){
             Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . json_encode($userInfo));
             return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
         }
-        $this->saveUserInfo($openid,$userInfo);
+        $data = array_merge(['openid' => $openid],$userInfo);
+        return view('bind',$data);//渲染继续填写信息模板
     }
 
     //存储用户信息
-    private function saveUserInfo($openid,$userInfo){
+    private function saveUserInfo($data){
+
         //用户还要输入一些信息
         //存储数据库
     }
