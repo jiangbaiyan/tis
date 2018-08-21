@@ -11,9 +11,9 @@
 |
 */
 
-Route::group(['prefix' => 'v1'], function () {
+Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
-    Route::group(['prefix' => 'login','middleware' => 'web'],function (){
+    Route::group(['prefix' => 'login'],function (){
 
         //微信公众平台"绑定信息"入口
         Route::get('bind','Login\HduLogin@casLogin');
