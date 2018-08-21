@@ -62,6 +62,8 @@
             color: red;
             margin: 0 auto;
             text-align: center;
+			font-weight: bold;
+			list-style: none;
         }
 	</style>
 </head>

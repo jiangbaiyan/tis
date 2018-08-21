@@ -22,9 +22,9 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
         Route::get('callback','Login\HduLogin@getCodeCallback');
 
         //渲染视图提交路由，进行后续存储操作
-        Route::post('savedata','Login\HduLogin@dealAllData');
+        Route::any('savedata','Login\HduLogin@dealAllData');
 
         //展示错误信息中间页
-        Route::get('geterror','Login\HduLogin@getError');
+        Route::any('geterror','Login\HduLogin@getError');
     });
 });
