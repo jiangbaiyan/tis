@@ -9,11 +9,11 @@ return [
     |
     | The following language lines are used during authentication for various
     | messages that we need to display to the user. You are free to modify
-    | these language lines according to your application's requirements.
+    | these language lines according to your application'HelpOthers requirements.
     |
     */
 
-    'failed' => 'These credentials do not match our records.',
-    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'failed' => '您输入的账号密码不正确，请检查',
+    'throttle' => '请在 :seconds 秒后再次尝试登录',
 
 ];

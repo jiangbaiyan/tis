@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use src\ApiHelper\ApiResponse;
 use src\Exceptions\UnAuthorizedException;
-use Util\Logger\Logger;
+use Util\Logger;
 
 class Handler extends ExceptionHandler
 {

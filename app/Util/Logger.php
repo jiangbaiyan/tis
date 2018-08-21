@@ -6,7 +6,7 @@
  * Time: 14:25
  */
 
-namespace Util\Logger;
+namespace Util;
 use Illuminate\Support\Facades\Log;
 
 class Logger

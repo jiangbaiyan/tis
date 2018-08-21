@@ -9,7 +9,7 @@ namespace App\Http\Model;
 use App\Http\Config\WxConf;
 use src\ApiHelper\ApiRequest;
 use src\Exceptions\OperateFailedException;
-use Util\Logger\Logger;
+use Util\Logger;
 
 class Wx{
 

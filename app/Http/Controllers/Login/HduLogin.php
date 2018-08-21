@@ -12,12 +12,12 @@ use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
 use App\Http\Controller;
 use App\Http\Model\Wx;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
-use Util\Logger\Logger;
+use Util\Logger;
 
 class HduLogin extends Controller {
 
@@ -49,7 +49,7 @@ class HduLogin extends Controller {
 
                 $nodeArr = json_decode(json_encode($validateXML),true);
 
-                if (empty($nodeArr['authenticationSuccess'])){//登录失败
+                if (empty($nodeAuestrr['authenticationSuccess'])){//登录失败
                     Logger::notice('login|get_user_info_from_hdu_api_failed|msg:' . json_encode($validateXML));
                     die('登录失败，杭电官方系统异常，请稍后重试');
                 }
