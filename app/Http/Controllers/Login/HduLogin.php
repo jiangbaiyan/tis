@@ -125,7 +125,7 @@ class HduLogin extends Controller {
     //存储用户信息
     public function dealAllData(){
         $validator = Validator::make(Request::all(),[
-            'email' => 'requied|email',
+            'email' => 'required|email',
             'phone' => 'required|numeric|max:11',
             'dean' => 'required',
             'uniqid' => 'required'
