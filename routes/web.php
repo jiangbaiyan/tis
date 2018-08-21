@@ -21,5 +21,7 @@ Route::group(['prefix' => 'v1'], function () {
         //根据code换取openid回调
         Route::get('callback','Login\HduLogin@getCodeCallback');
 
+        //渲染视图提交路由，进行后续存储操作
+        Route::post('savedata','Login\HduLogin@dealAllData');
     });
 });

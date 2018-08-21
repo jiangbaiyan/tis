@@ -57,10 +57,16 @@
 		select {
 			width: 198px;
 		}
+        .alert{
+            font-size: 18px;
+            color: red;
+            margin: 0 auto;
+            text-align: center;
+        }
 	</style>
 </head>
 <body>
-	<form id="main" method="POST" action="">
+	<form id="main" method="POST" action="{{\App\Http\Config\ComConf::HOST . '/api/v1/login/savedata'}}}}">
 		<h1>请填写您的信息</h1>
 		<br>
 		<label for="phone">联系电话</label>
@@ -69,12 +75,19 @@
 		<input type="text" name="email"><br><br>
 		<label for="dean">辅导员</label>
 		<select type="text" name="dean">
-			<option value="">卞广旭</option>
-			<option value="">冯尉瑾</option>
+			<option value="1">卞广旭</option>
+			<option value="2">冯尉瑾</option>
 		</select>
 		<input type="hidden" name="uniqid" value="{{$uniqid}}">
+        <div class="alert">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
 		<input class="smt" type="submit" value="提交信息">
-		{{csrf_token()}}
+		{{csrf_field()}}
 	</form>
 	<script>
 

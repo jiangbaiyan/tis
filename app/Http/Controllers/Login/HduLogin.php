@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 
@@ -81,7 +82,6 @@ class HduLogin extends Controller {
                     }
                 }
 
-                //模拟Session（laravel的Session有bug获取不到）
                 $uniqid = uniqid();//根据uniqid唯一标识一个用户
 
                 $data['uniqid'] = $uniqid;
@@ -132,9 +132,15 @@ class HduLogin extends Controller {
     }
 
     //存储用户信息
-    private function saveUserInfo($data){
-
-        //用户还要输入一些信息
-        //存储数据库
+    public function dealAllData(){
+        $validator = Validator::make(Request::all(),[
+            'email' => 'requied|email',
+            'phone' => 'required|numeric|max:11',
+            'dean' => 'required',
+            'uniqid' => 'required'
+        ]);
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
     }
 }
