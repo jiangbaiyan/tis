@@ -79,13 +79,15 @@
 			<option value="2">冯尉瑾</option>
 		</select>
 		<input type="hidden" name="uniqid" value="{{$uniqid}}">
-        <div class="alert">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+        @if (count($errors) > 0)
+            <div class="alert">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 		<input class="smt" type="submit" value="提交信息">
 		{{csrf_field()}}
 	</form>
