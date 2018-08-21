@@ -131,7 +131,7 @@ class HduLogin extends Controller {
             'uniqid' => 'required'
         ]);
         if ($validator->fails()){
-            return redirect()->back()->withErrors($validator)->withInput();
+            return back()->withErrors($validator)->withInput();
         }
     }
 }
