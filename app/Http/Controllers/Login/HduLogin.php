@@ -12,7 +12,7 @@ use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
 use App\Http\Controller;
 use App\Http\Model\Wx;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use src\Exceptions\OperateFailedException;
