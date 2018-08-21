@@ -49,7 +49,7 @@ class HduLogin extends Controller {
 
                 $nodeArr = json_decode(json_encode($validateXML),true);
 
-                if (empty($nodeAuestrr['authenticationSuccess'])){//登录失败
+                if (empty($nodeArr['authenticationSuccess'])){//登录失败
                     Logger::notice('login|get_user_info_from_hdu_api_failed|msg:' . json_encode($validateXML));
                     die('登录失败，杭电官方系统异常，请稍后重试');
                 }

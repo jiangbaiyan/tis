@@ -47,7 +47,6 @@ class Handler extends ExceptionHandler
      * @param  \Illuminate\Http\Request $request
      * @param  \Exception $exception
      * @return string
-     * @throws UnAuthorizedException
      */
     public function render($request, Exception $exception)
     {
