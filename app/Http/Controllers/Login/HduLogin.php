@@ -133,7 +133,7 @@ class HduLogin extends Controller {
     public function dealAllData(){
         $validator = Validator::make(Request::all(),[
             'email' => 'required|email',
-            'phone' => 'required|numeric|max:11',
+            'phone' => 'required|numeric',
             'dean' => 'required'
         ]);
         if ($validator->fails()){
