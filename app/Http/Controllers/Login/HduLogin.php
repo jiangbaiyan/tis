@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
-use Util\Logger;
+use App\Util\Logger;
 
 class HduLogin extends Controller {
 

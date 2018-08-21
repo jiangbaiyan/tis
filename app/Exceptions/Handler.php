@@ -7,6 +7,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Log;
 use src\ApiHelper\ApiResponse;
 use src\Exceptions\UnAuthorizedException;
+use App\Util\Logger;
 
 class Handler extends ExceptionHandler
 {
@@ -58,7 +59,7 @@ class Handler extends ExceptionHandler
             'url' => $request->fullUrl(),
             'params' => $request->all(),
         ];
-        Log::channel('daily')->error(json_encode($errArr));
+        Logger::fatal(json_encode($errArr));
         return ApiResponse::response($exception->getCode(),$exception->getMessage());
     }
 }
