@@ -66,7 +66,7 @@
 	</style>
 </head>
 <body>
-	<form id="main" method="POST" action="{{url('/api/v1/login/geterror')}}">
+	<form id="main" method="POST" action="{{url('/api/v1/login/savedata')}}">
 		<h1>请填写您的信息</h1>
 		<br>
 		<label for="phone">联系电话</label>
