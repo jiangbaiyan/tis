@@ -78,7 +78,6 @@
 			<option value="1">卞广旭</option>
 			<option value="2">冯尉瑾</option>
 		</select>
-		<input type="hidden" name="uniqid" value="{{$uniqid}}">
         @if (count($errors) > 0)
             <div class="alert">
                 <ul>
