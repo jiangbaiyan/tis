@@ -13,7 +13,6 @@ use App\Http\Config\WxConf;
 use App\Http\Controller;
 use App\Http\Model\Wx;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -23,7 +22,7 @@ use src\Exceptions\ParamValidateFailedException;
 class HduLogin extends Controller {
 
     //获取微信code URL
-    const GET_WX_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s#wechat_redirect';
+    const GET_WX_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base#wechat_redirect';
 
     const REDIS_GET_HDU_USER_INFO_KEY = 'tis_get_hdu_user_info';
 
@@ -82,17 +81,10 @@ class HduLogin extends Controller {
                     }
                 }
 
-                $uniqid = uniqid();//根据uniqid唯一标识一个用户
+                Session::put('userInfo', $data);
+                Session::save();
 
-                $data['uniqid'] = $uniqid;
-
-                $res = Redis::hset(self::REDIS_GET_HDU_USER_INFO_KEY,$uniqid,json_encode($data));//用户信息存入redis
-
-                if (empty($res)){
-                    Log::notice('hdu_cas_set_user_info_to_redis_failed|data:' . json_encode($data));
-                }
-
-                $redirectUrl = sprintf(self::GET_WX_CODE_URL , WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL) , $uniqid);
+                $redirectUrl = sprintf(self::GET_WX_CODE_URL , WxConf::APPID , urlencode(WxConf::GET_CODE_REDIRECT_URL));
 
                 //跳到微信授权
                 return redirect($redirectUrl);
@@ -115,14 +107,13 @@ class HduLogin extends Controller {
      * @throws ParamValidateFailedException
      */
     public function getCodeCallback(){
-        if (!Request::has('code') || !Request::has('state')){
-            Log::notice('get_wx_code_or_data_failed|params:' . Request::all());
+        if (!Request::has('code')){
+            Log::notice('get_wx_code_or_data_failed|params:' . json_encode(Request::all()));
             return redirect(ComConf::HDU_CAS_URL);
         }
         $code = Request::get('code');
-        $state = Request::get('state');//这个就是uniqid
         $openid = Wx::getOpenid($code);
-        $userInfo = json_decode(Redis::hget(self::REDIS_GET_HDU_USER_INFO_KEY,$state),true);//根据uniqid从redis中取得对应用户的信息
+        $userInfo = json_decode(Session::get('userInfo'),true);//根据uniqid从redis中取得对应用户的信息
         if (empty($openid) || empty($userInfo)){
             Log::notice('get_openid_or_hduInfo_from_session_failed|msg' . json_encode($userInfo));
             return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
