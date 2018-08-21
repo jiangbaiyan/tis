@@ -88,7 +88,6 @@
             </div>
         @endif
 		<input class="smt" type="submit" value="提交信息">
-		@csrf
 	</form>
 	<script>
 
