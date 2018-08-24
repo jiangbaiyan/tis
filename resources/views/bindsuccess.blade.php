@@ -52,7 +52,6 @@
 			margin: 50px auto;
 			color: #fff;
 			position: relative;
-			display: none;
 			border: none;
 			background-color: #55acee;
 		}
@@ -63,7 +62,11 @@
 		<h1>您的信息已绑定成功</h1>
 		<br>
 		<div class="item">
-			<span class="key">学号/工号</span>
+			@if (strlen($data->uid) == 5)
+				<span class="key">工号</span>
+			@else
+				<span class="key">学号</span>
+			@endif
 			<span class="val">{{$data->uid}}</span>
 		</div>
 		<div class="item">
@@ -94,30 +97,15 @@
 		<button id="back" class="back" onclick="back()">返回上一页面</button>
 	</div>
 	<script>
-		var param;
 		var token;
 		token = document.getElementById('token').value;
         localStorage.setItem("token", token);//token存到本地，每次请求接口携带
-		function getParam(url) {
-			var search = (typeof url !== 'undefined') 
-				? url.slice(url.indexOf('?') + 1)
-				: location.search.substring(1);
-			if (!search) 
-				return false;
-			return JSON.parse('{"' + decodeURI(search)
-				.replace(/"/g, '\\"')
-				.replace(/&/g, '","')
-				.replace(/=/g,'":"') + '"}');
-		}
-		function back() {
-			location.href = decodeURI(param.backurl) + (param.id ? '?id=' + param.id : '');
-		}
-		document.addEventListener("DOMContentLoaded", function(event) { 
-			param = getParam();
-			if (param && param.backurl) {
-				document.getElementById('back').style.display = 'block';
-			}
-		});
+
+        var returnBtn = document.getElementById('back');
+
+        returnBtn.onclick = function () {
+			location.href = "https://teacher.cloudshm.com";
+        };
 	</script>
 </body>
 </html>

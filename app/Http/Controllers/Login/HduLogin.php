@@ -192,8 +192,8 @@ class HduLogin extends Controller {
                 if (empty($res)){//第一次注册
                     $res = Student::create($data);
                 } else{
-                    Student::update($data);//已注册，更新数据，返回更新后的数据
-                    $res = Student::where('uid',$data['uid'])->first();
+                    $res->update($data);//已注册，更新数据，返回更新后的数据
+                    $res = Student::where('uid',$data['uid'])->first();//再查出新数据
                 }
                 break;
             case 2://研究生
@@ -202,7 +202,7 @@ class HduLogin extends Controller {
                 if (empty($res)){
                     $res = Graduate::create($data);
                 }else{
-                    Graduate::update($data);
+                    $res->update($data);
                     $res = Graduate::where('uid',$data['uid'])->first();
                 }
                 break;
@@ -212,7 +212,7 @@ class HduLogin extends Controller {
                 if (empty($res)){
                     $res = Teacher::create($data);
                 }else{
-                    Teacher::update($data);
+                    $res->update($data);
                     $res = Teacher::where('uid',$data['uid'])->first();
                 }
                 break;
