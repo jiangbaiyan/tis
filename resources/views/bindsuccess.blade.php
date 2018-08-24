@@ -49,7 +49,7 @@
 			padding: 12px 16px;
 			font-size: 18px;
 			text-decoration: none;
-			margin: 0 auto;
+			margin: 20px 0 0 40px;
 			color: #fff;
 			position: relative;
 			border: none;
