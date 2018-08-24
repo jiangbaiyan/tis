@@ -9,6 +9,7 @@
         "baiyan/helper": "dev-master",
         "barryvdh/laravel-ide-helper": "^2.4",
         "fideloper/proxy": "^4.0",
+        "firebase/php-jwt": "^5.0",
         "laravel/framework": "5.6.*",
         "laravel/tinker": "^1.0",
         "predis/predis": "^1.1"

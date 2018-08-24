@@ -15,6 +15,8 @@ use App\Http\Model\Common\Wx;
 use App\Http\Model\Graduate;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
+use Firebase\JWT\JWT;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -85,17 +87,10 @@ class HduLogin extends Controller {
                     }
                 }
 
-                //PC端，只有教师才有入口
+                //教师PC端，且未登录
                 if (!Wx::isFromWx()){
-                    Teacher::updateOrCreate(['uid' => $data['uid']],[
-                        'uid' => $data['uid'],
-                        'name' => $data['name'],
-                        'sex' => $data['sex'],
-                        'unit' => $data['unit']
-                    ]);
-
-                    //下发token，跳到首页
-                    return redirect(self::PC_INDEX_URL);
+                    $res = $this->updateOrInsertAndSetToken($data);
+                    return view('pcsettoken',['data' => $res]);
                 }
 
                 Session::put('userInfo', json_encode($data));
@@ -152,18 +147,18 @@ class HduLogin extends Controller {
     }
 
 
-    //存储微信端用户信息
+    //存储微信端用户信息，渲染绑定成功页面
     public function dealAllData(){
         $validator = Validator::make(Request::all(),[
             'email' => 'required|email',
-            'phone' => 'required|numeric',
-            'dean' => 'required'
+            'phone' => 'required|numeric'
         ]);
         if ($validator->fails()){
             return back()->withErrors($validator)->withInput();
         }
         $userInfo = json_decode(Session::get('userInfo'),true);
         if (empty($userInfo)){
+            Logger::notice('login|user_session_expired|msg:' . json_encode($userInfo));
             return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
         }
         $data = [];
@@ -178,20 +173,55 @@ class HduLogin extends Controller {
         !empty($userInfo['class']) && $data['class'] = $userInfo['class'];
         !empty($userInfo['class']) && $data['grade'] = '20' . substr($userInfo['class'],0,2);
 
-        print_r($data);exit;
-        switch ($userInfo['idType']){
-            case 1://本科生
-                $res = Student::create($data);
-                break;
-            case 2://研究生
-                $res = Graduate::create($data);
-                break;
-            default:
-                $res = Teacher::create($data);
-                break;
-        }
+        $res = $this->updateOrInsertAndSetToken($data);
 
         Logger::notice('login|user_wx_bind_result|msg:' . json_encode($res));
-        die('信息绑定成功');
+
+        return view('bindsuccess',['data' => $res]);
     }
+
+
+    //插入或更新信息，并返回模型
+    private function updateOrInsertAndSetToken($data){
+        switch ($data){
+            case 1://本科生
+                $res = Student::where('uid',$data['uid'])->first()->toArray();
+                if (empty($res)){//第一次注册
+                    $res = Student::create($data)->toArray();
+                } else{
+                    Student::update($data);//已注册，更新数据，返回更新后的数据
+                    $res = Student::where('uid',$data['uid'])->first()->toArray();
+                }
+                break;
+            case 2://研究生
+                $res = Graduate::where('uid',$data['uid'])->first()->toArray();
+                if (empty($res)){
+                    $res = Graduate::create($data)->toArray();
+                }else{
+                    Graduate::update($data);
+                    $res = Graduate::where('uid',$data['uid'])->first()->toArray();
+                }
+                break;
+            default:
+                $res = Teacher::where('uid',$data['uid'])->first()->toArray();
+                if (empty($res)){
+                    $res = Teacher::create($data)->toArray();
+                }else{
+                    Teacher::update($data);
+                    $res = Teacher::where('uid',$data['uid'])->first()->toArray();
+                }
+                break;
+        }
+        $res['token'] = $this->setToken($res);
+        return $res;
+    }
+
+    private function setToken($data){
+        $token = JWT::encode(env('JWT_KEY'),$data);
+        Redis::set($data['uid'],$token);
+        Redis::expire($data['uid'],2678400);
+        return $token;
+    }
+
 }
+
