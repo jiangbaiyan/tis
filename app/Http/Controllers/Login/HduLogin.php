@@ -185,8 +185,9 @@ class HduLogin extends Controller {
 
     //插入或更新信息，并返回模型
     private function updateOrInsertAndSetToken($data){
-        switch ($data){
+        switch ($data['idType']){
             case 1://本科生
+                unset($data['idType']);
                 $res = Student::where('uid',$data['uid'])->first();
                 if (empty($res)){//第一次注册
                     $res = Student::create($data);
@@ -196,6 +197,7 @@ class HduLogin extends Controller {
                 }
                 break;
             case 2://研究生
+                unset($data['idType']);
                 $res = Graduate::where('uid',$data['uid'])->first();
                 if (empty($res)){
                     $res = Graduate::create($data);
@@ -205,6 +207,7 @@ class HduLogin extends Controller {
                 }
                 break;
             default:
+                unset($data['idType']);
                 $res = Teacher::where('uid',$data['uid'])->first();
                 if (empty($res)){
                     $res = Teacher::create($data);
