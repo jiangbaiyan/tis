@@ -14,5 +14,9 @@ class Teacher extends Model{
 
     protected $guarded = [];
 
-
+    public static $deanMapping = [
+        1 => '卞广旭',
+        2 => '冯尉瑾',
+        3 => '袁理锋'
+    ];
 }

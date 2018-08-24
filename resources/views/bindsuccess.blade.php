@@ -80,17 +80,17 @@
 			</div>
 		@endif
 		<div class="item">
-			<span class="key">手机号</span>
+			<span class="key">手机</span>
 			<span class="val">{{$data->phone}}</span>
 		</div>
 		<div class="item">
 			<span class="key">邮箱</span>
 			<span class="val">{{$data->email}}</span>
 		</div>
-		@if (!empty($data->dean))
+		@if (!empty($data->teacher_id))
 			<div class="item">
 				<span class="key">辅导员</span>
-				<span class="val">{{$data->dean}}</span>
+				<span class="val">{{\App\Http\Model\Teacher::$deanMapping[$data->teacher_id]}}</span>
 			</div>
 		@endif
 		<input id="token" type="hidden" value="{{$data->token}}">
