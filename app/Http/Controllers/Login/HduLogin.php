@@ -165,11 +165,13 @@ class HduLogin extends Controller {
         $data['uid'] = $userInfo['uid'];
         $data['openid'] = $userInfo['openid'];
         $data['sex'] = $userInfo['sex'];
+        $data['name'] = $userInfo['name'];
         $data['unit'] = $userInfo['unit'];
+        $data['idType'] = $userInfo['idType'];
         $data['email'] = Request::get('email');
         $data['phone'] = Request::get('phone');
 
-        Request::get('dean') && $data['dean'] = Request::get('dean');//教师没有辅导员
+        Request::get('dean') && $data['teacher_id'] = Request::get('dean');//教师没有辅导员
         !empty($userInfo['class']) && $data['class'] = $userInfo['class'];
         !empty($userInfo['class']) && $data['grade'] = '20' . substr($userInfo['class'],0,2);
 
