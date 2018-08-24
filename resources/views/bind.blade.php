@@ -15,6 +15,7 @@
 			width: 340px;
 			padding: 15px;
 			margin: auto;
+			list-style-type: none;
 		}
 		h1 {
 			margin-top: 80px;
@@ -63,7 +64,6 @@
             margin: 0 auto;
             text-align: center;
 			font-weight: 400;
-			list-style: none;
         }
 	</style>
 </head>
