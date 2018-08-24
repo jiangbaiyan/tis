@@ -185,34 +185,34 @@ class HduLogin extends Controller {
     private function updateOrInsertAndSetToken($data){
         switch ($data){
             case 1://本科生
-                $res = Student::where('uid',$data['uid'])->first()->toArray();
+                $res = Student::where('uid',$data['uid'])->first();
                 if (empty($res)){//第一次注册
-                    $res = Student::create($data)->toArray();
+                    $res = Student::create($data);
                 } else{
                     Student::update($data);//已注册，更新数据，返回更新后的数据
-                    $res = Student::where('uid',$data['uid'])->first()->toArray();
+                    $res = Student::where('uid',$data['uid'])->first();
                 }
                 break;
             case 2://研究生
-                $res = Graduate::where('uid',$data['uid'])->first()->toArray();
+                $res = Graduate::where('uid',$data['uid'])->first();
                 if (empty($res)){
-                    $res = Graduate::create($data)->toArray();
+                    $res = Graduate::create($data);
                 }else{
                     Graduate::update($data);
-                    $res = Graduate::where('uid',$data['uid'])->first()->toArray();
+                    $res = Graduate::where('uid',$data['uid'])->first();
                 }
                 break;
             default:
-                $res = Teacher::where('uid',$data['uid'])->first()->toArray();
+                $res = Teacher::where('uid',$data['uid'])->first();
                 if (empty($res)){
-                    $res = Teacher::create($data)->toArray();
+                    $res = Teacher::create($data);
                 }else{
                     Teacher::update($data);
-                    $res = Teacher::where('uid',$data['uid'])->first()->toArray();
+                    $res = Teacher::where('uid',$data['uid'])->first();
                 }
                 break;
         }
-        $res['token'] = $this->setToken($res);
+        $res->token = $this->setToken($res);
         return $res;
     }
 
