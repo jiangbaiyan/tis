@@ -59,10 +59,10 @@
 		}
         .alert{
             font-size: 18px;
-            color: red;
+            color: #ff3333;
             margin: 0 auto;
             text-align: center;
-			font-weight: bold;
+			font-weight: 400;
 			list-style: none;
         }
 	</style>
@@ -75,11 +75,14 @@
 		<input type="text" name="phone" value="{{old('phone')}}"><br><br>
 		<label for="email">电子邮箱</label>
 		<input type="text" name="email" value="{{old('email')}}"><br><br>
-		<label for="dean">辅导员</label>
-		<select type="text" name="dean">
-			<option value="1">卞广旭</option>
-			<option value="2">冯尉瑾</option>
-		</select>
+		@if ($idType == 1 || $idType == 2)
+			<label for="dean">辅导员</label>
+			<select type="text" name="dean">
+				<option value="1">卞广旭</option>
+				<option value="2">冯尉瑾</option>
+				<option value="3">袁理锋</option>
+			</select>
+		@endif
         @if (count($errors) > 0)
             <div class="alert">
                 <ul>
@@ -91,8 +94,5 @@
         @endif
 		<input class="smt" type="submit" value="提交信息">
 	</form>
-	<script>
-
-	</script>
 </body>
 </html>

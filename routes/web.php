@@ -25,6 +25,6 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
         Route::any('savedata','Login\HduLogin@dealAllData');
 
         //展示错误信息中间页
-        Route::any('geterror','Login\HduLogin@getError');
+        Route::any('geterror','Login\HduLogin@getErrorAndDispatch');
     });
 });

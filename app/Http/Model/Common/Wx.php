@@ -5,7 +5,7 @@
  * Date: 2018/8/18
  * Time: 16:03
  */
-namespace App\Http\Model;
+namespace App\Http\Model\Common;
 use App\Http\Config\WxConf;
 use src\ApiHelper\ApiRequest;
 use src\Exceptions\OperateFailedException;
@@ -28,5 +28,11 @@ class Wx{
         }
         $openid = $res['openid'];
         return $openid;
+    }
+
+    //判断客户端类型
+    public static function isFromWx(){
+        return strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false
+            ? true : false;
     }
 }

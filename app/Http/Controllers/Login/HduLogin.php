@@ -11,34 +11,36 @@ namespace App\Http\Controllers\Login;
 use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
 use App\Http\Controller;
-use App\Http\Model\Wx;
+use App\Http\Model\Common\Wx;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 use App\Util\Logger;
+use Teacher;
 
 class HduLogin extends Controller {
 
     //获取微信code URL
     const GET_WX_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base#wechat_redirect';
 
-    const REDIS_GET_HDU_USER_INFO_KEY = 'tis_get_hdu_user_info';
+    const LOGIN_SERVER = 'http://cas.hdu.edu.cn/cas/login';
+
+    const VALIDATE_SERVER = 'http://cas.hdu.edu.cn/cas/serviceValidate';
+
+    const THIS_URL = ComConf::HOST . '/api/v1/login/bind';
+
+    const PC_INDEX_URL = 'www.baidu.com';
 
     //杭电CAS登录页
     public function casLogin(){
-        $loginServer = "http://cas.hdu.edu.cn/cas/login";
-        //杭电CAS Server的验证URL
-        $validateServer = "http://cas.hdu.edu.cn/cas/serviceValidate";
-
-        $thisURL = ComConf::HOST . "/api/v1/login/bind";
 
         //判断是否已经登录，如果ticket为空，则未登录
         if (!empty($_REQUEST["ticket"])) {
             //获取登录后的返回信息
             try {//认证ticket
-                $validateurl = $validateServer . "?ticket=" . $_REQUEST["ticket"] . "&service=" . $thisURL;
+                $validateurl = self::VALIDATE_SERVER . "?ticket=" . $_REQUEST["ticket"] . "&service=" . self::THIS_URL;
 
                 $validateResult = file_get_contents($validateurl);
 
@@ -81,6 +83,19 @@ class HduLogin extends Controller {
                     }
                 }
 
+                //PC端，只有教师才有入口
+                if (!Wx::isFromWx()){
+                    Teacher::updateOrCreate(['uid' => $data['uid']],[
+                        'uid' => $data['uid'],
+                        'name' => $data['name'],
+                        'sex' => $data['sex'],
+                        'unit' => $data['unit']
+                    ]);
+
+                    //下发token，跳到首页
+                    return redirect(self::PC_INDEX_URL);
+                }
+
                 Session::put('userInfo', json_encode($data));
                 Session::save();
 
@@ -92,11 +107,11 @@ class HduLogin extends Controller {
             }
             catch (\Exception $e) {
                 Logger::notice('login|get_user_info_from_hdu_api_failed|msg:' . json_encode($e->getMessage()));
-                return redirect($loginServer . "?service=" . $thisURL);
+                return redirect(self::LOGIN_SERVER . "?service=" .self::THIS_URL);
             }
         } else//没有ticket，说明没有登录，需要重定向到登录服务器
         {
-            return redirect($loginServer . "?service=" . $thisURL);
+            return redirect(self::LOGIN_SERVER . "?service=" .self::THIS_URL);
         }
     }
 
@@ -119,15 +134,18 @@ class HduLogin extends Controller {
             return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
         }
         $data = array_merge(['openid' => $openid],$userInfo);
-        Session::put('userInfo',$data);
+        Session::put('userInfo',json_encode($data));
         Session::save();
         return redirect(ComConf::HOST . '/api/v1/login/geterror');
     }
 
+
     //获取错误的时候要加一个中间跳转
-    public function getError(){
-        return view('bind');
+    public function getErrorAndDispatch(){
+        $idType = json_decode(Session::get('userInfo'),true)['idType'];
+        return view('bind',compact('idType'));
     }
+
 
     //存储用户信息
     public function dealAllData(){
@@ -139,5 +157,10 @@ class HduLogin extends Controller {
         if ($validator->fails()){
             return back()->withErrors($validator)->withInput();
         }
+        $userInfo = json_decode(Session::get('userInfo'),true);
+        if (empty($userInfo)){
+            return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
+        }
+
     }
 }
