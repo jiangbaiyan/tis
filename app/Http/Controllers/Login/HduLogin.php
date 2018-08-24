@@ -12,13 +12,15 @@ use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
 use App\Http\Controller;
 use App\Http\Model\Common\Wx;
+use App\Http\Model\Graduate;
+use App\Http\Model\Student;
+use App\Http\Model\Teacher;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 use App\Util\Logger;
-use Teacher;
 
 class HduLogin extends Controller {
 
@@ -78,7 +80,7 @@ class HduLogin extends Controller {
                             $data['unit'] = $attribute['@attributes']['value'];
                             break;
                         case 'classid'://班级号
-                            $data['classNum'] = $attribute['@attributes']['value'];
+                            $data['class'] = $attribute['@attributes']['value'];
                             break;
                     }
                 }
@@ -143,11 +145,14 @@ class HduLogin extends Controller {
     //获取错误的时候要加一个中间跳转
     public function getErrorAndDispatch(){
         $idType = json_decode(Session::get('userInfo'),true)['idType'];
+        if (empty($idType)){
+            Logger::notice('login|get_idtype_from_session_failed|msg:' . json_encode($idType));
+        }
         return view('bind',compact('idType'));
     }
 
 
-    //存储用户信息
+    //存储微信端用户信息
     public function dealAllData(){
         $validator = Validator::make(Request::all(),[
             'email' => 'required|email',
@@ -161,6 +166,33 @@ class HduLogin extends Controller {
         if (empty($userInfo)){
             return redirect(ComConf::HDU_CAS_URL);//session过期，重新登录
         }
+        $data = [];
+        $data['uid'] = $userInfo['uid'];
+        $data['openid'] = $userInfo['openid'];
+        $data['sex'] = $userInfo['sex'];
+        $data['unit'] = $userInfo['unit'];
+        $data['email'] = $userInfo['email'];
+        $data['phone'] = $userInfo['phone'];
 
+        Request::get('dean') && $data['dean'] = Request::get('dean');
+        !empty($userInfo['class'])
+            && $data['class'] = $userInfo['class']
+            && $data['grade'] = substr($userInfo['class'],0,2);
+
+        print_r($data);exit;
+        switch ($userInfo['idType']){
+            case 1://本科生
+                $res = Student::create($data);
+                break;
+            case 2://研究生
+                $res = Graduate::create($data);
+                break;
+            default:
+                $res = Teacher::create($data);
+                break;
+        }
+
+        Logger::notice('login|user_wx_bind_result|msg:' . json_encode($res));
+        die('信息绑定成功');
     }
 }
