@@ -175,9 +175,8 @@ class HduLogin extends Controller {
         $data['phone'] = Request::get('phone');
 
         Request::get('dean') && $data['dean'] = Request::get('dean');//教师没有辅导员
-        !empty($userInfo['class'])//班号可能也为空
-            && $data['class'] = $userInfo['class']
-            && $data['grade'] = substr($userInfo['class'],0,2);
+        !empty($userInfo['class']) && $data['class'] = $userInfo['class'];
+        !empty($userInfo['class']) && $data['grade'] = '20' . substr($userInfo['class'],0,2);
 
         print_r($data);exit;
         switch ($userInfo['idType']){
