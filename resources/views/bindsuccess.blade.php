@@ -93,10 +93,6 @@
 				<span class="val">{{\App\Http\Model\Teacher::$deanMapping[$data->teacher_id]}}</span>
 			</div>
 		@endif
-		<div class="item">
-			<span class="key">学院</span>
-			<span class="val">{{$data->unit}}</span>
-		</div>
 		<input id="token" type="hidden" value="{{$data->token}}">
 		<button id="back" class="back" onclick="back()">返回首页</button>
 	</div>
