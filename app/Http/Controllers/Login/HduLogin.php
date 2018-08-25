@@ -205,7 +205,7 @@ class HduLogin extends Controller {
                     $res = Graduate::where('uid',$data['uid'])->first();
                 }
                 break;
-            default:
+            default://教师
                 unset($data['idType']);
                 unset($data['class']);
                 $res = Teacher::where('uid',$data['uid'])->first();

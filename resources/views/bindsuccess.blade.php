@@ -62,16 +62,16 @@
 		<h1>您的信息已绑定成功</h1>
 		<br>
 		<div class="item">
+			<span class="key">姓名</span>
+			<span class="val">{{$data->name}}</span>
+		</div>
+		<div class="item">
 			@if (strlen($data->uid) == 5)
 				<span class="key">工号</span>
 			@else
 				<span class="key">学号</span>
 			@endif
 			<span class="val">{{$data->uid}}</span>
-		</div>
-		<div class="item">
-			<span class="key">姓名</span>
-			<span class="val">{{$data->name}}</span>
 		</div>
 		@if (!empty($data->class))
 			<div class="item">
@@ -93,6 +93,10 @@
 				<span class="val">{{\App\Http\Model\Teacher::$deanMapping[$data->teacher_id]}}</span>
 			</div>
 		@endif
+		<div class="item">
+			<span class="key">学院</span>
+			<span class="val">{{$data->unit}}</span>
+		</div>
 		<input id="token" type="hidden" value="{{$data->token}}">
 		<button id="back" class="back" onclick="back()">返回首页</button>
 	</div>
