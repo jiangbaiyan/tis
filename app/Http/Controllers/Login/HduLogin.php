@@ -207,6 +207,7 @@ class HduLogin extends Controller {
                 break;
             default:
                 unset($data['idType']);
+                unset($data['class']);
                 $res = Teacher::where('uid',$data['uid'])->first();
                 if (empty($res)){
                     $res = Teacher::create($data);
