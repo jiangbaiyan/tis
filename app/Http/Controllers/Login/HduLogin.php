@@ -35,7 +35,6 @@ class HduLogin extends Controller {
 
     const THIS_URL = ComConf::HOST . '/api/v1/login/bind';
 
-    const PC_INDEX_URL = 'www.baidu.com';
 
     //杭电CAS登录页
     public function casLogin(){

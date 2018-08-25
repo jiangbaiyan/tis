@@ -94,7 +94,7 @@
 			</div>
 		@endif
 		<input id="token" type="hidden" value="{{$data->token}}">
-		<button id="back" class="back" onclick="back()">返回上一页面</button>
+		<button id="back" class="back" onclick="back()">返回首页</button>
 	</div>
 	<script>
 		var token;
