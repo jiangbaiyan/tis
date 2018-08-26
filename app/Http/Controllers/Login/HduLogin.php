@@ -86,10 +86,10 @@ class HduLogin extends Controller {
                     }
                 }
 
-                //教师PC端，且未登录
+                //教师PC端
                 if (!Wx::isFromWx()){
                     $res = $this->updateOrInsertAndSetToken($data);
-                    return view('pcsettoken',['data' => $res]);
+                    return view('pcsettoken',['data' => $res->token]);
                 }
 
                 Session::put('userInfo', json_encode($data));
@@ -170,7 +170,7 @@ class HduLogin extends Controller {
         $data['email'] = Request::get('email');
         $data['phone'] = Request::get('phone');
 
-        Request::get('dean') && $data['teacher_id'] = Request::get('dean');//教师没有辅导员
+        Request::get('instructor') && $data['teacher_id'] = Request::get('instructor');//教师没有辅导员
         !empty($userInfo['class']) && $data['class'] = $userInfo['class'];
         !empty($userInfo['class']) && $data['grade'] = '20' . substr($userInfo['class'],0,2);
 
@@ -221,6 +221,7 @@ class HduLogin extends Controller {
         return $res;
     }
 
+    //设置token
     private function setToken($data){
         $token = JWT::encode(env('JWT_KEY'),$data);
         Redis::set($data['uid'],$token);

@@ -90,7 +90,7 @@
 		@if (!empty($data->teacher_id))
 			<div class="item">
 				<span class="key">辅导员</span>
-				<span class="val">{{\App\Http\Model\Teacher::$deanMapping[$data->teacher_id]}}</span>
+				<span class="val">{{\App\Http\Model\Teacher::$instructorMapping[$data->teacher_id]}}</span>
 			</div>
 		@endif
 		<input id="token" type="hidden" value="{{$data->token}}">
@@ -104,7 +104,7 @@
         var returnBtn = document.getElementById('back');
 
         returnBtn.onclick = function () {
-			location.href = "https://teacher.cloudshm.com";
+			location.href = "https://teacher.cloudshm.com/client";
         };
 	</script>
 </body>

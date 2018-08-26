@@ -78,8 +78,8 @@
 		<label for="email">电子邮箱</label>
 		<input type="text" name="email" value="{{old('email')}}"><br><br>
 		@if ($idType == 1 || $idType == 2)
-			<label for="dean">辅导员</label>
-			<select type="text" name="dean">
+			<label for="instructor">辅导员</label>
+			<select type="text" name="instructor">
 				<option value="1">卞广旭</option>
 				<option value="2">冯尉瑾</option>
 				<option value="3">袁理锋</option>

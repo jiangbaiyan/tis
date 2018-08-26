@@ -9,7 +9,7 @@
     var token;
     token = document.getElementById('token').value;
     localStorage.setItem("token", token);//token存到本地，每次请求接口携带
-    location.href = "https://www.baidu.com";//TODO:待修改为PC首页
+    location.href = "https://teacher.cloudshm.com/manager";
 </script>
 </body>
 </html>
