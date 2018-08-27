@@ -73,10 +73,22 @@
 			@endif
 			<span class="val">{{$data->uid}}</span>
 		</div>
+		@if (!empty($data->grade))
+			<div class="item">
+				<span class="key">年级</span>
+				<span class="val">{{$data->grade}}</span>
+			</div>
+		@endif
 		@if (!empty($data->class))
 			<div class="item">
 				<span class="key">班级</span>
 				<span class="val">{{$data->class}}</span>
+			</div>
+		@endif
+		@if (!empty($data->major))
+			<div class="item">
+				<span class="key">专业</span>
+				<span class="val">{{$data->major}}</span>
 			</div>
 		@endif
 		<div class="item">
