@@ -7,6 +7,7 @@
  */
 namespace App\Http\Model\Common;
 
+use App\Http\Model\Student;
 use Illuminate\Support\Facades\Session;
 
 class User{
@@ -18,6 +19,7 @@ class User{
      */
     public static function getUser(){
         $user = Session::get('user');
+        //$user = Student::find(1);
         if (empty($user)){
             throw new \src\Exceptions\UnAuthorizedException();
         }

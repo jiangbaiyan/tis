@@ -148,7 +148,7 @@ class HduLogin extends Controller {
 
     //存储微信端用户信息，渲染绑定成功页面
     public function dealAllData(){
-        $validator = Validator::make(Request::all(),[
+        $validator = Validator::make($params = Request::all(),[
             'email' => 'required|email',
             'phone' => 'required|numeric'
         ]);
@@ -167,10 +167,10 @@ class HduLogin extends Controller {
         $data['name'] = $userInfo['name'];
         $data['unit'] = $userInfo['unit'];
         $data['idType'] = $userInfo['idType'];
-        $data['email'] = Request::get('email');
-        $data['phone'] = Request::get('phone');
+        $data['email'] = $params['email'];
+        $data['phone'] = $params['phone'];
 
-        Request::get('instructor') && $data['teacher_id'] = Request::get('instructor');//教师没有辅导员
+        $params['instructor'] && $data['teacher_id'] = $params['instructor'];//教师没有辅导员
         if (!empty($userInfo['class'])){
             $data['class'] = $userInfo['class'];
             $data['grade'] = '20' . substr($userInfo['class'],0,2);

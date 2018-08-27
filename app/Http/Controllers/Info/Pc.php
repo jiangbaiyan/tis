@@ -8,10 +8,15 @@
 namespace App\Http\Controllers\Info;
 use App\Http\Controller;
 use App\Http\Model\Common\User;
+use App\Http\Model\Common\Wx;
 use App\Http\Model\Graduate;
+use App\Http\Model\Info\Info;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
+use src\Exceptions\ParamValidateFailedException;
 use src\Exceptions\PermissionDeniedException;
 
 class Pc extends Controller{
@@ -29,8 +34,7 @@ class Pc extends Controller{
         if ($infoAuthState != Teacher::INSTRUCTOR && $infoAuthState != Teacher::DEAN){
             throw new PermissionDeniedException();
         }
-        $student = Student::select('id', 'uid', 'name',
-            'major','grade', 'class')->get();
+        $student = Student::select('id', 'uid', 'name', 'major', 'grade', 'class')->get();
         $grade = $student->groupBy('grade');
         $class = $student->groupBy('class');
         $major = $student->groupBy('major');
@@ -50,5 +54,21 @@ class Pc extends Controller{
         }
         return ApiResponse::responseSuccess($resData);
     }
+
+
+    //发送通知
+    public function sendInfo(){
+        $validator = Validator::make($params = Request::all(),[
+            'title' => 'required',
+            'content' => 'required',
+            'type' => 'numeric|required'
+        ]);
+        if ($validator->fails()){
+            throw new ParamValidateFailedException($validator);
+        }
+        $infoObjects = Info::getInfoObject($params['type'],$params['target']);
+        Wx::sendModelInfo($infoObjects,$params['title'],$params['content']);
+    }
+
 }
 

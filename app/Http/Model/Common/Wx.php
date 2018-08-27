@@ -35,4 +35,11 @@ class Wx{
         return strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false
             ? true : false;
     }
+
+    //发送微信模板消息
+    public static function sendModelInfo($target,$title,$content){
+        foreach ($target as $item){
+
+        }
+    }
 }

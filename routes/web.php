@@ -27,13 +27,15 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
         //展示错误信息中间页
         Route::any('geterror','Login\HduLogin@getErrorAndDispatch');
     });
-
     Route::group(['middleware' => 'checkLogin'],function (){
 
-        Route::group(['middleware' => 'info'],function (){
+        Route::group(['prefix' => 'info'],function (){
 
             //获取通知对象
             Route::get('getInfoTargets','Info\Pc@getInfoTargets');
+
+            //发送通知
+            Route::post('sendInfo','Info\Pc@sendInfo');
 
         });
 
