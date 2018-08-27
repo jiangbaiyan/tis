@@ -171,8 +171,11 @@ class HduLogin extends Controller {
         $data['phone'] = Request::get('phone');
 
         Request::get('instructor') && $data['teacher_id'] = Request::get('instructor');//教师没有辅导员
-        !empty($userInfo['class']) && $data['class'] = $userInfo['class'];
-        !empty($userInfo['class']) && $data['grade'] = '20' . substr($userInfo['class'],0,2);
+        if (!empty($userInfo['class'])){
+            $data['class'] = $userInfo['class'];
+            $data['grade'] = '20' . substr($userInfo['class'],0,2);
+            $data['major'] = Student::$majorMapping[substr($userInfo['class'],4,2)];
+        }
 
         $res = $this->updateOrInsertAndSetToken($data);
 
@@ -207,7 +210,6 @@ class HduLogin extends Controller {
                 break;
             default://教师
                 unset($data['idType']);
-                unset($data['class']);
                 $res = Teacher::where('uid',$data['uid'])->first();
                 if (empty($res)){
                     $res = Teacher::create($data);

@@ -23,6 +23,7 @@ class CreateStudentTable extends Migration
             $table->string('email',32)->default('')->comment('邮箱');
             $table->string('unit',32)->default('')->comment('学院');
             $table->unsignedsmallInteger('grade')->default('0')->comment('年级');
+            $table->string('major',64)->default('')->comment('专业');
             $table->unsignedInteger('class')->default('0')->comment('班号');
             $table->mediumInteger('teacher_id')->default('0')->comment('辅导员id');
             $table->unique('uid');

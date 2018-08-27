@@ -14,5 +14,10 @@ class Student extends Model{
 
     protected $guarded = [];
 
-
+    public static $majorMapping = [
+        '24' => '网络工程',
+        '36' => '信息安全',
+        '02' => '信息安全（卓越工程师计划）',
+        '01' => '网络空间安全类'
+    ];
 }
