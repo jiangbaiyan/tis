@@ -89,7 +89,7 @@ class HduLogin extends Controller {
                 //教师PC端
                 if (!Wx::isFromWx()){
                     $res = $this->updateOrInsertAndSetToken($data);
-                    return view('pcsettoken',['data' => $res->token]);
+                    return view('pcsettoken',['token' => $res->token]);
                 }
 
                 Session::put('userInfo', json_encode($data));

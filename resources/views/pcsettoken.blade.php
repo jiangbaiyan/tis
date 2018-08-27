@@ -4,7 +4,7 @@
     <title>网安信息平台</title>
 </head>
 <body>
-<input id="token" type="hidden" value="{{$data->token}}">
+<input id="token" type="hidden" value="{{$token}}">
 <script>
     var token;
     token = document.getElementById('token').value;
