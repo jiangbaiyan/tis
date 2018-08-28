@@ -43,19 +43,19 @@ class Info extends Model {
             $midRes = $studentMdl->select('id','openid','uid','name');
             switch ($type){
                 case self::TYPE_GRADUATE_GRADE:
-                    $res = $midRes->whereIn('grade',explode(' ',$target))->get();
+                    $res = $midRes->whereIn('grade',explode(' ',$target))->get()->toArray();
                     break;
                 case self::TYPE_STUDENT_CLASS:
-                    $res = $midRes->whereIn('class',explode(' ',$target))->get();
+                    $res = $midRes->whereIn('class',explode(' ',$target))->get()->toArray();
                     break;
                 case self::TYPE_STUDENT_MAJOR:
-                    $res = $midRes->whereIn('major',explode(' ',$target))->get();
+                    $res = $midRes->whereIn('major',explode(' ',$target))->get()->toArray();
                     break;
                 case self::TYPE_STUDENT_SPEC:
-                    $res = $midRes->whereIn('uid',explode(' ',$target))->get();
+                    $res = $midRes->whereIn('uid',explode(' ',$target))->get()->toArray();
                     break;
                 case self::TYPE_STUDENT_ALL:
-                    $res = $midRes->get();
+                    $res = $midRes->get()->toArray();
                     break;
             }
         } else if ($type >= self::TYPE_GRADUATE_GRADE && $type <= self::TYPE_GRADUATE_ALL){
@@ -63,13 +63,13 @@ class Info extends Model {
             $midRes = $graduateMdl->select('id','openid','uid','name');
             switch ($type){
                 case self::TYPE_GRADUATE_GRADE:
-                    $res = $midRes->whereIn('grade',explode(' ',$target))->get();
+                    $res = $midRes->whereIn('grade',explode(' ',$target))->get()->toArray();
                     break;
                 case self::TYPE_GRADUATE_SPEC:
-                    $res = $midRes->whereIn('uid',explode(' ',$target))->get();
+                    $res = $midRes->whereIn('uid',explode(' ',$target))->get()->toArray();
                     break;
                 case self::TYPE_GRADUATE_ALL:
-                    $res = $midRes->get();
+                    $res = $midRes->get()->toArray();
                     break;
             }
         } else{
@@ -77,10 +77,10 @@ class Info extends Model {
             $midRes = $teacherMdl->select('id','openid','uid','name');
             switch ($type){
                 case self::TYPE_TEACHER_SPEC:
-                    $res = $midRes->whereIn('uid',explode(' ',$target))->get();
+                    $res = $midRes->whereIn('uid',explode(' ',$target))->get()->toArray();
                     break;
                 case self::TYPE_TEACHER_ALL:
-                    $res = $midRes->get();
+                    $res = $midRes->get()->toArray();
                     break;
             }
         }
