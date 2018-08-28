@@ -50,7 +50,7 @@ class Wx{
         $modelInfo['data']['first']['value'] = '《' . "$title" . '》';
         $modelInfo['data']['keyword2']['value'] = $sender;
         $modelInfo['data']['keyword3']['value'] = date('Y-m-d H:i');
-        $modelInfo['url'] = ComConf::FRONT_HOST . '/client/tongzhi_detail.html?id=' . $infoData['batchId'];
+        $modelInfo['url'] = ComConf::FRONT_HOST . '/client/tongzhi_detail.html?id=' . $infoData['batch_id'];
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
         foreach ($infoObjcets as $item){
@@ -78,6 +78,7 @@ class Wx{
         }
         $requestUrl = sprintf('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s',WxConf::APPID,WxConf::APPKEY);
         $res = ApiRequest::sendRequest('GET',$requestUrl);
+        dd($res);
         if (!empty($res['errorcode'])){
             Logger::fatal('wx|get_access_token_failed|res:' . json_encode($res));
         }

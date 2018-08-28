@@ -80,7 +80,7 @@ class Pc extends Controller{
         }
         $teacherId = User::getUser(true);
         $infoObjects = Info::getInfoObject($params['type'],$params['target']);
-        $batchId = uniqid();
+        $batchId = time();
         $infoData = [
             'title' => $params['title'],
             'content' => $params['content'],
