@@ -14,7 +14,6 @@ use App\Http\Model\Info\Info;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
 use App\Util\File;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
@@ -80,7 +79,7 @@ class Pc extends Controller{
             $file = Request::file('file');
             $path = implode(' ' , File::saveFile($file));
         }
-        $teacherId = User::getUser(true);
+        $teacherName = User::getUser()->name;
         $infoObjects = Info::getInfoObject($params['type'],$params['target']);
         if (empty($infoObjects)){
             throw new OperateFailedException('无可用通知对象');
@@ -91,7 +90,7 @@ class Pc extends Controller{
             'content' => $params['content'],
             'type' => $params['type'],
             'status' => Info::STATUS_NOT_WATCHED,
-            'teacher_id' => $teacherId,
+            'teacher_name' => $teacherName,
             'attachment' => $path,
             'batch_id' => $batchId
         ];
@@ -112,9 +111,7 @@ class Pc extends Controller{
      */
     public function getInfoList(){
         $user = User::getUser();
-        $midRes = DB::table('info')
-            ->join('teacher','teacher_id','=','teacher.id')
-            ->select('info.title','info.content','info.type','info.attachment','teacher.name','info.batch_id');
+        $midRes = Info::select('title','content','type','attachment','teacher_name','batch_id');
         $infoAuthState = Teacher::getInfoAuthState($user->uid);
         if ($infoAuthState == Teacher::NORMAL){
             throw new PermissionDeniedException();
@@ -124,7 +121,7 @@ class Pc extends Controller{
         }
         $res = $midRes->distinct()
             ->orderByDesc('info.created_at')
-            ->get();
+            ->paginate(5);
         return ApiResponse::responseSuccess($res);
     }
 

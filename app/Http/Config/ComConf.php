@@ -9,9 +9,7 @@ namespace App\Http\Config;
 
 class ComConf{
 
-    const HOST = 'https://tis.cloudshm.com';
-
-    const FRONT_HOST = 'https://teacher.cloudshm.com';
+    const HOST = 'https://tis.hzcloudservice.com';
 
     const HDU_CAS_URL = self::HOST . '/api/v1/login/bind';//杭电CAS登录URL
 

@@ -48,6 +48,13 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 Route::get('getInfoFeedbackStatus','Info\Pc@getFeedbackStatus');
 
             });
+
+            Route::group(['prefix' => 'wx'],function (){
+
+                //查看通知详情
+                Route::get('getInfoDetail','Info\Wx@getInfoDetail');
+
+            });
         });
 
     });

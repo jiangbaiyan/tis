@@ -46,11 +46,10 @@ class Wx{
     public static function sendModelInfo($infoObjcets,$infoData){
         $modelInfo = WxConf::MODEL_INFO;
         $title = $infoData['title'];
-        $sender = Teacher::find($infoData['teacher_id'])->name;
         $modelInfo['data']['first']['value'] = '《' . "$title" . '》';
-        $modelInfo['data']['keyword2']['value'] = $sender;
+        $modelInfo['data']['keyword2']['value'] = $infoData['teacher_name'];
         $modelInfo['data']['keyword3']['value'] = date('Y-m-d H:i');
-        $modelInfo['url'] = ComConf::FRONT_HOST . '/client/tongzhi_detail.html?id=' . $infoData['batch_id'];
+        $modelInfo['url'] = ComConf::HOST . '/client/tongzhi_detail.html?id=' . $infoData['batch_id'];
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
         foreach ($infoObjcets as $item){

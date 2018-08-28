@@ -19,7 +19,7 @@ use src\Exceptions\ParamValidateFailedException;
 class Wx{
 
     /**
-     * 微信端获取通知详情
+     * 获取通知详情
      * @return string
      * @throws ParamValidateFailedException
      * @throws \src\Exceptions\UnAuthorizedException
@@ -27,19 +27,31 @@ class Wx{
     public function getInfoDetail(){
         $user = User::getUser();
         $validator = Validator::make($params = Request::all(),[
-            'id' => 'required'
+            'batch_id' => 'required'
         ]);
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        $batchId = $params['id'];
         $info = Info::where([
-            'batch_id' => $batchId,
-            'uid' => $user->uid
-        ]);
+            ['batch_id' ,'=', $params['batch_id']],
+            ['uid' ,'=', $user->uid]
+        ])->first();
         $info->status = Info::STATUS_WATCHED;
         $info->save();
         return ApiResponse::responseSuccess($info);
+    }
+
+    /**
+     * 获取收到的通知列表
+     * @return string
+     * @throws \src\Exceptions\UnAuthorizedException
+     */
+    public function getReceivedInfoList(){
+        $user = User::getUser();
+        $data = Info::select('title','teacher_name','created_at','batch_id')
+            ->where('uid',$user->uid)
+            ->paginate(8);
+        return ApiResponse::responseSuccess($data);
     }
 
 }
