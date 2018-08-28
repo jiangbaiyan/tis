@@ -114,7 +114,7 @@ class Pc extends Controller{
         $user = User::getUser();
         $midRes = DB::table('info')
             ->join('teacher','teacher_id','=','teacher.id')
-            ->select('info.title','info.content','info.type','info.attachment','teacher.name');
+            ->select('info.title','info.content','info.type','info.attachment','teacher.name','info.batch_id');
         $infoAuthState = Teacher::getInfoAuthState($user->uid);
         if ($infoAuthState == Teacher::NORMAL){
             throw new PermissionDeniedException();
@@ -122,7 +122,9 @@ class Pc extends Controller{
         if($infoAuthState == Teacher::INSTRUCTOR){
             $midRes = $midRes->whereBetween('type',[Info::TYPE_STUDENT_GRADE,Info::TYPE_GRADUATE_ALL]);
         }
-        $res = $midRes->distinct()->latest()->get();
+        $res = $midRes->distinct()
+            ->orderByDesc('info.created_at')
+            ->get();
         return ApiResponse::responseSuccess($res);
     }
 
@@ -133,13 +135,12 @@ class Pc extends Controller{
      */
     public function getFeedbackStatus(){
         $validator = Validator::make($params = Request::all(),[
-            'id' => 'required'
+            'batch_id' => 'required'
         ]);
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        $info = Info::find($params['id']);
-        $feedbacks = Info::select('title','uid','name')->where('batch_id',$info->batch_id)->get();
+        $feedbacks = Info::select('title','uid','name','status')->where('batch_id',$params['batch_id'])->get();
         return ApiResponse::responseSuccess($feedbacks);
     }
 }

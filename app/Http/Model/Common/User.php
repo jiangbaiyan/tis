@@ -18,8 +18,8 @@ class User{
      * @throws \src\Exceptions\UnAuthorizedException
      */
     public static function getUser($isRtnId = false){
-        //$user = json_decode(Session::get('user'),true);
-        $user = Teacher::find(1);
+        $user = json_decode(Session::get('user'),true);
+        //$user = Teacher::find(1);
         if (empty($user)){
             throw new \src\Exceptions\UnAuthorizedException();
         }

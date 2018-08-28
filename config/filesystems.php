@@ -63,6 +63,7 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
         ],
+
         'upyun' => [
             'driver'        => 'upyun',
             'bucket'        => 'cbs-service',//Bucket名字
