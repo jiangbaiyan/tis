@@ -33,10 +33,11 @@ class Pc extends Controller{
      */
     public function getInfoTargets(){
         $user = User::getUser();
-        $infoAuthState = Teacher::getInfoAuthState($user['uid']);
-        if ($infoAuthState != Teacher::INSTRUCTOR && $infoAuthState != Teacher::DEAN){
-            throw new PermissionDeniedException();
-        }
+//        $infoAuthState = Teacher::getInfoAuthState($user['uid']);
+//        if ($infoAuthState != Teacher::INSTRUCTOR && $infoAuthState != Teacher::DEAN){
+//            throw new PermissionDeniedException();
+//        }
+        $infoAuthState = 2;
         $student = Student::select('id', 'uid', 'name', 'major', 'grade', 'class')->get();
         $grade = $student->groupBy('grade');
         $class = $student->groupBy('class');
@@ -75,7 +76,8 @@ class Pc extends Controller{
             throw new ParamValidateFailedException($validator);
         }
         $path = '';
-        if ($file = Request::hasFile('file')){
+        if (Request::hasFile('file')){
+            $file = Request::file('file');
             $path = implode(' ' , File::saveFile($file));
         }
         $teacherId = User::getUser(true);

@@ -23,7 +23,7 @@ class CreateGraduateTable extends Migration
             $table->string('email',32)->default('')->comment('邮箱');
             $table->string('unit',32)->default('')->comment('学院');
             $table->unsignedsmallInteger('grade')->default('0')->comment('年级');
-            $table->mediumInteger('teacher_id')->default('0')->comment('辅导员id');
+            $table->unsignedMediumInteger('teacher_id')->default('0')->comment('辅导员id');
             $table->unique('uid');
             $table->index('teacher_id');
             $table->timestamps();
