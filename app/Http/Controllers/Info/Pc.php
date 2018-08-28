@@ -80,6 +80,9 @@ class Pc extends Controller{
         }
         $teacherId = User::getUser(true);
         $infoObjects = Info::getInfoObject($params['type'],$params['target']);
+        if (empty($infoObjects)){
+            throw new OperateFailedException('无可用通知对象');
+        }
         $batchId = time();
         $infoData = [
             'title' => $params['title'],
