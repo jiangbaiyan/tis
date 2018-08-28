@@ -30,7 +30,12 @@ class CheckLogin
             Logger::notice('auth|header_token_empty');
             throw new UnAuthorizedException();
         }
-        $user = JWT::decode($frontToken, env('JWT_KEY'));
+        try{
+            $user = JWT::decode($frontToken, env('JWT_KEY'));
+        }catch (\Exception $e){
+            Logger::notice('auth|decode_token_failed|msg:' . $e->getMessage());
+            throw new UnAuthorizedException();
+        }
         if (Redis::ttl($user->uid) <= 0) {
             Logger::notice('auth|token_expired|msg:' . json_encode($user));
             throw new UnAuthorizedException();

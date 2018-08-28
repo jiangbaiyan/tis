@@ -22,7 +22,7 @@ class CreateInfoTable extends Migration
             $table->unsignedTinyInteger('type')->default('0')->comment('通知对象类型');
             $table->unsignedTinyInteger('status')->default('0')->comment('是否查看|0-未查看|1-已查看');
             $table->string('attachment',512)->default('0')->comment('附件URL');
-            $table->timestamp('time')->default('0')->comment('定时时间');
+            $table->timestamp('time')->default('1971-01-01 00:00:00')->comment('定时时间');
             $table->integer('teacher_id')->default('0')->comment('发通知教师id');
             $table->timestamps();
             $table->index('uid');

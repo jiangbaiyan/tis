@@ -8,6 +8,7 @@
 namespace App\Http\Controllers\Info;
 use App\Http\Controller;
 use App\Http\Model\Common\User;
+use App\Http\Model\Common\Wx;
 use App\Http\Model\Graduate;
 use App\Http\Model\Info\Info;
 use App\Http\Model\Student;
@@ -73,7 +74,7 @@ class Pc extends Controller{
             throw new ParamValidateFailedException($validator);
         }
         if ($file = Request::hasFile('file')){
-            $path = File::saveFile($file);
+            $path = implode(' ' , File::saveFile($file));
         }
         $teacherId = User::getUser(true);
         $infoObjects = Info::getInfoObject($params['type'],$params['target']);
@@ -86,6 +87,8 @@ class Pc extends Controller{
             'attachment' => $path
         ];
         Info::insertInfo($infoObjects,$infoData);
+        Wx::sendModelInfo($infoObjects,$infoData);
+        return ApiResponse::responseSuccess();
     }
 
     /**
