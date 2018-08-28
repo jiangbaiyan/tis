@@ -6,7 +6,9 @@
  * Time: 16:03
  */
 namespace App\Http\Model\Common;
+use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
+use App\Http\Model\Info\Info;
 use App\Http\Model\Teacher;
 use Illuminate\Support\Facades\Redis;
 use src\ApiHelper\ApiRequest;
@@ -48,6 +50,7 @@ class Wx{
         $modelInfo['data']['first']['value'] = '《' . "$title" . '》';
         $modelInfo['data']['keyword2']['value'] = $sender;
         $modelInfo['data']['keyword3']['value'] = date('Y-m-d H:i');
+        $modelInfo['url'] = ComConf::FRONT_HOST . '/client/tongzhi_detail.html?id=' . $infoData['batchId'];
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
         foreach ($infoObjcets as $item){
@@ -58,10 +61,11 @@ class Wx{
                 ]);
                 if (!empty($res['errcode'])){
                     Logger::fatal('info|send_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|errormsg:' . json_encode($res));
+                    return false;
                 }
             } catch (\Exception $e){
                 Logger::fatal('info|send_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|exceptionMsg:' . $e->getMessage());
-                continue;
+                return false;
             }
         }
     }

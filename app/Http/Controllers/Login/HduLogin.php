@@ -170,7 +170,7 @@ class HduLogin extends Controller {
         $data['email'] = $params['email'];
         $data['phone'] = $params['phone'];
 
-        $params['instructor'] && $data['teacher_id'] = $params['instructor'];//教师没有辅导员
+        !empty($params['instructor']) && $data['teacher_id'] = $params['instructor'];//教师没有辅导员
         if (!empty($userInfo['class'])){
             $data['class'] = $userInfo['class'];
             $data['grade'] = '20' . substr($userInfo['class'],0,2);

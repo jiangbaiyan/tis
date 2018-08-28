@@ -7,7 +7,7 @@
  */
 namespace App\Http\Model\Common;
 
-use App\Http\Model\Student;
+use App\Http\Model\Teacher;
 use Illuminate\Support\Facades\Session;
 
 class User{
@@ -18,7 +18,8 @@ class User{
      * @throws \src\Exceptions\UnAuthorizedException
      */
     public static function getUser($isRtnId = false){
-        $user = json_decode(Session::get('user'),true);
+        //$user = json_decode(Session::get('user'),true);
+        $user = Teacher::find(1);
         if (empty($user)){
             throw new \src\Exceptions\UnAuthorizedException();
         }

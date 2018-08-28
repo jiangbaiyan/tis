@@ -15,6 +15,7 @@ class CreateInfoTable extends Migration
     {
         Schema::create('info', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedinteger('batch_id')->default('0')->comment('通知批次id');
             $table->string('title',512)->default('')->comment('通知标题');
             $table->string('content',1024)->default('')->comment('通知内容');
             $table->integer('uid')->default('0')->comment('通知接收人学号/工号');
@@ -27,6 +28,7 @@ class CreateInfoTable extends Migration
             $table->timestamps();
             $table->index('uid');
             $table->index('teacher_id');
+            $table->index('batch_id');
         });
     }
 

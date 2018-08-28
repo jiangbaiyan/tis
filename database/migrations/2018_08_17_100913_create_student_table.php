@@ -15,7 +15,7 @@ class CreateStudentTable extends Migration
     {
         Schema::create('student', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('uid')->default('0')->comment('学号');
+            $table->unsignedInteger('uid')->default('0')->comment('学号');
             $table->string('name',32)->default('')->comment('学生姓名');
             $table->string('openid',32)->default('')->comment('微信openid');
             $table->unsignedTinyInteger('sex')->default('0')->comment('学生性别,0-未知 1-男 2-女');

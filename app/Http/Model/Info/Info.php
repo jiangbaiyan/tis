@@ -96,13 +96,16 @@ class Info extends Model {
     public static function insertInfo($infoObjects,$infoData){
         $count = count($infoObjects);
         for ($i = 0 ; $i<$count ;$i++){
-            $infoData[$i] = array_merge($infoData,[
+            $data[$i] = array_merge($infoData,[
                 'uid' => $infoObjects[$i]->uid,
-                'name' => $infoObjects[$i]->name
+                'name' => $infoObjects[$i]->name,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+                'batch_id' => $infoData['batchId']
             ]);
         }
         try {
-            DB::table('info')->insert($infoData);
+            DB::table('info')->insert($data);
         } catch (\Exception $e){
             throw new OperateFailedException($e->getMessage());
         }

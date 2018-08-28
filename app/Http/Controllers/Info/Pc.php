@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
+use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 use src\Exceptions\PermissionDeniedException;
 
@@ -73,21 +74,28 @@ class Pc extends Controller{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
+        $path = '';
         if ($file = Request::hasFile('file')){
             $path = implode(' ' , File::saveFile($file));
         }
         $teacherId = User::getUser(true);
         $infoObjects = Info::getInfoObject($params['type'],$params['target']);
+        $batchId = uniqid();
         $infoData = [
             'title' => $params['title'],
             'content' => $params['content'],
             'type' => $params['type'],
             'status' => Info::STATUS_NOT_WATCHED,
             'teacher_id' => $teacherId,
-            'attachment' => $path
+            'attachment' => $path,
+            'batch_id' => $batchId
         ];
         Info::insertInfo($infoObjects,$infoData);
-        Wx::sendModelInfo($infoObjects,$infoData);
+        $res = Wx::sendModelInfo($infoObjects,$infoData);
+        if ($res === false){
+            Info::where('title',$infoData['title'])->delete();
+            throw new OperateFailedException('通知发送失败，请重试');
+        }
         return ApiResponse::responseSuccess();
     }
 
@@ -126,7 +134,7 @@ class Pc extends Controller{
             throw new ParamValidateFailedException($validator);
         }
         $info = Info::find($params['id']);
-        $feedbacks = Info::select('title','uid','name')->where('title',$info->title)->get();
+        $feedbacks = Info::select('title','uid','name')->where('batch_id',$info->batch_id)->get();
         return ApiResponse::responseSuccess($feedbacks);
     }
 }
