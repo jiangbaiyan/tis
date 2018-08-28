@@ -13,6 +13,8 @@ use App\Http\Model\Graduate;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use src\Exceptions\OperateFailedException;
 
 class Info extends Model {
 
@@ -27,6 +29,8 @@ class Info extends Model {
     const TYPE_TEACHER_SPEC = 9;//给特定教师
     const TYPE_TEACHER_ALL = 10;//给全体教师
 
+    const STATUS_NOT_WATCHED = 0;//未查看
+    const STATUS_WATCHED = 1;//已查看
 
     protected $table = 'info';
 
@@ -36,7 +40,7 @@ class Info extends Model {
     public static function getInfoObject($type,$target){
         if ($type >= self::TYPE_STUDENT_GRADE && $type <= self::TYPE_STUDENT_ALL){
             $studentMdl = new Student();
-            $midRes = $studentMdl->select('id','openid');
+            $midRes = $studentMdl->select('id','openid','uid','name');
             switch ($type){
                 case self::TYPE_GRADUATE_GRADE:
                     $res = $midRes->whereIn('grade',explode(' ',$target))->get();
@@ -56,7 +60,7 @@ class Info extends Model {
             }
         } else if ($type >= self::TYPE_GRADUATE_GRADE && $type <= self::TYPE_GRADUATE_ALL){
             $graduateMdl = new Graduate();
-            $midRes = $graduateMdl->select('id','openid');
+            $midRes = $graduateMdl->select('id','openid','uid','name');
             switch ($type){
                 case self::TYPE_GRADUATE_GRADE:
                     $res = $midRes->whereIn('grade',explode(' ',$target))->get();
@@ -70,7 +74,7 @@ class Info extends Model {
             }
         } else{
             $teacherMdl = new Teacher();
-            $midRes = $teacherMdl->select('id','openid');
+            $midRes = $teacherMdl->select('id','openid','uid','name');
             switch ($type){
                 case self::TYPE_TEACHER_SPEC:
                     $res = $midRes->whereIn('uid',explode(' ',$target))->get();
@@ -82,4 +86,26 @@ class Info extends Model {
         }
         return $res;
     }
+
+    /**
+     * 批量插入通知信息表
+     * @param $infoObjects
+     * @param $infoData
+     * @throws OperateFailedException
+     */
+    public static function insertInfo($infoObjects,$infoData){
+        $count = count($infoObjects);
+        for ($i = 0 ; $i<$count ;$i++){
+            $infoData[$i] = array_merge($infoData,[
+                'uid' => $infoObjects[$i]->uid,
+                'name' => $infoObjects[$i]->name
+            ]);
+        }
+        try {
+            DB::table('info')->insert($infoData);
+        } catch (\Exception $e){
+            throw new OperateFailedException($e->getMessage());
+        }
+    }
+
 }

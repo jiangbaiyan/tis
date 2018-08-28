@@ -63,7 +63,14 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
         ],
-
+        'upyun' => [
+            'driver'        => 'upyun',
+            'bucket'        => 'cbs-service',//Bucket名字
+            'operator'      => 'baiyan', // 操作员的名字
+            'password'      => 'qlc_2017-#*m', // 操作员的密码
+            'domain'        => 'https://cloudfiles.cloudshm.com/', // 服务分配的域名
+            'protocol'     => 'https', // 服务使用的协议，如需使用 http，在此配置 http
+        ],
     ],
 
 ];

@@ -26,16 +26,28 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
         //展示错误信息中间页
         Route::any('geterror','Login\HduLogin@getErrorAndDispatch');
+
     });
+
     Route::group(['middleware' => 'checkLogin'],function (){
 
         Route::group(['prefix' => 'info'],function (){
 
-            //获取通知对象
-            Route::get('getInfoTargets','Info\Pc@getInfoTargets');
+            Route::group(['prefix' => 'pc'],function (){
 
-            //发送通知
-            Route::post('sendInfo','Info\Pc@sendInfo');
+                //获取通知对象
+                Route::get('getInfoTargets','Info\Pc@getInfoTargets');
+
+                //发送通知
+                Route::post('sendInfo','Info\Pc@sendInfo');
+
+                //查看通知列表
+                Route::get('getInfoList','Info\Pc@getInfoList');
+
+                //查看通知反馈情况
+                Route::get('getInfoFeedbackStatus','Info\Pc@getFeedbackStatus');
+
+            });
 
         });
 

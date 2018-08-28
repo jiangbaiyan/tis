@@ -40,14 +40,14 @@ class CheckLogin
             Logger::notice('auth|front_token_not_equals_redis_token|user:' . json_encode($user));
             throw new UnAuthorizedException();
         }
-        Session::put('user',$user);
+        Session::put('user',json_encode($user));
         Session::save();
 
         //检查各模块权限
         //PC端通知模块权限0-普通教师 1-辅导员（可给学生发）2-教务老师（可给老师和学生发）
         $url = $request->url();
         if (strpos($url,'info')){//如果请求了通知模块
-            $infoAuthState = Redis::hget(Teacher::ALL_AUTH_STATE_KEY,$user->uid);
+            $infoAuthState = Teacher::getInfoAuthState($user->uid);
             if ($infoAuthState == Teacher::NORMAL){
                 Logger::notice('auth|info_module_permission_denied|user:' . json_encode($user));
                 throw new PermissionDeniedException();

@@ -17,11 +17,13 @@ class User{
      * @return mixed
      * @throws \src\Exceptions\UnAuthorizedException
      */
-    public static function getUser(){
-        $user = Session::get('user');
-        //$user = Student::find(1);
+    public static function getUser($isRtnId = false){
+        $user = json_decode(Session::get('user'),true);
         if (empty($user)){
             throw new \src\Exceptions\UnAuthorizedException();
+        }
+        if ($isRtnId){
+            return $user['id'];
         }
         return $user;
     }

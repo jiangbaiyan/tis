@@ -16,4 +16,7 @@ class WxConf{
     //根据code换取openid回调url
     const GET_CODE_REDIRECT_URL = ComConf::HOST . '/api/v1/login/callback';
 
+    const MODEL_INFO = [
+
+    ];
 }

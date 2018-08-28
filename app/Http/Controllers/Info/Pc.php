@@ -8,11 +8,12 @@
 namespace App\Http\Controllers\Info;
 use App\Http\Controller;
 use App\Http\Model\Common\User;
-use App\Http\Model\Common\Wx;
 use App\Http\Model\Graduate;
 use App\Http\Model\Info\Info;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
+use App\Util\File;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
@@ -30,7 +31,7 @@ class Pc extends Controller{
      */
     public function getInfoTargets(){
         $user = User::getUser();
-        $infoAuthState = Teacher::getInfoAuthState($user->uid);
+        $infoAuthState = Teacher::getInfoAuthState($user['uid']);
         if ($infoAuthState != Teacher::INSTRUCTOR && $infoAuthState != Teacher::DEAN){
             throw new PermissionDeniedException();
         }
@@ -56,7 +57,12 @@ class Pc extends Controller{
     }
 
 
-    //发送通知
+    /**
+     * 发送通知
+     * @throws ParamValidateFailedException
+     * @throws \src\Exceptions\OperateFailedException
+     * @throws \src\Exceptions\UnAuthorizedException
+     */
     public function sendInfo(){
         $validator = Validator::make($params = Request::all(),[
             'title' => 'required',
@@ -66,9 +72,59 @@ class Pc extends Controller{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
+        if ($file = Request::hasFile('file')){
+            $path = File::saveFile($file);
+        }
+        $teacherId = User::getUser(true);
         $infoObjects = Info::getInfoObject($params['type'],$params['target']);
-        Wx::sendModelInfo($infoObjects,$params['title'],$params['content']);
+        $infoData = [
+            'title' => $params['title'],
+            'content' => $params['content'],
+            'type' => $params['type'],
+            'status' => Info::STATUS_NOT_WATCHED,
+            'teacher_id' => $teacherId,
+            'attachment' => $path
+        ];
+        Info::insertInfo($infoObjects,$infoData);
     }
 
+    /**
+     * 查看已发送通知列表
+     * @return string
+     * @throws PermissionDeniedException
+     * @throws \src\Exceptions\UnAuthorizedException
+     */
+    public function getInfoList(){
+        $user = User::getUser();
+        $midRes = DB::table('info')
+            ->join('teacher','teacher_id','=','teacher.id')
+            ->select('info.title','info.content','info.type','info.attachment','teacher.name');
+        $infoAuthState = Teacher::getInfoAuthState($user->uid);
+        if ($infoAuthState == Teacher::NORMAL){
+            throw new PermissionDeniedException();
+        }
+        if($infoAuthState == Teacher::INSTRUCTOR){
+            $midRes = $midRes->whereBetween('type',[Info::TYPE_STUDENT_GRADE,Info::TYPE_GRADUATE_ALL]);
+        }
+        $res = $midRes->distinct()->latest()->get();
+        return ApiResponse::responseSuccess($res);
+    }
+
+    /**
+     * 查看反馈情况
+     * @return string
+     * @throws ParamValidateFailedException
+     */
+    public function getFeedbackStatus(){
+        $validator = Validator::make($params = Request::all(),[
+            'id' => 'required'
+        ]);
+        if ($validator->fails()){
+            throw new ParamValidateFailedException($validator);
+        }
+        $info = Info::find($params['id']);
+        $feedbacks = Info::select('title','uid','name')->where('title',$info->title)->get();
+        return ApiResponse::responseSuccess($feedbacks);
+    }
 }
 
