@@ -116,7 +116,7 @@
         var returnBtn = document.getElementById('back');
 
         returnBtn.onclick = function () {
-			location.href = "https://teacher.cloudshm.com/client";
+			location.href = "https://tis.hzcloudservice.com/client";
         };
 	</script>
 </body>
