@@ -179,7 +179,7 @@ class HduLogin extends Controller {
 
         $res = $this->updateOrInsertAndSetToken($data);
 
-        Logger::notice('login|user_wx_bind_result|msg:' . json_encode($res));
+        Logger::notice('login|user_wx_bind_success|msg:' . json_encode($res));
 
         return view('bindsuccess',['data' => $res]);
     }

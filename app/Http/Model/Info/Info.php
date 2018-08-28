@@ -97,8 +97,8 @@ class Info extends Model {
         $count = count($infoObjects);
         for ($i = 0 ; $i<$count ;$i++){
             $data[$i] = array_merge($infoData,[
-                'uid' => $infoObjects[$i]->uid,
-                'name' => $infoObjects[$i]->name,
+                'uid' => $infoObjects[$i]['uid'],
+                'name' => $infoObjects[$i]['name'],
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
                 'batch_id' => $infoData['batch_id']

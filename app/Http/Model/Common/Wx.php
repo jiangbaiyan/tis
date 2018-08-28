@@ -54,7 +54,7 @@ class Wx{
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
         foreach ($infoObjcets as $item){
-            $modelInfo['touser'] = $item->openid;
+            $modelInfo['touser'] = $item['openid'];
             try{
                 $res = ApiRequest::sendRequest('POST',$requestUrl,[
                     'json' => $modelInfo
@@ -78,7 +78,6 @@ class Wx{
         }
         $requestUrl = sprintf('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s',WxConf::APPID,WxConf::APPKEY);
         $res = ApiRequest::sendRequest('GET',$requestUrl);
-        dd($res);
         if (!empty($res['errorcode'])){
             Logger::fatal('wx|get_access_token_failed|res:' . json_encode($res));
         }
