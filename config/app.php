@@ -146,7 +146,6 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-        JellyBool\Flysystem\Upyun\UpyunServiceProvider::class,
 
         /*
          * Package Service Providers...

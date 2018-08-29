@@ -33,22 +33,26 @@ class File
     {
         $path = [];
         self::isAllowedFormat($file);
+        $name = $file->getClientOriginalName();
         if (is_array($file)) {
             foreach ($file as $fileItem) {
-                $res = Storage::disk('upyun')->putFileAs('tis/' . date('Y') . '/' . date('md'), $fileItem, $fileItem->getClientOriginalName(), 'public');
-                if ($res === false){
+                $path = Storage::disk('upyun')->putFileAs('/tis/' . date('Y') . '/' . date('md'),$fileItem,$name,'public');
+                if (empty($path)){
                     throw new OperateFailedException(self::UPLOAD_FAILED);
                 }
-                $path[] = self::UPYUN_HOST . $res;
+                $path[] = self::UPYUN_HOST . $path;
             }
         } else {
-            $res = Storage::disk('upyun')->putFileAs('tis/' . date('Y') . '/' . date('md'), $file, $file->getClientOriginalName(), 'public');
-            if ($res === false){
+            $path = Storage::disk('upyun')->putFileAs('/tis/' . date('Y') . '/' . date('md'),$file,$name,'public');
+            if (empty($path)){
                 throw new OperateFailedException(self::UPLOAD_FAILED);
             }
-            $path[] = self::UPYUN_HOST . $res;
+            $path = self::UPYUN_HOST . $path;
         }
-        return implode(' ',$path);
+        if (is_array($path)){
+            return implode(' ',$path);
+        }
+        return $path;
     }
 
     /**

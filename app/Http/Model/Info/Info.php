@@ -12,6 +12,7 @@ namespace App\Http\Model\Info;
 use App\Http\Model\Graduate;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
+use App\Util\Logger;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use src\Exceptions\OperateFailedException;
@@ -107,6 +108,7 @@ class Info extends Model {
         try {
             DB::table('info')->insert($data);
         } catch (\Exception $e){
+            Logger::fatal('info|insert_to_info_table_falied|data:' . json_encode($data));
             throw new OperateFailedException($e->getMessage());
         }
     }

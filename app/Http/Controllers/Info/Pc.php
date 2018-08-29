@@ -14,6 +14,7 @@ use App\Http\Model\Info\Info;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
 use App\Util\File;
+use App\Util\Logger;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
@@ -32,10 +33,10 @@ class Pc extends Controller{
      */
     public function getInfoTargets(){
         $user = User::getUser();
-//        $infoAuthState = Teacher::getInfoAuthState($user['uid']);
-//        if ($infoAuthState != Teacher::INSTRUCTOR && $infoAuthState != Teacher::DEAN){
-//            throw new PermissionDeniedException();
-//        }
+        $infoAuthState = Teacher::getInfoAuthState($user['uid']);
+        if ($infoAuthState != Teacher::INSTRUCTOR && $infoAuthState != Teacher::DEAN){
+            throw new PermissionDeniedException();
+        }
         $infoAuthState = 2;
         $student = Student::select('id', 'uid', 'name', 'major', 'grade', 'class')->get();
         $grade = $student->groupBy('grade');
@@ -129,6 +130,7 @@ class Pc extends Controller{
      * 查看反馈情况
      * @return string
      * @throws ParamValidateFailedException
+     * @throws OperateFailedException
      */
     public function getFeedbackStatus(){
         $validator = Validator::make($params = Request::all(),[
@@ -138,6 +140,10 @@ class Pc extends Controller{
             throw new ParamValidateFailedException($validator);
         }
         $feedbacks = Info::select('title','uid','name','status')->where('batch_id',$params['batch_id'])->get();
+        if (empty($feedbacks)){
+            Logger::fatal('info|info_was_deleted|batch_id:' . $params['batch_id']);
+            throw new OperateFailedException('该通知已被删除');
+        }
         return ApiResponse::responseSuccess($feedbacks);
     }
 }

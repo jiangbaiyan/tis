@@ -57,7 +57,7 @@ class Handler extends ExceptionHandler
             'line' => $exception->getLine(),
             'url' => $request->fullUrl(),
             'params' => $request->all(),
-            'ip' => $_SERVER['HTTP_X_FORWARDED_FOR'],
+            'ip' => !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ?? $_SERVER['REMOTE_ADDR'],
             'userAgent' => $_SERVER['HTTP_USER_AGENT']
         ];
         Logger::fatal(json_encode($errArr));

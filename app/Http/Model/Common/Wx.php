@@ -8,8 +8,6 @@
 namespace App\Http\Model\Common;
 use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
-use App\Http\Model\Info\Info;
-use App\Http\Model\Teacher;
 use Illuminate\Support\Facades\Redis;
 use src\ApiHelper\ApiRequest;
 use src\Exceptions\OperateFailedException;
@@ -42,7 +40,13 @@ class Wx{
             ? true : false;
     }
 
-    //发送微信模板消息
+    /**
+     * 发送模板消息
+     * @param $infoObjcets
+     * @param $infoData
+     * @return bool
+     * @throws OperateFailedException
+     */
     public static function sendModelInfo($infoObjcets,$infoData){
         $modelInfo = WxConf::MODEL_INFO;
         $title = $infoData['title'];
@@ -69,7 +73,11 @@ class Wx{
         }
     }
 
-    //获取access_token（带缓存）
+    /**
+     * 获取access_token（带缓存)
+     * @return mixed
+     * @throws OperateFailedException
+     */
     public static function getAccessToken(){
         $accessToken = Redis::get(self::REDIS_ACCESS_TOKEN_KEY);
         if (Redis::ttl(self::REDIS_ACCESS_TOKEN_KEY) > 0 && !empty($accessToken)){
@@ -77,8 +85,9 @@ class Wx{
         }
         $requestUrl = sprintf('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s',WxConf::APPID,WxConf::APPKEY);
         $res = ApiRequest::sendRequest('GET',$requestUrl);
-        if (!empty($res['errorcode'])){
+        if (!empty($res['errcode'])){
             Logger::fatal('wx|get_access_token_failed|res:' . json_encode($res));
+            throw new OperateFailedException('获取微信信息失败');
         }
         $accessToken = $res['access_token'];
         Redis::set(self::REDIS_ACCESS_TOKEN_KEY,$accessToken);

@@ -66,11 +66,13 @@ return [
 
         'upyun' => [
             'driver'        => 'upyun',
+            'domain'        => 'https://cloudfiles.cloudshm.com',//你的upyun域名
+            'username'      => 'baiyan',//UserName
+            'password'      => 'qlc_2017-#*m',//Password
             'bucket'        => 'cbs-service',//Bucket名字
-            'operator'      => 'baiyan', // 操作员的名字
-            'password'      => 'qlc_2017-#*m', // 操作员的密码
-            'domain'        => 'https://cloudfiles.cloudshm.com/', // 服务分配的域名
-            'protocol'     => 'https', // 服务使用的协议，如需使用 http，在此配置 http
+            'timeout'       => 130,//超时时间
+            'endpoint'      => null,//线路
+            'transport'     => 'https',//如果支持https，请填写https，如果不支持请填写http
         ],
     ],
 
