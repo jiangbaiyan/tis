@@ -35,15 +35,20 @@ class File
         self::isAllowedFormat($file);
         if (is_array($file)) {
             foreach ($file as $fileItem) {
-                $path[] = self::UPYUN_HOST . Storage::disk('upyun')->putFileAs('tis/' . date('Y') . '/' . date('md'), $fileItem, $fileItem->getClientOriginalName(), 'public');
+                $res = Storage::disk('upyun')->putFileAs('tis/' . date('Y') . '/' . date('md'), $fileItem, $fileItem->getClientOriginalName(), 'public');
+                if ($res === false){
+                    throw new OperateFailedException(self::UPLOAD_FAILED);
+                }
+                $path[] = self::UPYUN_HOST . $res;
             }
         } else {
-            $path[] = self::UPYUN_HOST . Storage::disk('upyun')->putFileAs('tis/' . date('Y') . '/' . date('md'), $file, $file->getClientOriginalName(), 'public');
+            $res = Storage::disk('upyun')->putFileAs('tis/' . date('Y') . '/' . date('md'), $file, $file->getClientOriginalName(), 'public');
+            if ($res === false){
+                throw new OperateFailedException(self::UPLOAD_FAILED);
+            }
+            $path[] = self::UPYUN_HOST . $res;
         }
-        if (!$path) {
-            throw new OperateFailedException(self::UPLOAD_FAILED);
-        }
-        return $path;
+        return implode(' ',$path);
     }
 
     /**
