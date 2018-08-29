@@ -77,7 +77,7 @@ class Pc extends Controller{
         $path = '';
         if (Request::hasFile('file')){
             $file = Request::file('file');
-            $path = implode(' ' , File::saveFile($file));
+            $path = File::saveFile($file);
         }
         $teacherName = User::getUser()->name;
         $infoObjects = Info::getInfoObject($params['type'],$params['target']);
