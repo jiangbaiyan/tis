@@ -26,8 +26,7 @@ class CreateInfoTable extends Migration
             $table->timestamp('time')->default('1971-01-01 00:00:00')->comment('定时时间');
             $table->string('teacher_name',32)->default('')->comment('发通知教师姓名');
             $table->timestamps();
-            $table->index('uid');
-            $table->index('teacher_id');
+            $table->index('type');
             $table->index('batch_id');
         });
     }

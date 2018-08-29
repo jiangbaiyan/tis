@@ -25,6 +25,7 @@ class CreateGraduateTable extends Migration
             $table->unsignedsmallInteger('grade')->default('0')->comment('年级');
             $table->unsignedMediumInteger('teacher_id')->default('0')->comment('辅导员id');
             $table->unique('uid');
+            $table->index('grade');
             $table->index('teacher_id');
             $table->timestamps();
         });

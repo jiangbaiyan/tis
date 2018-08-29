@@ -28,6 +28,8 @@ class CreateStudentTable extends Migration
             $table->unsignedMediumInteger('teacher_id')->default('0')->comment('辅导员id');
             $table->unique('uid');
             $table->index('grade');
+            $table->index('major');
+            $table->index('class');
             $table->index('teacher_id');
             $table->timestamps();
         });

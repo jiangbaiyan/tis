@@ -97,7 +97,7 @@ class Pc extends Controller{
         Info::insertInfo($infoObjects,$infoData);
         $res = Wx::sendModelInfo($infoObjects,$infoData);
         if ($res === false){
-            Info::where('title',$infoData['title'])->delete();
+            Info::where('batch_id',$infoData['batch_id'])->delete();
             throw new OperateFailedException('通知发送失败，请重试');
         }
         return ApiResponse::responseSuccess();
@@ -120,7 +120,7 @@ class Pc extends Controller{
             $midRes = $midRes->whereBetween('type',[Info::TYPE_STUDENT_GRADE,Info::TYPE_GRADUATE_ALL]);
         }
         $res = $midRes->distinct()
-            ->orderByDesc('info.created_at')
+            ->orderByDesc('created_at')
             ->paginate(5);
         return ApiResponse::responseSuccess($res);
     }
