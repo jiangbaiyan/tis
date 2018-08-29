@@ -22,10 +22,10 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
         Route::get('callback','Login\HduLogin@getCodeCallback');
 
         //渲染视图提交路由，进行后续存储操作
-        Route::any('savedata','Login\HduLogin@dealAllData');
+        Route::any('saveData','Login\HduLogin@dealAllData');
 
         //展示错误信息中间页
-        Route::any('geterror','Login\HduLogin@getErrorAndDispatch');
+        Route::any('getError','Login\HduLogin@getErrorAndDispatch');
 
     });
 
@@ -53,6 +53,9 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
                 //查看通知详情
                 Route::get('getInfoDetail','Info\Wx@getInfoDetail');
+
+                //查看已收到的通知列表
+                Route::get('getReceivedInfoList','Info\Wx@getReceivedInfoList');
 
             });
         });

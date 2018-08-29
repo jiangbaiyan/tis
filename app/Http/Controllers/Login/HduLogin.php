@@ -132,7 +132,7 @@ class HduLogin extends Controller {
         $data = array_merge(['openid' => $openid],$userInfo);
         Session::put('userInfo',json_encode($data));
         Session::save();
-        return redirect(ComConf::HOST . '/api/v1/login/geterror');
+        return redirect(ComConf::HOST . '/api/v1/login/getError');
     }
 
 

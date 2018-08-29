@@ -70,7 +70,7 @@
 	</style>
 </head>
 <body>
-	<form id="main" method="GET" action="{{url('/api/v1/login/savedata')}}">
+	<form id="main" method="GET" action="{{url('/api/v1/login/saveData')}}">
 		<h1>请填写您的信息</h1>
 		<br>
 		<label for="phone">联系电话</label>

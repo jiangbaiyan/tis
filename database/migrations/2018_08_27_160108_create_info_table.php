@@ -27,6 +27,7 @@ class CreateInfoTable extends Migration
             $table->string('teacher_name',32)->default('')->comment('发通知教师姓名');
             $table->timestamps();
             $table->index('type');
+            $table->index('uid');
             $table->index('batch_id');
         });
     }
