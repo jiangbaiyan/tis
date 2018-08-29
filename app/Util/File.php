@@ -50,7 +50,7 @@ class File
             $path = self::UPYUN_HOST . $path;
         }
         if (is_array($path)){
-            return implode(' ',$path);
+            return implode(',',$path);
         }
         return $path;
     }

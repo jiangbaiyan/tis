@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Info;
 use App\Http\Model\Common\User;
 use App\Http\Model\Info\Info;
 use App\Util\Logger;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
@@ -61,4 +62,39 @@ class Wx{
         return ApiResponse::responseSuccess($data);
     }
 
+    /**
+     * 发送通知邮件
+     * @throws OperateFailedException
+     * @throws ParamValidateFailedException
+     * @throws \src\Exceptions\UnAuthorizedException
+     */
+    public function sendInfoEmail(){
+        $validator = Validator::make($params = Request::all(),[
+            'batch_id' => 'required'
+        ]);
+        if ($validator->fails()){
+            throw new ParamValidateFailedException($validator);
+        }
+        $user = User::getUser();
+        $name = $user->name;
+        $email = $user->email;
+        if (empty($email)){
+            Logger::notice('info|user_do_not_have_email_addr|user:' . json_encode($user));
+            throw new OperateFailedException('您还没有绑定邮箱信息，请先到公众号绑定信息');
+        }
+        $info = Info::where('batch_id',$params['batch_id'])->first();//同一通知批次url相同
+        $fileUrls = explode(',',$info->attachment);//将数据库多文件的url分隔开
+        Mail::send('email',['name' => $name,'fileUrls' => $fileUrls],function ($message) use ($email){
+            $message->to($email)->subject('学院通知');//设置地址和标题 并发送邮件
+        });
+        if (count(Mail::failures())>0){
+            $logInfo = [
+                'user' => $user,
+                'info' => $info
+            ];
+            Logger::fatal('info|send_email_failed|msg:' . json_encode($logInfo));
+            throw new OperateFailedException('邮件发送失败');
+        }
+        return ApiResponse::responseSuccess();
+    }
 }

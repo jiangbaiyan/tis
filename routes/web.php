@@ -57,6 +57,8 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 //查看已收到的通知列表
                 Route::get('getReceivedInfoList','Info\Wx@getReceivedInfoList');
 
+                //发送通知邮件
+                Route::get('sendInfoEmail','Info\Wx@sendInfoEmail');
             });
         });
 
