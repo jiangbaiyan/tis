@@ -13,7 +13,8 @@
         "laravel/framework": "5.6.*",
         "laravel/tinker": "^1.0",
         "predis/predis": "^1.1",
-        "yangyifan/upload": "^0.2.1"
+        "yangyifan/upload": "^0.2.1",
+        "true/punycode": "~2.0"
     },
     "require-dev": {
         "filp/whoops": "^2.0",
