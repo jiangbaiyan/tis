@@ -226,7 +226,7 @@ class HduLogin extends Controller {
 
     //设置token
     private function setToken($data){
-        $token = JWT::encode(env('JWT_KEY'),$data);
+        $token = JWT::encode($data,env('JWT_KEY'));
         Redis::set($data['uid'],$token);
         Redis::expire($data['uid'],2678400);
         return $token;
