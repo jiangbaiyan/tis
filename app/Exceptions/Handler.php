@@ -57,6 +57,8 @@ class Handler extends ExceptionHandler
             'line' => $exception->getLine(),
             'url' => $request->fullUrl(),
             'params' => $request->all(),
+            'ip' => $_SERVER['REMOTE_ADDR'],
+            'userAgent' => $_SERVER['HTTP_USER_AGENT']
         ];
         Logger::fatal(json_encode($errArr));
         return ApiResponse::response($exception->getCode(),$exception->getMessage());
