@@ -96,12 +96,13 @@ class Info extends Model {
      */
     public static function insertInfo($infoObjects,$infoData){
         $count = count($infoObjects);
+        $time = date('Y-m-d H:i:s');
         for ($i = 0 ; $i<$count ;$i++){
             $data[$i] = array_merge($infoData,[
                 'uid' => $infoObjects[$i]['uid'],
                 'name' => $infoObjects[$i]['name'],
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
+                'created_at' => $time,
+                'updated_at' => $time,
                 'batch_id' => $infoData['batch_id']
             ]);
         }

@@ -121,7 +121,7 @@ class Pc extends Controller{
             $midRes = $midRes->whereBetween('type',[Info::TYPE_STUDENT_GRADE,Info::TYPE_GRADUATE_ALL]);
         }
         $res = $midRes->distinct()
-            ->orderByDesc('created_at')
+            ->latest()
             ->paginate(5);
         return ApiResponse::responseSuccess($res);
     }

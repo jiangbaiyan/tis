@@ -31,7 +31,7 @@ class CheckLogin
             throw new UnAuthorizedException();
         }
         try{
-            $user = JWT::decode($frontToken, env('JWT_KEY'));
+            $user = JWT::decode($frontToken, env('JWT_KEY'),['HS256']);
         }catch (\Exception $e){
             Logger::notice('auth|decode_token_failed|msg:' . $e->getMessage());
             throw new UnAuthorizedException();
