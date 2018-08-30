@@ -54,9 +54,7 @@ class Pc extends Controller{
             $teacher = Teacher::select('id','uid','name')
                 ->where('openid','!=','')
                 ->get();
-            if (!$teacher){
-                $resData['teacher'] = $teacher;
-            }
+            $resData['teacher'] = $teacher;
         }
         return ApiResponse::responseSuccess($resData);
     }
