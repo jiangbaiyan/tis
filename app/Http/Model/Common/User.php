@@ -24,7 +24,7 @@ class User{
             throw new \src\Exceptions\UnAuthorizedException();
         }
         if ($isRtnId){
-            return $user['id'];
+            return $user->id;
         }
         return $user;
     }
