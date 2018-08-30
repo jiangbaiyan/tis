@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class DailyLeave extends Model {
 
-    const AUTH_ING = 1;
-    const AUTH_SUCC = 2;
-    const AUTH_FAIL = 3;
+    const AUTH_ING = 1;//审核中
+    const AUTH_SUCC = 2;//审核通过
+    const AUTH_FAIL = 3;//审核不通过
 
     protected $table = 'daily_leave';
 

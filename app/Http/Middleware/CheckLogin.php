@@ -35,7 +35,7 @@ class CheckLogin
         try{
             $user = JWT::decode($frontToken, ComConf::JWT_KEY ,['HS256']);
         }catch (\Exception $e){
-            Logger::notice('auth|decode_token_failed|msg:' . $e->getMessage());
+            Logger::notice('auth|decode_token_failed|msg:' . $e->getMessage() . 'token:'. $frontToken);
             throw new UnAuthorizedException();
         }
         if (Redis::ttl($user->uid) <= 0) {

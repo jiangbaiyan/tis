@@ -71,4 +71,28 @@ class WxConf{
             ]
         ]
     ];
+
+    const MODEL_LEAVE_RESULT = [
+        'touser' => '',
+        'template_id' => 'omqDuahmrpgg8qPRGnqzVLQAgnqd2Jmj0Hw1-HhCjG8',
+        'url' => '',
+        'data' => [
+            'first' => [
+                'value' => '您的辅导员答复了您的请假申请',
+            ],
+            'keyword1' => [
+                'value' => '',
+            ],
+            'keyword2' => [
+                'value' => ''
+            ],
+            'keyword3' => [
+                'value' => ''
+            ],
+            'remark' => [
+                'value' => '',
+                'color' => '#00B642'
+            ]
+        ]
+    ];
 }

@@ -8,6 +8,7 @@
 namespace App\Http\Model\Common;
 use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
+use App\Http\Model\Leave\DailyLeave;
 use App\Http\Model\Teacher;
 use Illuminate\Support\Facades\Redis;
 use src\ApiHelper\ApiRequest;
@@ -19,10 +20,10 @@ class Wx{
     const REDIS_ACCESS_TOKEN_KEY = 'tis_access_token';
 
     const MODEL_NUM_INFO = 1;//通知模板
-
     const MODEL_NUM_ADD_LEAVE_SUCC = 2;//请假申请成功模板
-
     const MODEL_NUM_LEAVE_AUTH_RESULT = 3;//请假结果通知模板
+
+
     /**
      * 第二步通过code换取openid
      * @param $code
@@ -63,15 +64,30 @@ class Wx{
             $modelInfo['data']['keyword2']['value'] = $infoData['teacher_name'];
             $modelInfo['data']['keyword3']['value'] = date('Y-m-d H:i');
             $modelInfo['url'] = ComConf::HOST . '/client/tongzhi_detail.html?id=' . $infoData['batch_id'];
-        } else if ($modelNum == self::MODEL_NUM_ADD_LEAVE_SUCC){//请假成功模板
+        } else if ($modelNum == self::MODEL_NUM_ADD_LEAVE_SUCC){//添加请假成功模板
             $modelInfo = WxConf::MODEL_ADD_LEAVE_SUCC;
             $modelInfo['data']['keyword1']['value'] = $infoData['leave_reason'];
             $modelInfo['data']['keyword2']['value'] = $infoObjects['name'];
             $modelInfo['data']['keyword3']['value'] = Teacher::find($infoData['teacher_id'])->name;
             $modelInfo['data']['keyword5']['value'] = date('Y-m-d H:i');
             //TODO $modelInfo['url'] = '';
+        } else if ($modelNum == self::MODEL_NUM_LEAVE_AUTH_RESULT){//请假结果通知模板
+            $modelInfo = WxConf::MODEL_LEAVE_RESULT;
+            if ($infoData['status'] == DailyLeave::AUTH_SUCC){
+                $modelInfo['data']['keyword1']['value'] = '审核通过';
+                $modelInfo['data']['keyword1']['color'] = '#00B642';
+            } else {
+                $modelInfo['data']['keyword1']['value'] = '审核不通过';
+                $modelInfo['data']['keyword1']['color'] = '#FF3333';
+            }
+            $modelInfo['data']['keyword2']['value'] = $infoData['teacher_name'];
+            $modelInfo['data']['keyword3']['value'] = $infoData['updated_at'];
+            $modelInfo['data']['remark']['value'] = '辅导员意见：' . $infoData['auth_reason'];
+        } else{
+            return false;
         }
 
+        //发送
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
         if (!is_object($infoObjects) && is_array($infoObjects)){

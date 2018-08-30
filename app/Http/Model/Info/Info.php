@@ -109,7 +109,7 @@ class Info extends Model {
         try {
             DB::table('info')->insert($data);
         } catch (\Exception $e){
-            Logger::fatal('info|insert_to_info_table_falied|data:' . json_encode($data));
+            Logger::fatal('info|insert_to_info_table_failed|data:' . json_encode($data));
             throw new OperateFailedException($e->getMessage());
         }
     }

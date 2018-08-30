@@ -21,6 +21,7 @@ use src\ApiHelper\ApiResponse;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 use src\Exceptions\PermissionDeniedException;
+use src\Exceptions\ResourceNotFoundException;
 
 class Pc extends Controller{
 
@@ -65,6 +66,7 @@ class Pc extends Controller{
      * @throws ParamValidateFailedException
      * @throws \src\Exceptions\OperateFailedException
      * @throws \src\Exceptions\UnAuthorizedException
+     * @throws ResourceNotFoundException
      */
     public function sendInfo(){
         $validator = Validator::make($params = Request::all(),[
@@ -83,7 +85,7 @@ class Pc extends Controller{
         $teacherName = User::getUser()->name;
         $infoObjects = Info::getInfoObject($params['type'],$params['target']);
         if (empty($infoObjects)){
-            throw new OperateFailedException('无可用通知对象');
+            throw new ResourceNotFoundException('无可用通知对象');
         }
         $batchId = time();
         $infoData = [
@@ -131,6 +133,7 @@ class Pc extends Controller{
      * @return string
      * @throws ParamValidateFailedException
      * @throws OperateFailedException
+     * @throws ResourceNotFoundException
      */
     public function getFeedbackStatus(){
         $validator = Validator::make($params = Request::all(),[
@@ -142,7 +145,7 @@ class Pc extends Controller{
         $feedbacks = Info::select('title','uid','name','status')->where('batch_id',$params['batch_id'])->get();
         if (empty($feedbacks)){
             Logger::fatal('info|info_was_deleted|batch_id:' . $params['batch_id']);
-            throw new OperateFailedException('该通知已被删除');
+            throw new ResourceNotFoundException('该通知已被删除');
         }
         return ApiResponse::responseSuccess($feedbacks);
     }

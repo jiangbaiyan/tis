@@ -67,6 +67,15 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
             Route::group(['prefix' => 'pc'],function (){
 
+                //获取教师信息(自动填写到请假任课教师)
+                Route::get('getTeacherInfo','Leave\Pc@getTeacherInfo');
+
+                //获取待审核的请假信息
+                Route::get('getAuthIngLeave','Leave\Pc@getAuthIngLeave');
+
+                //获取已审批过的请假信息
+                Route::get('getLeaveAuthHistory','Leave\Pc@getLeaveAuthHistory');
+
             });
 
             Route::group(['prefix' => 'wx'],function (){

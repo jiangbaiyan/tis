@@ -70,4 +70,12 @@ class Wx{
         return ApiResponse::responseSuccess();
     }
 
+    /**
+     * 获取已绑定信息教师的信息(请假自动导入）
+     * @return string
+     */
+    public function getTeacherInfo(){
+        $data = Teacher::select('name','phone')->get();
+        return ApiResponse::responseSuccess($data);
+    }
 }

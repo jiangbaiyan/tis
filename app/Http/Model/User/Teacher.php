@@ -30,7 +30,7 @@ class Teacher extends Model{
     //获取通知模块权限
     public static function getAuthState($uid){
         $authState = json_decode(Redis::hget(self::ALL_AUTH_STATE_KEY,$uid),true);
-        if (!isset($infoAuthState)){
+        if (!isset($authState)){
             return self::NORMAL;
         }
         return $authState;

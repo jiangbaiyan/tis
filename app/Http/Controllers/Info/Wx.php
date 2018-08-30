@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
+use src\Exceptions\ResourceNotFoundException;
 
 class Wx{
 
@@ -42,7 +43,7 @@ class Wx{
         ])->first();
         if (empty($info)){
             Logger::fatal('info|info_was_deleted|batch_id:' . $params['batch_id']);
-            throw new OperateFailedException('抱歉，该通知已被删除');
+            throw new ResourceNotFoundException('抱歉，该通知已被删除');
         }
         $info->status = Info::STATUS_WATCHED;
         $info->save();
