@@ -39,6 +39,10 @@
 			font-weight: 300;
 			color: #333;
 			letter-spacing: 1.3px;
+			overflow:hidden;
+			white-space:nowrap;
+			text-overflow: ellipsis;
+			width: 199px;
 		}
 		span.key, span.val {
 			font-size: 18px;
@@ -58,66 +62,66 @@
 	</style>
 </head>
 <body>
-	<div id="main">
-		<h1>您的信息已绑定成功</h1>
-		<br>
-		<div class="item">
-			<span class="key">姓名</span>
-			<span class="val">{{$data->name}}</span>
-		</div>
-		<div class="item">
-			@if (strlen($data->uid) == 5)
-				<span class="key">工号</span>
-			@else
-				<span class="key">学号</span>
-			@endif
-			<span class="val">{{$data->uid}}</span>
-		</div>
-		@if (!empty($data->grade))
-			<div class="item">
-				<span class="key">年级</span>
-				<span class="val">{{$data->grade}}</span>
-			</div>
-		@endif
-		@if (!empty($data->class))
-			<div class="item">
-				<span class="key">班级</span>
-				<span class="val">{{$data->class}}</span>
-			</div>
-		@endif
-		@if (!empty($data->major))
-			<div class="item">
-				<span class="key">专业</span>
-				<span class="val">{{$data->major}}</span>
-			</div>
-		@endif
-		<div class="item">
-			<span class="key">手机</span>
-			<span class="val">{{$data->phone}}</span>
-		</div>
-		<div class="item">
-			<span class="key">邮箱</span>
-			<span class="val">{{$data->email}}</span>
-		</div>
-		@if (!empty($data->teacher_id))
-			<div class="item">
-				<span class="key">辅导员</span>
-				<span class="val">{{\App\Http\Model\Teacher::$instructorMapping[$data->teacher_id]}}</span>
-			</div>
-		@endif
-		<input id="token" type="hidden" value="{{$data->token}}">
-		<button id="back" class="back" onclick="back()">返回首页</button>
+<div id="main">
+	<h1>您的信息已绑定成功</h1>
+	<br>
+	<div class="item">
+		<span class="key">姓名</span>
+		<span class="val">{{$data->name}}</span>
 	</div>
-	<script>
-		var token;
-		token = document.getElementById('token').value;
-        localStorage.setItem("token", token);//token存到本地，每次请求接口携带
+	<div class="item">
+		@if (strlen($data->uid) == 5)
+			<span class="key">工号</span>
+		@else
+			<span class="key">学号</span>
+		@endif
+		<span class="val">{{$data->uid}}</span>
+	</div>
+	@if (!empty($data->grade))
+		<div class="item">
+			<span class="key">年级</span>
+			<span class="val">{{$data->grade}}</span>
+		</div>
+	@endif
+	@if (!empty($data->class))
+		<div class="item">
+			<span class="key">班级</span>
+			<span class="val">{{$data->class}}</span>
+		</div>
+	@endif
+	@if (!empty($data->major))
+		<div class="item">
+			<span class="key">专业</span>
+			<span class="val">{{$data->major}}</span>
+		</div>
+	@endif
+	<div class="item">
+		<span class="key">手机</span>
+		<span class="val">{{$data->phone}}</span>
+	</div>
+	<div class="item">
+		<span class="key">邮箱</span>
+		<span class="val" style="letter-spacing: 0.5px">{{$data->email}}</span>
+	</div>
+	@if (!empty($data->teacher_id))
+		<div class="item">
+			<span class="key">辅导员</span>
+			<span class="val">{{\App\Http\Model\Teacher::$instructorMapping[$data->teacher_id]}}</span>
+		</div>
+	@endif
+	<input id="token" type="hidden" value="{{$data->token}}">
+	<button id="back" class="back" onclick="back()">返回首页</button>
+</div>
+<script>
+    var token;
+    token = document.getElementById('token').value;
+    localStorage.setItem("token", token);//token存到本地，每次请求接口携带
 
-        var returnBtn = document.getElementById('back');
+    var returnBtn = document.getElementById('back');
 
-        returnBtn.onclick = function () {
-			location.href = "https://tis.hzcloudservice.com/client";
-        };
-	</script>
+    returnBtn.onclick = function () {
+        location.href = "https://tis.hzcloudservice.com/client";
+    };
+</script>
 </body>
 </html>
