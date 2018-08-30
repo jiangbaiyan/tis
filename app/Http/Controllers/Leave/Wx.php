@@ -46,7 +46,7 @@ class Wx{
         $data = $params;
         !empty($params['destination']) ? $data['is_leave_hz'] = 1 : $data['is_leave_hz'] = 0;
         $data['status'] = DailyLeave::AUTH_ING;
-        $user = User::getUser();
+        $user = User::getUser()->toArray();
         $data['student_id'] = $user->id;
         $data['teacher_id'] = $user->teacher_id;
         try {

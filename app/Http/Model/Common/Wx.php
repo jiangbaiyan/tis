@@ -48,12 +48,13 @@ class Wx{
 
     /**
      * 发送模板消息
-     * @param $infoObjcets
-     * @param $infoData
+     * @param array $infoObjcets
+     * @param array $infoData
+     * @param $modelNum
      * @return bool
      * @throws OperateFailedException
      */
-    public static function sendModelInfo($infoObjcets,$infoData,$modelNum){
+    public static function sendModelInfo(array $infoObjcets, array $infoData,$modelNum){
 
         if ($modelNum == self::MODEL_NUM_INFO){//通知模板
             $modelInfo = WxConf::MODEL_INFO;
@@ -65,7 +66,7 @@ class Wx{
         } else if ($modelNum == self::MODEL_NUM_ADD_LEAVE_SUCC){//请假成功模板
             $modelInfo = WxConf::MODEL_ADD_LEAVE_SUCC;
             $modelInfo['data']['keyword1'] = $infoData['leave_reason'];
-            $modelInfo['data']['keyword2'] = $infoObjcets->name;
+            $modelInfo['data']['keyword2'] = $infoObjcets['name'];
             $modelInfo['data']['keyword3'] = Teacher::find($infoData['teacher_id'])->name;
             $modelInfo['data']['keyword5'] = date('Y-m-d H:i');
             //TODO $modelInfo['url'] = '';
@@ -73,21 +74,38 @@ class Wx{
 
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
-        foreach ($infoObjcets as $item){
-            $modelInfo['touser'] = $item['openid'];
+        if (is_array($infoObjcets)){
+            foreach ($infoObjcets as $item){
+                $modelInfo['touser'] = $item['openid'];
+                try{
+                    $res = ApiRequest::sendRequest('POST',$requestUrl,[
+                        'json' => $modelInfo
+                    ]);
+                    if (!empty($res['errcode'])){
+                        Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|errormsg:' . json_encode($res));
+                        return false;
+                    }
+                } catch (\Exception $e){
+                    Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|exceptionMsg:' . $e->getMessage());
+                    return false;
+                }
+            }
+        } else{
+            $modelInfo['touser'] = $infoObjcets['openid'];
             try{
                 $res = ApiRequest::sendRequest('POST',$requestUrl,[
                     'json' => $modelInfo
                 ]);
                 if (!empty($res['errcode'])){
-                    Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|errormsg:' . json_encode($res));
+                    Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjcets) . '|infoData:' . json_encode($infoData) . '|errormsg:' . json_encode($res));
                     return false;
                 }
             } catch (\Exception $e){
-                Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|exceptionMsg:' . $e->getMessage());
+                Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjcets) . '|infoData:' . json_encode($infoData) . '|exceptionMsg:' . $e->getMessage());
                 return false;
             }
         }
+
     }
 
     /**
