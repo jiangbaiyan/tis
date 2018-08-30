@@ -29,7 +29,7 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
     });
 
-   // Route::group(['middleware' => 'checkLogin'],function (){
+    Route::group(['middleware' => 'checkLogin'],function (){
 
         Route::group(['prefix' => 'info'],function (){
 
@@ -77,5 +77,5 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
             });
 
         });
-   // });
+    });
 });
