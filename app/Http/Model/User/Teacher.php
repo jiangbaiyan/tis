@@ -28,12 +28,12 @@ class Teacher extends Model{
     ];
 
     //获取通知模块权限
-    public static function getInfoAuthState($uid){
-        $infoAuthState = json_decode(Redis::hget(self::ALL_AUTH_STATE_KEY,$uid),true)['info_auth_state'];
+    public static function getAuthState($uid){
+        $authState = json_decode(Redis::hget(self::ALL_AUTH_STATE_KEY,$uid),true);
         if (!isset($infoAuthState)){
             return self::NORMAL;
         }
-        return $infoAuthState;
+        return $authState;
     }
 
 }

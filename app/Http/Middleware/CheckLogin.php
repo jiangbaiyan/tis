@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Config\ComConf;
+use App\Http\Controllers\Info\Wx;
 use App\Http\Model\Teacher;
 use App\Util\Logger;
 use Closure;
@@ -51,11 +52,21 @@ class CheckLogin
 
         //检查各模块权限
         //PC端通知模块权限0-普通教师 1-辅导员（可给学生发）2-教务老师（可给老师和学生发）
-        $url = $request->url();
-        if (strpos($url,'info')){//如果请求了通知模块
-            $infoAuthState = Teacher::getInfoAuthState($user->uid);
-            if ($infoAuthState == Teacher::NORMAL){
-                Logger::notice('auth|info_module_permission_denied|user:' . json_encode($user));
+        if (!\App\Http\Model\Common\Wx::isFromWx()){
+            $url = $request->url();
+            if (strpos($url,'info')){//检测通知模块权限
+                $infoAuthState = Teacher::getAuthState($user->uid)['info_auth_state'];
+                if (empty($infoAuthState) || $infoAuthState == Teacher::NORMAL){
+                    Logger::notice('auth|info_module_permission_denied|user:' . json_encode($user));
+                    throw new PermissionDeniedException();
+                }
+            }
+
+            if (strpos($url,'leave')){//检测请假模块权限
+                $leaveAuthState = Teacher::getAuthState($user->uid)['leave_auth_state'];
+                if (empty($leaveAuthState) || $infoAuthState == Teacher::NORMAL){
+                    Logger::notice('auth|leave_module_permission_denied|user:' . json_encode($user));
+                }
                 throw new PermissionDeniedException();
             }
         }
