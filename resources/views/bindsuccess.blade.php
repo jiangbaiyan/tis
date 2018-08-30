@@ -47,6 +47,7 @@
 		span.key, span.val {
 			font-size: 18px;
 			display: inline-block;
+			vertical-align:middle;
 		}
 		.back {
 			border-radius: 5px;
