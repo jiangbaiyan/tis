@@ -46,7 +46,7 @@ class Wx{
         $data = $params;
         !empty($params['destination']) ? $data['is_leave_hz'] = 1 : $data['is_leave_hz'] = 0;
         $data['status'] = DailyLeave::AUTH_ING;
-        $user = User::getUser()->toArray();
+        $user = User::getUser();
         $data['student_id'] = $user->id;
         $data['teacher_id'] = $user->teacher_id;
         try {
@@ -62,7 +62,7 @@ class Wx{
                 \DB::table('daily_leave_course')->insert($courses);//插入请假课程信息
             }
             //发送模板消息
-            \App\Http\Model\Common\Wx::sendModelInfo($user,$data,\App\Http\Model\Common\Wx::MODEL_NUM_ADD_LEAVE_SUCC);
+            \App\Http\Model\Common\Wx::sendModelInfo($user->toArray(),$data,\App\Http\Model\Common\Wx::MODEL_NUM_ADD_LEAVE_SUCC);
         } catch (\Exception $e){
             Logger::fatal('leave|insert_leave_info_failed|msg:' . $e->getMessage() . '|data:' . json_encode($data));
             throw new OperateFailedException($e->getMessage());
