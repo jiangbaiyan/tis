@@ -17,14 +17,13 @@ class WxConf{
     const GET_CODE_REDIRECT_URL = ComConf::HOST . '/api/v1/login/callback';
 
     const MODEL_INFO = [
-        //模板消息配置
             'touser' => '',
             'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
-            'url' => "",
+            'url' => '',
             'data' => [
                 'first' => [
                     'value' => '',
-                    'color' => '#FF0000'
+                    'color' => '#FF3333'
                 ],
                 'keyword1' => [
                     'value' => '网安学院'
@@ -42,4 +41,34 @@ class WxConf{
             ]
         ];
 
+    const MODEL_ADD_LEAVE_SUCC = [
+        'touser' => '',
+        'teamplate_id' => '5J8NV6W_s9THmXA7BcrMnv8CBjHH1MmHTzzQ52dDcC8',
+        'url' => '',
+        'data' => [
+            'first' => [
+                'value' => '您的请假申请已成功提交',
+                'color' => '#FF33333'
+            ],
+            'keyword1' => [
+                'value' => ''
+            ],
+            'keyword2' => [
+                'value' => ''
+            ],
+            'keyword3' => [
+                'value' => ''
+            ],
+            'keyword4' => [
+                'value' => '审核中'
+            ],
+            'keyword5' => [
+                'value' => ''
+            ],
+            'remark' => [
+                'value' => '我们已通知相关辅导员，您的请假申请会尽快得到审批',
+                'color' => '#00B642'
+            ]
+        ]
+    ];
 }

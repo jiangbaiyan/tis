@@ -8,6 +8,7 @@
 namespace App\Http\Model\Common;
 use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
+use App\Http\Model\Teacher;
 use Illuminate\Support\Facades\Redis;
 use src\ApiHelper\ApiRequest;
 use src\Exceptions\OperateFailedException;
@@ -17,6 +18,11 @@ class Wx{
 
     const REDIS_ACCESS_TOKEN_KEY = 'tis_access_token';
 
+    const MODEL_NUM_INFO = 1;//通知模板
+
+    const MODEL_NUM_ADD_LEAVE_SUCC = 2;//请假申请成功模板
+
+    const MODEL_NUM_LEAVE_AUTH_RESULT = 3;//请假结果通知模板
     /**
      * 第二步通过code换取openid
      * @param $code
@@ -47,13 +53,24 @@ class Wx{
      * @return bool
      * @throws OperateFailedException
      */
-    public static function sendModelInfo($infoObjcets,$infoData){
-        $modelInfo = WxConf::MODEL_INFO;
-        $title = $infoData['title'];
-        $modelInfo['data']['first']['value'] = '《' . "$title" . '》';
-        $modelInfo['data']['keyword2']['value'] = $infoData['teacher_name'];
-        $modelInfo['data']['keyword3']['value'] = date('Y-m-d H:i');
-        $modelInfo['url'] = ComConf::HOST . '/client/tongzhi_detail.html?id=' . $infoData['batch_id'];
+    public static function sendModelInfo($infoObjcets,$infoData,$modelNum){
+
+        if ($modelNum == self::MODEL_NUM_INFO){//通知模板
+            $modelInfo = WxConf::MODEL_INFO;
+            $title = $infoData['title'];
+            $modelInfo['data']['first']['value'] = '《' . "$title" . '》';
+            $modelInfo['data']['keyword2']['value'] = $infoData['teacher_name'];
+            $modelInfo['data']['keyword3']['value'] = date('Y-m-d H:i');
+            $modelInfo['url'] = ComConf::HOST . '/client/tongzhi_detail.html?id=' . $infoData['batch_id'];
+        } else if ($modelNum == self::MODEL_NUM_ADD_LEAVE_SUCC){//请假成功模板
+            $modelInfo = WxConf::MODEL_ADD_LEAVE_SUCC;
+            $modelInfo['data']['keyword1'] = $infoData['leave_reason'];
+            $modelInfo['data']['keyword2'] = $infoObjcets->name;
+            $modelInfo['data']['keyword3'] = Teacher::find($infoData['teacher_id'])->name;
+            $modelInfo['data']['keyword5'] = date('Y-m-d H:i');
+            //TODO $modelInfo['url'] = '';
+        }
+
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
         foreach ($infoObjcets as $item){
@@ -63,11 +80,11 @@ class Wx{
                     'json' => $modelInfo
                 ]);
                 if (!empty($res['errcode'])){
-                    Logger::fatal('info|send_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|errormsg:' . json_encode($res));
+                    Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|errormsg:' . json_encode($res));
                     return false;
                 }
             } catch (\Exception $e){
-                Logger::fatal('info|send_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|exceptionMsg:' . $e->getMessage());
+                Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|exceptionMsg:' . $e->getMessage());
                 return false;
             }
         }

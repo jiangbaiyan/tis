@@ -22,8 +22,12 @@ class CreateDailyLeaveTable extends Migration
             $table->unsignedTinyInteger('end_course')->default('0')->comment('请假结束课程');
             $table->unsignedTinyInteger('is_leave_hz')->deafult('0')->comment('是否离杭');
             $table->string('destination',255)->default('')->comment('去往何处');
-            $table->unsignedTinyInteger('status')->default('')->comment('辅导员审核状态|1-审核中|2-审核通过|3-审核不通过');
+            $table->unsignedTinyInteger('status')->default('0')->comment('辅导员审核状态|1-审核中|2-审核通过|3-审核不通过');
             $table->string('auth_reason',255)->default('')->comment('辅导员审核备注');
+            $table->unsignedInteger('teacher_id')->default('0')->comment('所属辅导员');
+            $table->unsignedInteger('student_id')->default('0')->comment('请假发起人');
+            $table->index('teacher_id');
+            $table->index('student_id');
             $table->timestamps();
         });
     }

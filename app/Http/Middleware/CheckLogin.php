@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Http\Config\ComConf;
-use App\Http\Controllers\Info\Wx;
 use App\Http\Model\Teacher;
 use App\Util\Logger;
 use Closure;
@@ -24,6 +23,7 @@ class CheckLogin
      * @param  \Closure $next
      * @return mixed
      * @throws UnAuthorizedException
+     * @throws PermissionDeniedException
      */
     public function handle($request, Closure $next)
     {

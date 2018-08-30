@@ -29,7 +29,7 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
     });
 
-    Route::group(['middleware' => 'checkLogin'],function (){
+   // Route::group(['middleware' => 'checkLogin'],function (){
 
         Route::group(['prefix' => 'info'],function (){
 
@@ -62,5 +62,20 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
             });
         });
 
-    });
+        //请假模块
+        Route::group(['prefix' => 'leave'],function (){
+
+            Route::group(['prefix' => 'pc'],function (){
+
+            });
+
+            Route::group(['prefix' => 'wx'],function (){
+
+                //添加一条请假信息
+                Route::post('addLeave','Leave\Wx@addLeave');
+
+            });
+
+        });
+   // });
 });

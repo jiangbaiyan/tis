@@ -96,7 +96,7 @@ class Pc extends Controller{
             'batch_id' => $batchId
         ];
         Info::insertInfo($infoObjects,$infoData);
-        $res = Wx::sendModelInfo($infoObjects,$infoData);
+        $res = Wx::sendModelInfo($infoObjects,$infoData,Wx::MODEL_NUM_INFO);
         if ($res === false){
             Info::where('batch_id',$infoData['batch_id'])->delete();
             throw new OperateFailedException('通知发送失败，请重试');
