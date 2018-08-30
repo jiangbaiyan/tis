@@ -74,7 +74,7 @@ class Wx{
 
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
-        if (is_array($infoObjcets)){
+        if (is_array($infoObjcets) && count($infoObjcets) > 1){
             foreach ($infoObjcets as $item){
                 $modelInfo['touser'] = $item['openid'];
                 try{
