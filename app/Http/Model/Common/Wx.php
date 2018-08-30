@@ -82,11 +82,11 @@ class Wx{
                         'json' => $modelInfo
                     ]);
                     if (!empty($res['errcode'])){
-                        Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|errormsg:' . json_encode($res));
+                        Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($modelInfo) . '|errormsg:' . json_encode($res));
                         return false;
                     }
                 } catch (\Exception $e){
-                    Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($infoData) . '|exceptionMsg:' . $e->getMessage());
+                    Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($modelInfo) . '|exceptionMsg:' . $e->getMessage());
                     return false;
                 }
             }
@@ -97,11 +97,11 @@ class Wx{
                     'json' => $modelInfo
                 ]);
                 if (!empty($res['errcode'])){
-                    Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjects) . '|infoData:' . json_encode($infoData) . '|errormsg:' . json_encode($res));
+                    Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjects) . '|infoData:' . json_encode($modelInfo) . '|errormsg:' . json_encode($res));
                     return false;
                 }
             } catch (\Exception $e){
-                Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjects) . '|infoData:' . json_encode($infoData) . '|exceptionMsg:' . $e->getMessage());
+                Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjects) . '|infoData:' . json_encode($modelInfo) . '|exceptionMsg:' . $e->getMessage());
                 return false;
             }
         }

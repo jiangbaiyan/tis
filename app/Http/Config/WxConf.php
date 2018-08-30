@@ -43,7 +43,7 @@ class WxConf{
 
     const MODEL_ADD_LEAVE_SUCC = [
         'touser' => '',
-        'teamplate_id' => '5J8NV6W_s9THmXA7BcrMnv8CBjHH1MmHTzzQ52dDcC8',
+        'template_id' => '5J8NV6W_s9THmXA7BcrMnv8CBjHH1MmHTzzQ52dDcC8',
         'url' => '',
         'data' => [
             'first' => [
