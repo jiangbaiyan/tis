@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Session;
 class User{
 
     /**
-     * 获取当前登录用户
+     * 获取当前登录用户对象
      * @return mixed
      * @throws \src\Exceptions\UnAuthorizedException
      */
     public static function getUser($isRtnId = false){
-        $user = json_decode(Session::get('user'),true);
+        $user = Session::get('user');
         //$user = Teacher::find(1);
         if (empty($user)){
             throw new \src\Exceptions\UnAuthorizedException();

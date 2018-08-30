@@ -33,7 +33,7 @@ class Pc extends Controller{
      */
     public function getInfoTargets(){
         $user = User::getUser();
-        $infoAuthState = Teacher::getInfoAuthState($user['uid']);
+        $infoAuthState = Teacher::getInfoAuthState($user->uid);
         if ($infoAuthState != Teacher::INSTRUCTOR && $infoAuthState != Teacher::DEAN){
             throw new PermissionDeniedException();
         }

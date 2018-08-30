@@ -45,7 +45,7 @@ class CheckLogin
             Logger::notice('auth|front_token_not_equals_redis_token|user:' . json_encode($user));
             throw new UnAuthorizedException();
         }
-        Session::put('user',json_encode($user));
+        Session::put('user',$user);
         Session::save();
 
         //检查各模块权限
