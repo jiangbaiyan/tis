@@ -13,6 +13,7 @@ class ComConf{
 
     const HDU_CAS_URL = self::HOST . '/api/v1/login/bind';//杭电CAS登录URL
 
+    const JWT_KEY = 'TeacherInfoSystem';//JWT KEY
 
     //const HOST = 'http://localhost:8888';
 }

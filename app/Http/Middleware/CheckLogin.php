@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Config\ComConf;
 use App\Http\Model\Teacher;
 use App\Util\Logger;
 use Closure;
@@ -31,7 +32,7 @@ class CheckLogin
             throw new UnAuthorizedException();
         }
         try{
-            $user = JWT::decode($frontToken, env('JWT_KEY'),['HS256']);
+            $user = JWT::decode($frontToken, ComConf::JWT_KEY ,['HS256']);
         }catch (\Exception $e){
             Logger::notice('auth|decode_token_failed|msg:' . $e->getMessage());
             throw new UnAuthorizedException();
