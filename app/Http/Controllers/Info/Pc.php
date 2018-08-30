@@ -114,7 +114,7 @@ class Pc extends Controller{
      */
     public function getInfoList(){
         $user = User::getUser();
-        $midRes = Info::select('title','content','type','attachment','teacher_name','batch_id');
+        $midRes = Info::select('title','content','type','attachment','teacher_name','batch_id','created_at');
         $infoAuthState = Teacher::getAuthState($user->uid)['info_auth_state'];
         if ($infoAuthState == Teacher::NORMAL){
             throw new PermissionDeniedException();
