@@ -17,29 +17,29 @@ class WxConf{
     const GET_CODE_REDIRECT_URL = ComConf::HOST . '/api/v1/login/callback';
 
     const MODEL_INFO = [
-            'touser' => '',
-            'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
-            'url' => '',
-            'data' => [
-                'first' => [
-                    'value' => '',
-                    'color' => '#FF3333'
-                ],
-                'keyword1' => [
-                    'value' => '网安学院'
-                ],
-                'keyword2' => [
-                    'value' => ''
-                ],
-                'keyword3' => [
-                    'value' => ''
-                ],
-                'keyword4' => [
-                    'value' => '点我进入详情页查看',
-                    'color' => '#00B642'
-                ],
-            ]
-        ];
+        'touser' => '',
+        'template_id' => 'rlewQdPyJ6duW7KorFEPPi0Kd28yJUn_MTtSkC0jpvk',
+        'url' => '',
+        'data' => [
+            'first' => [
+                'value' => '',
+                'color' => '#FF3333'
+            ],
+            'keyword1' => [
+                'value' => '网安学院'
+            ],
+            'keyword2' => [
+                'value' => ''
+            ],
+            'keyword3' => [
+                'value' => ''
+            ],
+            'keyword4' => [
+                'value' => '点我进入详情页查看',
+                'color' => '#00B642'
+            ],
+        ]
+    ];
 
     const MODEL_ADD_LEAVE_SUCC = [
         'touser' => '',
@@ -48,7 +48,7 @@ class WxConf{
         'data' => [
             'first' => [
                 'value' => '您的请假申请已成功提交',
-                'color' => '#FF33333'
+                'color' => '#FF3333'
             ],
             'keyword1' => [
                 'value' => ''

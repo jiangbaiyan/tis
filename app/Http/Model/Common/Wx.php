@@ -65,10 +65,10 @@ class Wx{
             $modelInfo['url'] = ComConf::HOST . '/client/tongzhi_detail.html?id=' . $infoData['batch_id'];
         } else if ($modelNum == self::MODEL_NUM_ADD_LEAVE_SUCC){//请假成功模板
             $modelInfo = WxConf::MODEL_ADD_LEAVE_SUCC;
-            $modelInfo['data']['keyword1'] = $infoData['leave_reason'];
-            $modelInfo['data']['keyword2'] = $infoObjects['name'];
-            $modelInfo['data']['keyword3'] = Teacher::find($infoData['teacher_id'])->name;
-            $modelInfo['data']['keyword5'] = date('Y-m-d H:i');
+            $modelInfo['data']['keyword1']['value'] = $infoData['leave_reason'];
+            $modelInfo['data']['keyword2']['value'] = $infoObjects['name'];
+            $modelInfo['data']['keyword3']['value'] = Teacher::find($infoData['teacher_id'])->name;
+            $modelInfo['data']['keyword5']['value'] = date('Y-m-d H:i');
             //TODO $modelInfo['url'] = '';
         }
 
