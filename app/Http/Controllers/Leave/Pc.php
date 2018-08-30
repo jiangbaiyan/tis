@@ -68,7 +68,7 @@ class Pc{
             throw new ParamValidateFailedException($validator);
         }
         $leave = DailyLeave::find($params['id']);
-        if (empty($leave)){
+        if (!$leave){
             throw new ResourceNotFoundException();
         }
         $data = [];

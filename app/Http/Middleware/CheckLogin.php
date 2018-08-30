@@ -56,7 +56,7 @@ class CheckLogin
             $url = $request->url();
             if (strpos($url,'info')){//检测通知模块权限
                 $infoAuthState = Teacher::getAuthState($user->uid)['info_auth_state'];
-                if (empty($infoAuthState) || $infoAuthState == Teacher::NORMAL){
+                if (empty($infoAuthState)){
                     Logger::notice('auth|info_module_permission_denied|user:' . json_encode($user));
                     throw new PermissionDeniedException();
                 }
@@ -64,7 +64,7 @@ class CheckLogin
 
             if (strpos($url,'leave')){//检测请假模块权限
                 $leaveAuthState = Teacher::getAuthState($user->uid)['leave_auth_state'];
-                if (empty($leaveAuthState) || $infoAuthState == Teacher::NORMAL){
+                if (empty($leaveAuthState)){
                     Logger::notice('auth|leave_module_permission_denied|user:' . json_encode($user));
                 }
                 throw new PermissionDeniedException();

@@ -21,7 +21,7 @@ class User{
     public static function getUser($isRtnId = false){
         $user = Session::get('user');
         //$user = Student::find(1);
-        if (empty($user)){
+        if (!$user){
             throw new \src\Exceptions\UnAuthorizedException();
         }
         if ($isRtnId){

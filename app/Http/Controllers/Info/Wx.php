@@ -41,7 +41,7 @@ class Wx{
             ['batch_id' ,'=', $params['batch_id']],
             ['uid' ,'=', $user->uid]
         ])->first();
-        if (empty($info)){
+        if (!$info){
             Logger::fatal('info|info_was_deleted|batch_id:' . $params['batch_id']);
             throw new ResourceNotFoundException('抱歉，该通知已被删除');
         }

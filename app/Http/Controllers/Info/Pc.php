@@ -38,7 +38,6 @@ class Pc extends Controller{
         if ($infoAuthState != Teacher::INSTRUCTOR && $infoAuthState != Teacher::DEAN){
             throw new PermissionDeniedException();
         }
-        $infoAuthState = 2;
         $student = Student::select('id', 'uid', 'name', 'major', 'grade', 'class')->get();
         $grade = $student->groupBy('grade');
         $class = $student->groupBy('class');
@@ -55,7 +54,7 @@ class Pc extends Controller{
             $teacher = Teacher::select('id','uid','name')
                 ->where('openid','!=','')
                 ->get();
-            if (!empty($teacher)){
+            if (!$teacher){
                 $resData['teacher'] = $teacher;
             }
         }
@@ -145,7 +144,7 @@ class Pc extends Controller{
             throw new ParamValidateFailedException($validator);
         }
         $feedbacks = Info::select('title','uid','name','status')->where('batch_id',$params['batch_id'])->get();
-        if (empty($feedbacks)){
+        if (!$feedbacks){
             Logger::fatal('info|info_was_deleted|batch_id:' . $params['batch_id']);
             throw new ResourceNotFoundException('该通知已被删除');
         }
