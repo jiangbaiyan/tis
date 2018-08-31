@@ -28,6 +28,7 @@ class Wx{
      * @throws ParamValidateFailedException
      * @throws \src\Exceptions\UnAuthorizedException
      * @throws OperateFailedException
+     * @throws ResourceNotFoundException
      */
     public function getInfoDetail(){
         $user = User::getUser();
@@ -59,6 +60,7 @@ class Wx{
         $user = User::getUser();
         $data = Info::select('title','teacher_name','created_at','batch_id')
             ->where('uid',$user->uid)
+            ->latest()
             ->paginate(8);
         return ApiResponse::responseSuccess($data);
     }

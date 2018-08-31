@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Leave;
 use App\Http\Model\Common\Wx;
 use App\Http\Model\Common\User;
 use App\Http\Model\Leave\DailyLeave;
+use App\Http\Model\Leave\DailyLeaveCourse;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
 use Illuminate\Support\Facades\Request;
@@ -53,10 +54,11 @@ class Pc{
 
 
     /**
-     * 审核请假信息
+     * 审核请假信息（支持批量）
      * @return string
      * @throws ParamValidateFailedException
      * @throws ResourceNotFoundException
+     * @throws \src\Exceptions\OperateFailedException
      */
     public function authLeave(){
         $validator = Validator::make($params = Request::all(),[
@@ -67,20 +69,26 @@ class Pc{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        $leave = DailyLeave::find($params['id']);
+        $leave = DailyLeave::whereIn('id',explode(',',$params['id']))->get();
         if (!$leave){
             throw new ResourceNotFoundException();
         }
-        $data = [];
-        $data['status'] = $params['status'];
-        $data['auth_reason'] = $params['auth_reason'];
-        $leave->update($data);
-        $student = Student::find($leave->student_id);
-        $teacher = Teacher::find($leave->teacher_id);
-        //发模板消息
-        $data['teacher_name'] = $teacher->name;
-        $data['updated_at'] = $leave->updated_at;
-        Wx::sendModelInfo($student,$data,Wx::MODEL_NUM_LEAVE_AUTH_RESULT);
+        foreach ($leave as &$item){//处理每一条请假信息
+            $data = [];
+            $data['status'] = $params['status'];
+            $data['auth_reason'] = $params['auth_reason'];
+            $item->update($data);
+            $student = Student::find($item->student_id);
+            $teacher = Teacher::find($item->teacher_id);
+            $data['teacher_name'] = $teacher->name;
+            $data['updated_at'] = $item->updated_at;
+            //发送审核结果给学生
+            Wx::sendModelInfo($student,$data,Wx::MODEL_NUM_LEAVE_AUTH_RESULT);
+            //发送请假短信给任课教师
+            $courses = DailyLeaveCourse::where('daily_leave_id',$item->id)->get();
+
+
+        }
         //发短信给任课老师
         return ApiResponse::responseSuccess();
     }

@@ -70,7 +70,7 @@ class Wx{
             $modelInfo['data']['keyword2']['value'] = $infoObjects['name'];
             $modelInfo['data']['keyword3']['value'] = Teacher::find($infoData['teacher_id'])->name;
             $modelInfo['data']['keyword5']['value'] = date('Y-m-d H:i');
-            //TODO $modelInfo['url'] = '';
+            //TODO $modelInfo['url'] = '';//辅导员审批该条请假HTML
         } else if ($modelNum == self::MODEL_NUM_LEAVE_AUTH_RESULT){//请假结果通知模板
             $modelInfo = WxConf::MODEL_LEAVE_RESULT;
             if ($infoData['status'] == DailyLeave::AUTH_SUCC){
@@ -83,6 +83,7 @@ class Wx{
             $modelInfo['data']['keyword2']['value'] = $infoData['teacher_name'];
             $modelInfo['data']['keyword3']['value'] = $infoData['updated_at'];
             $modelInfo['data']['remark']['value'] = '辅导员意见：' . $infoData['auth_reason'];
+            //TODO $modelInfo['url'] = '';//查看该条请假详情HTML
         } else{
             return false;
         }
@@ -99,11 +100,11 @@ class Wx{
                     ]);
                     if (!empty($res['errcode'])){
                         Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($modelInfo) . '|errormsg:' . json_encode($res));
-                        return false;
+                        throw new OperateFailedException();
                     }
                 } catch (\Exception $e){
                     Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($modelInfo) . '|exceptionMsg:' . $e->getMessage());
-                    return false;
+                    throw new OperateFailedException();
                 }
             }
         } else{
@@ -114,11 +115,11 @@ class Wx{
                 ]);
                 if (!empty($res['errcode'])){
                     Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjects) . '|infoData:' . json_encode($modelInfo) . '|errormsg:' . json_encode($res));
-                    return false;
+                    throw new OperateFailedException();
                 }
             } catch (\Exception $e){
                 Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjects) . '|infoData:' . json_encode($modelInfo) . '|exceptionMsg:' . $e->getMessage());
-                return false;
+                throw new OperateFailedException();
             }
         }
 
@@ -131,7 +132,7 @@ class Wx{
      */
     public static function getAccessToken(){
         $accessToken = Redis::get(self::REDIS_ACCESS_TOKEN_KEY);
-        if (Redis::ttl(self::REDIS_ACCESS_TOKEN_KEY) > 0 && !empty($accessToken)){
+        if (!empty($accessToken) && Redis::ttl(self::REDIS_ACCESS_TOKEN_KEY) > 0){
             return $accessToken;
         }
         $requestUrl = sprintf('https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s',WxConf::APPID,WxConf::APPKEY);

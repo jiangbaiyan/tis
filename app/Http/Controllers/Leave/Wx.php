@@ -61,7 +61,7 @@ class Wx{
                 }
                 \DB::table('daily_leave_course')->insert($courses);//插入请假课程信息
             }
-            //发送模板消息
+            //发送提交成功模板消息
             \App\Http\Model\Common\Wx::sendModelInfo($user,$data,\App\Http\Model\Common\Wx::MODEL_NUM_ADD_LEAVE_SUCC);
         } catch (\Exception $e){
             Logger::fatal('leave|insert_leave_info_failed|msg:' . $e->getMessage() . '|data:' . json_encode($data));
