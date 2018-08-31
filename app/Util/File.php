@@ -33,17 +33,16 @@ class File
     {
         $path = [];
         self::isAllowedFormat($file);
-        $name = $file->getClientOriginalName();
         if (is_array($file)) {
             foreach ($file as $fileItem) {
-                $path = Storage::disk('upyun')->putFileAs('/tis/' . date('Y') . '/' . date('md'),$fileItem,$name,'public');
+                $path = Storage::disk('upyun')->putFileAs('/tis/' . date('Y') . '/' . date('md'),$fileItem,$fileItem->getClientOriginalName(),'public');
                 if (empty($path)){
                     throw new OperateFailedException(self::UPLOAD_FAILED);
                 }
                 $path[] = self::UPYUN_HOST . $path;
             }
         } else {
-            $path = Storage::disk('upyun')->putFileAs('/tis/' . date('Y') . '/' . date('md'),$file,$name,'public');
+            $path = Storage::disk('upyun')->putFileAs('/tis/' . date('Y') . '/' . date('md'),$file,$file->getClientOriginalName(),'public');
             if (empty($path)){
                 throw new OperateFailedException(self::UPLOAD_FAILED);
             }
