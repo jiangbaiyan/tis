@@ -80,7 +80,7 @@ class Wx{
                 $modelInfo['data']['keyword1']['value'] = '审核不通过';
                 $modelInfo['data']['keyword1']['color'] = '#FF3333';
             }
-            $modelInfo['data']['keyword2']['value'] = $infoData['teacher_name'];
+            $modelInfo['data']['keyword2']['value'] = $infoData['dean_name'];
             $modelInfo['data']['keyword3']['value'] = $infoData['updated_at'];
             $modelInfo['data']['remark']['value'] = '辅导员意见：' . $infoData['auth_reason'];
             //TODO $modelInfo['url'] = '';//查看该条请假详情HTML

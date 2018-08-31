@@ -9,7 +9,41 @@
 namespace App\Util;
 
 
-class Sms
-{
+use src\ApiHelper\ApiRequest;
+use src\Exceptions\OperateFailedException;
 
+class Sms{
+
+    const UPYUN_CONF = [
+        'template_id' => 540,
+        'mobile' => '',
+        'vars' => ''
+    ];
+
+    const UPYUN_URL = 'https://sms-api.upyun.com/api/messages';
+
+    const UPYUN_HEADERS = [
+        'Authorization:MdALl4JlrIV5zohaS0vsoKx2HY5ud0',
+        'Content-Type: application/json'
+    ];
+
+    /**
+     * 发送单条短信
+     * @param $phone
+     * @param $vars
+     * @throws OperateFailedException
+     */
+    public static function send($phone,$vars){
+        $conf = self::UPYUN_CONF;
+        $conf['mobile'] = $phone;
+        $conf['vars'] = "{$vars['teacher_name']}|{$vars['course_name']}|{$vars['student_name']}|{$vars['leave_time']}|{$vars['dean_name']}";
+        $result = ApiRequest::sendRequest('POST',self::UPYUN_URL,[
+            'json' => json_encode($conf),
+            'headers' => self::UPYUN_HEADERS
+        ]);
+        if (isset($result['message_ids'][0]['error_code'])){//如果又拍云短信官方报错
+            Logger::fatal('sms|send_leave_upyun_sms_failed|msg:' . $result['message_ids'][0]['error_code'] . '|conf:' . json_encode($conf) . '|phone:' . $phone);
+            throw new OperateFailedException();
+        }
+    }
 }

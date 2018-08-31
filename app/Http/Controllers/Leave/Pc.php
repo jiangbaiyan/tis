@@ -14,6 +14,7 @@ use App\Http\Model\Leave\DailyLeave;
 use App\Http\Model\Leave\DailyLeaveCourse;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
+use App\Util\Sms;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
@@ -69,7 +70,7 @@ class Pc{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        $leave = DailyLeave::whereIn('id',explode(',',$params['id']))->get();
+        $leave = DailyLeave::whereIn('id',explode(',',$params['id']))->get()->toArray();
         if (!$leave){
             throw new ResourceNotFoundException();
         }
@@ -80,16 +81,18 @@ class Pc{
             $item->update($data);
             $student = Student::find($item->student_id);
             $teacher = Teacher::find($item->teacher_id);
-            $data['teacher_name'] = $teacher->name;
+            $data['dean_name'] = $teacher->name;
+            $data['student_name'] = $student->name;
             $data['updated_at'] = $item->updated_at;
             //发送审核结果给学生
             Wx::sendModelInfo($student,$data,Wx::MODEL_NUM_LEAVE_AUTH_RESULT);
             //发送请假短信给任课教师
             $courses = DailyLeaveCourse::where('daily_leave_id',$item->id)->get();
-
-
+            foreach ($courses as $course){
+                $data['leave_time'] = $item->begin_time . '第' . $item->begin_course . '节课' . ' ~ ' . $item->end_time . '第' . $item->end_course . '节课';
+                Sms::send($course->teacher_phone,array_merge($course,$data));
+            }
         }
-        //发短信给任课老师
         return ApiResponse::responseSuccess();
     }
 

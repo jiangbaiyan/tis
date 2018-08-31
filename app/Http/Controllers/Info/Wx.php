@@ -27,7 +27,6 @@ class Wx{
      * @return string
      * @throws ParamValidateFailedException
      * @throws \src\Exceptions\UnAuthorizedException
-     * @throws OperateFailedException
      * @throws ResourceNotFoundException
      */
     public function getInfoDetail(){
