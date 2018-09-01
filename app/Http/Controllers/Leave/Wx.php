@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Leave;
 use App\Http\Model\Common\User;
 use App\Http\Model\Leave\DailyLeave;
 use App\Http\Model\Leave\DailyLeaveCourse;
+use App\Http\Model\Teacher;
 use App\Util\Logger;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
@@ -65,6 +66,11 @@ class Wx{
             }
             //发送提交成功模板消息
             \App\Http\Model\Common\Wx::sendModelInfo($user,$data,\App\Http\Model\Common\Wx::MODEL_NUM_ADD_LEAVE_SUCC);
+            //提醒辅导员进行审批
+            $teacher = Teacher::find($data['teacher_id']);
+            $data['student_name'] = $user->name;
+            $data['student_uid'] = $user->uid;
+            \App\Http\Model\Common\Wx::sendModelInfo($teacher,$data,\App\Http\Model\Common\Wx::MODEL_NUM_NOTIFY_TEACHER);
         } catch (\Exception $e){
             Logger::fatal('leave|insert_leave_info_failed|msg:' . $e->getMessage() . '|data:' . json_encode($data));
             throw new OperateFailedException($e->getMessage());

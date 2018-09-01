@@ -20,8 +20,9 @@ class Wx{
     const REDIS_ACCESS_TOKEN_KEY = 'tis_access_token';
 
     const MODEL_NUM_INFO = 1;//通知模板
-    const MODEL_NUM_ADD_LEAVE_SUCC = 2;//请假申请成功模板
-    const MODEL_NUM_LEAVE_AUTH_RESULT = 3;//请假结果通知模板
+    const MODEL_NUM_ADD_LEAVE_SUCC = 2;//学生请假申请成功模板
+    const MODEL_NUM_LEAVE_AUTH_RESULT = 3;//学生请假结果通知模板
+    const MODEL_NUM_NOTIFY_TEACHER = 4;//提醒辅导员审核模板
 
 
     /**
@@ -55,7 +56,7 @@ class Wx{
      * @return bool
      * @throws OperateFailedException
      */
-    public static function sendModelInfo($infoObjects, $infoData,$modelNum){
+    public static function  sendModelInfo($infoObjects, $infoData,$modelNum){
 
         if ($modelNum == self::MODEL_NUM_INFO){//通知模板
             $modelInfo = WxConf::MODEL_INFO;
@@ -64,14 +65,14 @@ class Wx{
             $modelInfo['data']['keyword2']['value'] = $infoData['teacher_name'];
             $modelInfo['data']['keyword3']['value'] = date('Y-m-d H:i');
             $modelInfo['url'] = ComConf::HOST . '/client/tongzhi_detail.html?id=' . $infoData['batch_id'];
-        } else if ($modelNum == self::MODEL_NUM_ADD_LEAVE_SUCC){//添加请假成功模板
+        } else if ($modelNum == self::MODEL_NUM_ADD_LEAVE_SUCC){//学生添加请假成功模板
             $modelInfo = WxConf::MODEL_ADD_LEAVE_SUCC;
             $modelInfo['data']['keyword1']['value'] = $infoData['leave_reason'];
-            $modelInfo['data']['keyword2']['value'] = $infoObjects['name'];
+            $modelInfo['data']['keyword2']['value'] = $infoObjects->name;
             $modelInfo['data']['keyword3']['value'] = Teacher::find($infoData['teacher_id'])->name;
             $modelInfo['data']['keyword5']['value'] = date('Y-m-d H:i');
             //TODO $modelInfo['url'] = '';//辅导员审批该条请假HTML
-        } else if ($modelNum == self::MODEL_NUM_LEAVE_AUTH_RESULT){//请假结果通知模板
+        } else if ($modelNum == self::MODEL_NUM_LEAVE_AUTH_RESULT){//学生请假结果通知模板
             $modelInfo = WxConf::MODEL_LEAVE_RESULT;
             if ($infoData['status'] == DailyLeave::AUTH_SUCC){
                 $modelInfo['data']['keyword1']['value'] = '审核通过';
@@ -84,7 +85,14 @@ class Wx{
             $modelInfo['data']['keyword3']['value'] = $infoData['updated_at'];
             $modelInfo['data']['remark']['value'] = '辅导员意见：' . $infoData['auth_reason'];
             //TODO $modelInfo['url'] = '';//查看该条请假详情HTML
-        } else{
+        } else if ($modelNum == self::MODEL_NUM_NOTIFY_TEACHER){//提醒辅导员审核模板
+            $modelInfo = WxConf::MODEL_LEAVE_NOTIFY_TEACHER;
+            $modelInfo['data']['childName']['value'] = $infoData['uid'] . $infoData['name'];
+            $modelInfo['data']['time']['value'] = $infoData['begin_time'] . '第' . $infoData['begin_course'] . '节课' . ' ~ ' . $infoData['end_time'] . '第' . $infoData['end_course'] . '节课';
+            $modelInfo['data']['score']['value'] = $infoData['leave_reason'];
+            //TODO $modelInfo['url'] = '';//查看该条请假详情并审批HTML
+        }
+        else{
             return false;
         }
 

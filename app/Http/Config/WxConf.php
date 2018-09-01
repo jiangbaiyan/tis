@@ -66,7 +66,7 @@ class WxConf{
                 'value' => ''
             ],
             'remark' => [
-                'value' => '我们已通知相关辅导员，您的请假申请会尽快得到审批。若您之前填写了请假课程，辅导员审批通过后，我们会将您的请假信息发送给相关任课教师',
+                'value' => '我们已通知辅导员尽快审批您的请假申请。若您填写了请假课程，若辅导员审批通过，我们会短信通知相关任课教师',
                 'color' => '#00B642'
             ]
         ]
@@ -91,6 +91,31 @@ class WxConf{
             ],
             'remark' => [
                 'value' => '',
+                'color' => '#00B642'
+            ]
+        ]
+    ];
+
+    const MODEL_LEAVE_NOTIFY_TEACHER = [
+        'touser' => '',
+        'template_id' => 'zja03P3aWNkEb-XYo9HwKQMWwUY2zJMhd9k6AxAjvS8',
+        'url' => '',
+        'data' => [
+            'first' => [
+                'value' => '有一条新的学生请假申请等待您审批',
+                'color' => '#FF3333'
+            ],
+            'childName' => [
+                'value' => '',
+            ],
+            'time' => [
+                'value' => ''
+            ],
+            'score' => [
+                'value' => ''
+            ],
+            'remark' => [
+                'value' => '点我查看详情并进行审批',
                 'color' => '#00B642'
             ]
         ]
