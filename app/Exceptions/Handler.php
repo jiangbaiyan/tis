@@ -4,9 +4,8 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use src\ApiHelper\ApiResponse;
-use src\Exceptions\UnAuthorizedException;
 use App\Util\Logger;
 
 class Handler extends ExceptionHandler
@@ -57,6 +56,7 @@ class Handler extends ExceptionHandler
             'line' => $exception->getLine(),
             'url' => $request->fullUrl(),
             'params' => $request->all(),
+            'user' => Session::get('user'),
             'ip' => !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
             'userAgent' => $_SERVER['HTTP_USER_AGENT']
         ];
