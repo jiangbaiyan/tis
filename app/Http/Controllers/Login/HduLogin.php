@@ -88,11 +88,13 @@ class HduLogin extends Controller {
                 }
 
                 if ($data['unit'] != '网络空间安全学院、浙江保密学院'){//非本学院禁止访问
+                    Logger::notice('login|user_is_not_from_cbs|user:' . json_encode($data));
                     die('您无权访问本系统，请联系管理员获取权限');
                 }
                 //教师PC端
                 if (!Wx::isFromWx()){
                     if ($data['idType'] == 1 ||$data['idType'] == 2){//学生禁止访问
+                        Logger::notice('login|user_is_not_a_teacher|user:' . json_encode($data));
                         die('您无权访问本系统，请联系管理员获取权限');
                     }
                     $res = $this->updateOrInsertAndSetToken($data);
