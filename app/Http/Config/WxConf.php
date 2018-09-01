@@ -74,14 +74,15 @@ class WxConf{
 
     const MODEL_LEAVE_RESULT = [
         'touser' => '',
-        'template_id' => 'omqDuahmrpgg8qPRGnqzVLQAgnqd2Jmj0Hw1-HhCjG8',
+        'template_id' => 'UdfPHmXTErC2l5b52JPIO3adeCfFhvaVVr98pmIIcQU',
         'url' => '',
         'data' => [
             'first' => [
-                'value' => '您的辅导员答复了您的请假申请',
+                'value' => '辅导员答复了您的请假申请',
+                'color' => '#FF3333'
             ],
             'keyword1' => [
-                'value' => '',
+                'value' => '日常请假',
             ],
             'keyword2' => [
                 'value' => ''
@@ -89,9 +90,15 @@ class WxConf{
             'keyword3' => [
                 'value' => ''
             ],
+            'keyword4' => [
+                'value' => ''
+            ],
+            'keyword5' => [
+                'value' => ''
+            ],
             'remark' => [
                 'value' => '',
-                'color' => '#00B642'
+                'color' => '#FF3333'
             ]
         ]
     ];

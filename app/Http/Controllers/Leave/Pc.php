@@ -95,15 +95,15 @@ class Pc{
             $teacher = Teacher::find($item['teacher_id']);
             $data['dean_name'] = $teacher->name;
             $data['student_name'] = $student->name;
-            $data['updated_at'] = $item['updated_at'];
+            $data['leave_reason'] = $item['leave_reason'];
             $data['leave_time'] = $item['begin_time'] . '第' . $item['begin_course'] . '节课' . ' ~ ' . $item['end_time'] . '第' . $item['end_course'] . '节课';
             //发送审核结果给学生
             Wx::sendModelInfo($student,$data,Wx::MODEL_NUM_LEAVE_AUTH_RESULT);
             if ($data['status'] == DailyLeave::AUTH_SUCC){
                 //审核通过，发送请假通知短信给任课教师
-                $courses = DailyLeaveCourse::where('daily_leave_id',$item['id'])->get();
+                $courses = DailyLeaveCourse::where('daily_leave_id',$item['id'])->get()->toArray();
                 foreach ($courses as $course){
-                    Sms::send($course->teacher_phone,array_merge($course,$data));
+                    Sms::send($course['teacher_phone'],array_merge($course,$data));
                 }
             }
         }

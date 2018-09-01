@@ -74,15 +74,16 @@ class Wx{
             //TODO $modelInfo['url'] = '';//辅导员审批该条请假HTML
         } else if ($modelNum == self::MODEL_NUM_LEAVE_AUTH_RESULT){//学生请假结果通知模板
             $modelInfo = WxConf::MODEL_LEAVE_RESULT;
+            $modelInfo['data']['keyword2']['value'] = $infoData['leave_time'];
+            $modelInfo['data']['keyword3']['value'] = $infoData['leave_reason'];
+            $modelInfo['data']['keyword4']['value'] = $infoData['dean_name'];
             if ($infoData['status'] == DailyLeave::AUTH_SUCC){
-                $modelInfo['data']['keyword1']['value'] = '审核通过';
-                $modelInfo['data']['keyword1']['color'] = '#00B642';
+                $modelInfo['data']['keyword5']['value'] = '审核通过';
+                $modelInfo['data']['keyword5']['color'] = '#00B642';
             } else {
-                $modelInfo['data']['keyword1']['value'] = '审核不通过';
-                $modelInfo['data']['keyword1']['color'] = '#FF3333';
+                $modelInfo['data']['keyword5']['value'] = '审核不通过';
+                $modelInfo['data']['keyword5']['color'] = '#FF3333';
             }
-            $modelInfo['data']['keyword2']['value'] = $infoData['dean_name'];
-            $modelInfo['data']['keyword3']['value'] = $infoData['updated_at'];
             $modelInfo['data']['remark']['value'] = '辅导员意见：' . $infoData['auth_reason'];
             //TODO $modelInfo['url'] = '';//查看该条请假详情HTML
         } else if ($modelNum == self::MODEL_NUM_NOTIFY_TEACHER){//提醒辅导员审核模板
