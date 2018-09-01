@@ -48,7 +48,7 @@ class Sms{
                 throw new OperateFailedException();
             }
         }catch (\Exception $e){
-            Logger::fatal('sms|send_leave_upyun_sms_failed|params:' . json_encode($params));
+            Logger::fatal('sms|send_leave_upyun_sms_failed|params:' . json_encode($params) . '|errorMsg:' . json_encode($e->getMessage()));
             throw new OperateFailedException('短信发送失败，请联系管理员');
         }
     }
