@@ -31,9 +31,9 @@ class Pc{
      */
     public function getAuthIngLeave(){
         $teacherId = User::getUser()->id;
-        $data = DailyLeave::select('id','leave_reason','begin_time','end_time','begin_course','end_course','is_leave_hz','destination','created_at')
-            ->where('status',DailyLeave::AUTH_ING)
-            ->where('teacher_id',$teacherId)
+        $data = DailyLeave::join('student','student.id','=','daily_leave.student_id')->select('daily_leave.id','daily_leave.leave_reason','daily_leave.begin_time','daily_leave.end_time','daily_leave.begin_course','daily_leave.end_course','daily_leave.is_leave_hz','daily_leave.destination','daily_leave.created_at','student.name','student.uid','student.class')
+            ->where('daily_leave.status',DailyLeave::AUTH_ING)
+            ->where('daily_leave.teacher_id',$teacherId)
             ->paginate(5);
         return ApiResponse::responseSuccess($data);
     }
