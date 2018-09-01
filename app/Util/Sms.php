@@ -38,7 +38,7 @@ class Sms{
         $conf['mobile'] = $phone;
         $conf['vars'] = "{$vars['teacher_name']}|{$vars['course_name']}|{$vars['student_name']}|{$vars['leave_time']}|{$vars['dean_name']}";
         $params = [
-            'json' => json_encode($conf),
+            'json' => $conf,
             'headers' => self::UPYUN_HEADERS
         ];
         try{
@@ -48,7 +48,8 @@ class Sms{
                 throw new OperateFailedException();
             }
         }catch (\Exception $e){
-            Logger::fatal('sms|send_leave_upyun_sms_failed|body:' . json_encode($conf) . '|headers:' . json_encode(self::UPYUN_HEADERS));
+            Logger::fatal('sms|send_leave_upyun_sms_failed|params:' . json_encode($params));
+            throw new OperateFailedException('短信发送失败，请联系管理员');
         }
     }
 }
