@@ -54,9 +54,13 @@ class CheckLogin
         Session::put('user',$user);
         Session::save();
 
+        $userType = User::getUserType($user->uid);
         $url = $request->url();
         //检查各模块权限
         if (!\App\Http\Model\Common\Wx::isFromWx()){//PC端
+            if ($userType != User::TYPE_TEACHER){
+                throw new PermissionDeniedException();
+            }
             $allAuthState = Teacher::getAuthState($user->uid);
             //PC端通知模块权限0-普通教师 1-辅导员（可给学生发）2-教务老师（可给老师和学生发）
             if (strpos($url,'info')){//检测通知模块权限
@@ -74,7 +78,6 @@ class CheckLogin
             }
         }else{//微信端
             if (strpos($url,'leave')){//非本科生不能用请假模块
-                $userType = User::getUserType($user->uid);
                 if ($userType != User::TYPE_STUDENT){
                     throw new PermissionDeniedException();
                 }
