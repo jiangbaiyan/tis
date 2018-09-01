@@ -87,7 +87,7 @@ class Wx{
             //TODO $modelInfo['url'] = '';//查看该条请假详情HTML
         } else if ($modelNum == self::MODEL_NUM_NOTIFY_TEACHER){//提醒辅导员审核模板
             $modelInfo = WxConf::MODEL_LEAVE_NOTIFY_TEACHER;
-            $modelInfo['data']['childName']['value'] = $infoData['uid'] . $infoData['name'];
+            $modelInfo['data']['childName']['value'] = $infoData['student_uid'] . $infoData['student_name'];
             $modelInfo['data']['time']['value'] = $infoData['begin_time'] . '第' . $infoData['begin_course'] . '节课' . ' ~ ' . $infoData['end_time'] . '第' . $infoData['end_course'] . '节课';
             $modelInfo['data']['score']['value'] = $infoData['leave_reason'];
             //TODO $modelInfo['url'] = '';//查看该条请假详情并审批HTML
