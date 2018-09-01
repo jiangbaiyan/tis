@@ -78,10 +78,8 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 Route::get('getTeacherInfo','Leave\Wx@getTeacherInfo');
 
                 //获取请假历史信息列表
-                Route::get('getLeaveHistoryList','Leave\Wx@getLeaveHistoryList');
+                Route::get('getLeaveHistory','Leave\Wx@getLeaveHistory');
 
-                //获取请假详情
-                Route::get('getLeaveDetail','Leave\Wx@getLeaveDetail');
             });
 
         });

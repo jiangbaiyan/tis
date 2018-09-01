@@ -50,10 +50,11 @@ class Pc{
      */
     public function getLeaveAuthHistory(){
         $teacherId = User::getUser()->id;
-        $data = DailyLeave::select('id','leave_reason','auth_reason','begin_time','end_time','begin_course','end_course','is_leave_hz','destination','status','updated_at')
-            ->whereIn('status',[DailyLeave::AUTH_FAIL,DailyLeave::AUTH_SUCC])
-            ->where('teacher_id',$teacherId)
-            ->orderByDesc('updated_at')
+        $data = DailyLeave::join('daily_leave_course','daily_leave.id','=','daily_leave_course.daily_leave_id')
+            ->select('daily_leave.*','daily_leave_course.course_name','daily_leave_course.teacher_phone','daily_leave_course.teacher_name')
+            ->whereIn('daily_leave.status',[DailyLeave::AUTH_FAIL,DailyLeave::AUTH_SUCC])
+            ->where('daily_leave.teacher_id',$teacherId)
+            ->orderByDesc('daily_leave.updated_at')
             ->paginate(5);
         return ApiResponse::responseSuccess($data);
     }

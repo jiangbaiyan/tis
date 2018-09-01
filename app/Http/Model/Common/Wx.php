@@ -71,7 +71,7 @@ class Wx{
             $modelInfo['data']['keyword2']['value'] = $infoObjects->name;
             $modelInfo['data']['keyword3']['value'] = Teacher::find($infoData['teacher_id'])->name;
             $modelInfo['data']['keyword5']['value'] = date('Y-m-d H:i');
-            //TODO $modelInfo['url'] = '';//辅导员审批该条请假HTML
+            //TODO $modelInfo['url'] = '';//查看该条请假详情HTML
         } else if ($modelNum == self::MODEL_NUM_LEAVE_AUTH_RESULT){//学生请假结果通知模板
             $modelInfo = WxConf::MODEL_LEAVE_RESULT;
             $modelInfo['data']['keyword2']['value'] = $infoData['leave_time'];
@@ -91,7 +91,7 @@ class Wx{
             $modelInfo['data']['childName']['value'] = $infoData['student_uid'] . $infoData['student_name'];
             $modelInfo['data']['time']['value'] = $infoData['begin_time'] . '第' . $infoData['begin_course'] . '节课' . ' ~ ' . $infoData['end_time'] . '第' . $infoData['end_course'] . '节课';
             $modelInfo['data']['score']['value'] = $infoData['leave_reason'];
-            //TODO $modelInfo['url'] = '';//查看该条请假详情并审批HTML
+            $modelInfo['url'] = ComConf::HOST . '/manager/qingjia.html';
         }
         else{
             return false;
