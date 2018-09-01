@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Config\ComConf;
+use App\Http\Model\Common\User;
 use App\Http\Model\Teacher;
 use App\Util\Logger;
 use Closure;
@@ -35,11 +36,14 @@ class CheckLogin
         try{
             $user = JWT::decode($frontToken, ComConf::JWT_KEY ,['HS256']);
         }catch (\Exception $e){
-            Logger::notice('auth|decode_token_failed|msg:' . $e->getMessage() . 'token:'. $frontToken);
+            Logger::notice('auth|decode_token_failed|msg:' . $e->getMessage() . 'frontToken:'. $frontToken);
             throw new UnAuthorizedException();
         }
+        if ($user->unit != '网络空间安全学院、浙江保密学院'){
+            Logger::notice('auth|user_not_from_cbs|user:' . json_encode($user));
+        }
         if (Redis::ttl($user->uid) <= 0) {
-            Logger::notice('auth|token_expired|msg:' . json_encode($user));
+            Logger::notice('auth|token_expired|user:' . json_encode($user));
             throw new UnAuthorizedException();
         }
         $token = Redis::get($user->uid);//查redis里token，比较
@@ -50,10 +54,10 @@ class CheckLogin
         Session::put('user',$user);
         Session::save();
 
+        $url = $request->url();
         //检查各模块权限
-        //PC端通知模块权限0-普通教师 1-辅导员（可给学生发）2-教务老师（可给老师和学生发）
-        if (!\App\Http\Model\Common\Wx::isFromWx()){
-            $url = $request->url();
+        if (!\App\Http\Model\Common\Wx::isFromWx()){//PC端
+            //PC端通知模块权限0-普通教师 1-辅导员（可给学生发）2-教务老师（可给老师和学生发）
             if (strpos($url,'info')){//检测通知模块权限
                 $infoAuthState = Teacher::getAuthState($user->uid)['info_auth_state'];
                 if (empty($infoAuthState)){
@@ -69,7 +73,15 @@ class CheckLogin
                 }
                 throw new PermissionDeniedException();
             }
+        }else{//微信端
+            if (strpos($url,'leave')){//非学生不能用请假模块
+                $userType = User::getUserType($user->uid);
+                if ($userType != User::TYPE_STUDENT && $user != User::TYPE_GRADUATE){
+                    throw new PermissionDeniedException();
+                }
+            }
         }
+
         return $next($request);
     }
 }

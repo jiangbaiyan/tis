@@ -11,12 +11,14 @@ namespace App\Http\Controllers\Leave;
 
 use App\Http\Model\Common\User;
 use App\Http\Model\Leave\DailyLeave;
+use App\Http\Model\Leave\DailyLeaveCourse;
 use App\Util\Logger;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
+use src\Exceptions\ResourceNotFoundException;
 
 class Wx{
 
@@ -38,6 +40,7 @@ class Wx{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
+        $user = User::getUser();
         //分离基本信息和课程信息
         if (!empty($params['courses'])){
             $courses = $params['courses'];
@@ -46,7 +49,6 @@ class Wx{
         $data = $params;
         !empty($params['destination']) ? $data['is_leave_hz'] = 1 : $data['is_leave_hz'] = 0;
         $data['status'] = DailyLeave::AUTH_ING;
-        $user = User::getUser();
         $data['student_id'] = $user->id;
         $data['teacher_id'] = $user->teacher_id;
         try {
@@ -77,5 +79,40 @@ class Wx{
     public function getTeacherInfo(){
         $data = Teacher::select('name','phone')->get();
         return ApiResponse::responseSuccess($data);
+    }
+
+    /**
+     * 获取请假历史
+     * @return string
+     * @throws \src\Exceptions\UnAuthorizedException
+     */
+    public function getLeaveHistoryList(){
+        $user = User::getUser();
+        $data = DailyLeave::select('leave_reason','status','created_at')
+            ->where('student_id',$user->id)
+            ->latest()
+            ->paginate(5);
+        return ApiResponse::responseSuccess($data);
+    }
+
+    /**
+     * 获取请假详情
+     * @return string
+     * @throws ParamValidateFailedException
+     * @throws ResourceNotFoundException
+     */
+    public function getLeaveDetail(){
+        $validator = Validator::make($params = Request::all(),[
+            'id' => 'required'
+        ]);
+        if ($validator->fails()){
+            throw new ParamValidateFailedException($validator);
+        }
+        $dailyLeave = DailyLeave::find($params['id'])->toArray();
+        if (!$dailyLeave){
+            throw new ResourceNotFoundException('抱歉，该条请假已被删除');
+        }
+        $dailyLeaveCourses = DailyLeaveCourse::where('daily_leave_id',$dailyLeave->id)->get()->toArray();
+        return ApiResponse::responseSuccess(array_merge($dailyLeave,$dailyLeaveCourses));
     }
 }

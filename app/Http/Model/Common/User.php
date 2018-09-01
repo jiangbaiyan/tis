@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Session;
 
 class User{
 
+    const TYPE_STUDENT = 0;
+    const TYPE_GRADUATE = 1;
+    const TYPE_TEACHER = 2;
+
     /**
      * 获取当前登录用户对象
      * @return mixed
@@ -28,5 +32,20 @@ class User{
             return $user->id;
         }
         return $user;
+    }
+
+    /**
+     * 获取用户类型
+     * @param $uid
+     * @return int
+     */
+    public static function getUserType($uid){
+        if (strlen($uid) == 8){//8位本科生
+            return self::TYPE_STUDENT;
+        } else if (strlen($uid) == 5){//5位教师
+            return self::TYPE_TEACHER;
+        } else{
+            return self::TYPE_GRADUATE;//9位研究生
+        }
     }
 }

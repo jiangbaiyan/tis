@@ -71,7 +71,7 @@
 		<span class="val">{{$data->name}}</span>
 	</div>
 	<div class="item">
-		@if (strlen($data->uid) == 5)
+		@if (\App\Http\Model\Common\User::getUserType($data->uid) == \App\Http\Model\Common\User::TYPE_TEACHER)
 			<span class="key">工号</span>
 		@else
 			<span class="key">学号</span>

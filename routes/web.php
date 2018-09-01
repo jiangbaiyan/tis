@@ -20,6 +20,7 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
     Route::group(['middleware' => 'checkLogin'],function (){
 
+        //通知模块
         Route::group(['prefix' => 'info'],function (){
 
             Route::group(['prefix' => 'pc'],function (){
@@ -56,14 +57,15 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
             Route::group(['prefix' => 'pc'],function (){
 
-                //获取教师信息(自动填写到请假任课教师)
-                Route::get('getTeacherInfo','Leave\Pc@getTeacherInfo');
 
                 //获取待审核的请假信息
                 Route::get('getAuthIngLeave','Leave\Pc@getAuthIngLeave');
 
                 //获取已审批过的请假信息
                 Route::get('getLeaveAuthHistory','Leave\Pc@getLeaveAuthHistory');
+
+                //辅导员审核
+                Route::post('authLeave','Leave\Pc@authLeave');
 
             });
 
@@ -72,6 +74,14 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 //添加一条请假信息
                 Route::post('addLeave','Leave\Wx@addLeave');
 
+                //获取教师信息(自动填写到请假任课教师)
+                Route::get('getTeacherInfo','Leave\Wx@getTeacherInfo');
+
+                //获取请假历史信息列表
+                Route::get('getLeaveHistoryList','Leave\Wx@getLeaveHistoryList');
+
+                //获取请假详情
+                Route::get('getLeaveDetail','Leave\Wx@getLeaveDetail');
             });
 
         });
