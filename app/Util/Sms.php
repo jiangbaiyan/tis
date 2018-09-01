@@ -37,13 +37,18 @@ class Sms{
         $conf = self::UPYUN_CONF;
         $conf['mobile'] = $phone;
         $conf['vars'] = "{$vars['teacher_name']}|{$vars['course_name']}|{$vars['student_name']}|{$vars['leave_time']}|{$vars['dean_name']}";
-        $result = ApiRequest::sendRequest('POST',self::UPYUN_URL,[
+        $params = [
             'json' => json_encode($conf),
             'headers' => self::UPYUN_HEADERS
-        ]);
-        if (isset($result['message_ids'][0]['error_code'])){//如果又拍云短信官方报错
-            Logger::fatal('sms|send_leave_upyun_sms_failed|msg:' . $result['message_ids'][0]['error_code'] . '|conf:' . json_encode($conf) . '|phone:' . $phone);
-            throw new OperateFailedException();
+        ];
+        try{
+            $result = ApiRequest::sendRequest('POST',self::UPYUN_URL,$params);
+            if (isset($result['message_ids'][0]['error_code'])){//如果又拍云短信官方报错
+                Logger::fatal('sms|send_leave_upyun_sms_failed|msg:' . $result['message_ids'][0]['error_code'] . '|conf:' . json_encode($conf) . '|phone:' . $phone);
+                throw new OperateFailedException();
+            }
+        }catch (\Exception $e){
+            Logger::fatal('sms|send_leave_upyun_sms_failed|body:' . json_encode($conf) . '|headers:' . json_encode(self::UPYUN_HEADERS));
         }
     }
 }
