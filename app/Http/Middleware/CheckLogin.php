@@ -57,21 +57,20 @@ class CheckLogin
         $url = $request->url();
         //检查各模块权限
         if (!\App\Http\Model\Common\Wx::isFromWx()){//PC端
+            $allAuthState = Teacher::getAuthState($user->uid);
             //PC端通知模块权限0-普通教师 1-辅导员（可给学生发）2-教务老师（可给老师和学生发）
             if (strpos($url,'info')){//检测通知模块权限
-                $infoAuthState = Teacher::getAuthState($user->uid)['info_auth_state'];
-                if (empty($infoAuthState)){
+                if (!isset($allAuthState['info_auth_state']) || $allAuthState['info_auth_state'] == Teacher::NORMAL){
                     Logger::notice('auth|info_module_permission_denied|user:' . json_encode($user));
                     throw new PermissionDeniedException();
                 }
             }
 
             if (strpos($url,'leave')){//检测请假模块权限
-                $leaveAuthState = Teacher::getAuthState($user->uid)['leave_auth_state'];
-                if (empty($leaveAuthState)){
+                if (!isset($allAuthState['leave_auth_state']) || $allAuthState['leave_auth_state'] == Teacher::NORMAL){
                     Logger::notice('auth|leave_module_permission_denied|user:' . json_encode($user));
+                    throw new PermissionDeniedException();
                 }
-                throw new PermissionDeniedException();
             }
         }else{//微信端
             if (strpos($url,'leave')){//非学生不能用请假模块
