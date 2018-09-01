@@ -31,7 +31,7 @@ class Pc{
      * @return string
      * @throws \src\Exceptions\UnAuthorizedException
      */
-    public function getAuthIngLeave(){
+    public function getAuthingLeave(){
         $teacherId = User::getUser()->id;
         $data = DailyLeave::join('student','student.id','=','daily_leave.student_id')
             ->select('daily_leave.id','daily_leave.leave_reason','daily_leave.begin_time','daily_leave.end_time','daily_leave.begin_course','daily_leave.end_course','daily_leave.is_leave_hz','daily_leave.destination','daily_leave.created_at','student.name','student.uid','student.class')

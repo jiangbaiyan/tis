@@ -59,7 +59,7 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
 
                 //获取待审核的请假信息
-                Route::get('getAuthIngLeave','Leave\Pc@getAuthIngLeave');
+                Route::get('getAuthingLeave','Leave\Pc@getAuthingLeave');
 
                 //获取已审批过的请假信息
                 Route::get('getLeaveAuthHistory','Leave\Pc@getLeaveAuthHistory');
