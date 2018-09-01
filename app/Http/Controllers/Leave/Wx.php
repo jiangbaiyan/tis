@@ -47,7 +47,11 @@ class Wx{
             $courses = $params['courses'];
             unset($params['courses']);
         }
-        $data = $params;
+        $data['leave_reason'] = $params['leave_reason'];
+        $data['begin_time'] = $params['begin_time'];
+        $data['end_time'] = $params['end_time'];
+        $data['begin_course'] = $params['begin_course'];
+        $data['end_course'] = $params['end_course'];
         !empty($params['destination']) ? $data['is_leave_hz'] = 1 : $data['is_leave_hz'] = 0;
         $data['status'] = DailyLeave::AUTH_ING;
         $data['student_id'] = $user->id;
