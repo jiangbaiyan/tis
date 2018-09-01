@@ -71,7 +71,7 @@ class Wx{
             $modelInfo['data']['keyword2']['value'] = $infoObjects->name;
             $modelInfo['data']['keyword3']['value'] = Teacher::find($infoData['teacher_id'])->name;
             $modelInfo['data']['keyword5']['value'] = date('Y-m-d H:i');
-            //TODO $modelInfo['url'] = '';//查看该条请假详情HTML
+            $modelInfo['url'] = ComConf::HOST . '/client/qingjia_his.html';
         } else if ($modelNum == self::MODEL_NUM_LEAVE_AUTH_RESULT){//学生请假结果通知模板
             $modelInfo = WxConf::MODEL_LEAVE_RESULT;
             $modelInfo['data']['keyword2']['value'] = $infoData['leave_time'];
@@ -85,7 +85,7 @@ class Wx{
                 $modelInfo['data']['keyword5']['color'] = '#FF3333';
             }
             $modelInfo['data']['remark']['value'] = '辅导员意见：' . $infoData['auth_reason'];
-            //TODO $modelInfo['url'] = '';//查看该条请假详情HTML
+            $modelInfo['url'] = ComConf::HOST . '/client/qingjia_his.html';
         } else if ($modelNum == self::MODEL_NUM_NOTIFY_TEACHER){//提醒辅导员审核模板
             $modelInfo = WxConf::MODEL_LEAVE_NOTIFY_TEACHER;
             $modelInfo['data']['childName']['value'] = $infoData['student_uid'] . $infoData['student_name'];
