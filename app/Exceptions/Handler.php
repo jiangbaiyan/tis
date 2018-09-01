@@ -49,9 +49,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if ($exception->getCode() == 0){
-            exit;
-        }
         $errArr = [
             'status' => $exception->getCode(),
             'msg' => $exception->getMessage(),
@@ -64,6 +61,9 @@ class Handler extends ExceptionHandler
             'userAgent' => $_SERVER['HTTP_USER_AGENT']
         ];
         Logger::fatal(json_encode($errArr));
+        if ($exception->getCode() == 0){
+            exit;
+        }
         return ApiResponse::response($exception->getCode(),$exception->getMessage());
     }
 }
