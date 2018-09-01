@@ -102,6 +102,9 @@ class Pc{
             if ($data['status'] == DailyLeave::AUTH_SUCC){
                 //审核通过，发送请假通知短信给任课教师
                 $courses = DailyLeaveCourse::where('daily_leave_id',$item['id'])->get()->toArray();
+                if (!$courses){//未填写课程，继续处理下一条请假
+                    break;
+                }
                 foreach ($courses as $course){
                     Sms::send($course['teacher_phone'],array_merge($course,$data));
                 }
