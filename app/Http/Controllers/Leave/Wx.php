@@ -112,7 +112,7 @@ class Wx{
         if (!$dailyLeave){
             throw new ResourceNotFoundException('抱歉，该条请假已被删除');
         }
-        $dailyLeaveCourses = DailyLeaveCourse::where('daily_leave_id',$dailyLeave->id)->get()->toArray();
+        $dailyLeaveCourses = DailyLeaveCourse::where('daily_leave_id',$dailyLeave['id'])->get()->toArray();
         return ApiResponse::responseSuccess(array_merge($dailyLeave,$dailyLeaveCourses));
     }
 }
