@@ -23,8 +23,8 @@ class Sms{
     const UPYUN_URL = 'https://sms-api.upyun.com/api/messages';
 
     const UPYUN_HEADERS = [
-        'Authorization:MdALl4JlrIV5zohaS0vsoKx2HY5ud0',
-        'Content-Type: application/json'
+        'Authorization' => 'MdALl4JlrIV5zohaS0vsoKx2HY5ud0',
+        'Content-Type' => 'application/json'
     ];
 
     /**
