@@ -18,6 +18,7 @@ use App\Util\Sms;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
+use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 use src\Exceptions\ResourceNotFoundException;
 
@@ -77,6 +78,9 @@ class Pc{
             throw new ResourceNotFoundException();
         }
         foreach ($leave as &$item){//处理每一条请假信息
+            if ($item->status != DailyLeave::AUTH_ING){
+                throw new OperateFailedException('错误的请假状态');
+            }
             $data = [];
             $data['status'] = $params['status'];
             $data['auth_reason'] = $params['auth_reason'];
