@@ -49,6 +49,9 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception->getCode() == 0){
+            exit;
+        }
         $errArr = [
             'status' => $exception->getCode(),
             'msg' => $exception->getMessage(),
