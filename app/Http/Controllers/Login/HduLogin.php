@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 use App\Util\Logger;
+use src\Exceptions\PermissionDeniedException;
 
 class HduLogin extends Controller {
 
@@ -88,6 +89,10 @@ class HduLogin extends Controller {
 
                 //教师PC端
                 if (!Wx::isFromWx()){
+                    if ($data['idType'] == 1 ||$data['idType'] == 2){//学生禁止访问
+                        throw new PermissionDeniedException();
+                    }
+
                     $res = $this->updateOrInsertAndSetToken($data);
                     return view('pcsettoken',['token' => $res->token]);
                 }
