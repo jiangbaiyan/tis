@@ -50,6 +50,7 @@ class Pc{
         $data = DailyLeave::select('id','leave_reason','begin_time','end_time','begin_course','end_course','is_leave_hz','destination','created_at','updated_at')
             ->whereIn('status',[DailyLeave::AUTH_FAIL,DailyLeave::AUTH_SUCC])
             ->where('teacher_id',$teacherId)
+            ->orderByDesc('created_at')
             ->paginate(5);
         return ApiResponse::responseSuccess($data);
     }
