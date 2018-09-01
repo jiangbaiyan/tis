@@ -14,6 +14,7 @@ use App\Http\Model\Leave\DailyLeave;
 use App\Http\Model\Leave\DailyLeaveCourse;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
+use App\Util\Logger;
 use App\Util\Sms;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
@@ -73,30 +74,33 @@ class Pc{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        $leave = DailyLeave::whereIn('id',explode(',',$params['id']))->get()->toArray();
-        if (!$leave){
-            throw new ResourceNotFoundException();
+        $data = [];
+        $data['status'] = $params['status'];
+        $data['auth_reason'] = $params['auth_reason'];
+        $builder = DailyLeave::whereIn('id',explode(',',$params['id']));
+        try {
+            $builder->update($data);
+        }catch (\Exception $e){
+            Logger::fatal('leave|update_leave_status_failed|data:' . json_encode($params));
+            throw new OperateFailedException();
         }
-        foreach ($leave as &$item){//处理每一条请假信息
-            if ($item->status != DailyLeave::AUTH_ING){
+        $leave = $builder->get()->toArray();
+        foreach ($leave as $item){//处理每一条请假信息
+            if ($item['status'] != DailyLeave::AUTH_ING){
                 throw new OperateFailedException('错误的请假状态');
             }
-            $data = [];
-            $data['status'] = $params['status'];
-            $data['auth_reason'] = $params['auth_reason'];
-            $item->update($data);
-            $student = Student::find($item->student_id);
-            $teacher = Teacher::find($item->teacher_id);
+            $student = Student::find($item['student_id']);
+            $teacher = Teacher::find($item['teacher_id']);
             $data['dean_name'] = $teacher->name;
             $data['student_name'] = $student->name;
-            $data['updated_at'] = $item->updated_at;
+            $data['updated_at'] = $item['updated_at'];
             //发送审核结果给学生
             Wx::sendModelInfo($student,$data,Wx::MODEL_NUM_LEAVE_AUTH_RESULT);
             if ($data['status'] == DailyLeave::AUTH_SUCC){
                 //审核通过，发送请假通知短信给任课教师
-                $courses = DailyLeaveCourse::where('daily_leave_id',$item->id)->get();
+                $courses = DailyLeaveCourse::where('daily_leave_id',$item['id'])->get();
                 foreach ($courses as $course){
-                    $data['leave_time'] = $item->begin_time . '第' . $item->begin_course . '节课' . ' ~ ' . $item->end_time . '第' . $item->end_course . '节课';
+                    $data['leave_time'] = $item['begin_time'] . '第' . $item['begin_course'] . '节课' . ' ~ ' . $item['end_time'] . '第' . $item['end_course'] . '节课';
                     Sms::send($course->teacher_phone,array_merge($course,$data));
                 }
             }
