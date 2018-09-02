@@ -144,7 +144,7 @@ class Pc{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        if (strtotime($params['begin_time']) >= strtotime($params['end_time'])){
+        if (strtotime($params['from']) >= strtotime($params['to'])){
             throw new ParamValidateFailedException('节假日起止时间不合法，请重新输入');
         }
         HolidayLeave::create([

@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Leave;
 use App\Http\Model\Common\User;
 use App\Http\Model\Leave\DailyLeave;
 use App\Http\Model\Leave\DailyLeaveCourse;
+use App\Http\Model\Leave\HolidayLeave;
 use App\Http\Model\Leave\HolidayLeaveModel;
 use App\Http\Model\Teacher;
 use App\Util\Logger;
@@ -153,7 +154,7 @@ class Wx{
         $data['end_time'] = $params['end_time'];
         $data['holiday_leave_model_id'] = $holidayLeaveModel->id;
         $data['student_id'] = $userId;
-        HolidayLeaveModel::create($data);
+        HolidayLeave::create($data);
         return ApiResponse::responseSuccess();
     }
 
