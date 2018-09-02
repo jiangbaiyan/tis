@@ -26,6 +26,7 @@ class CreateDailyLeaveTable extends Migration
             $table->string('auth_reason',255)->default('')->comment('辅导员审核备注');
             $table->unsignedInteger('teacher_id')->default('0')->comment('所属辅导员');
             $table->unsignedInteger('student_id')->default('0')->comment('请假发起人');
+            $table->index('status');
             $table->index('teacher_id');
             $table->index('student_id');
             $table->timestamps();
