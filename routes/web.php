@@ -73,7 +73,7 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 //辅导员添加一条节假日信息
                 Route::post('addHolidayLeaveModel','Leave\Pc@addHolidayLeaveModel');
 
-                //获取当前辅导员之前创建的所有模板
+                //获取历史创建的节假日模板列表
                 Route::get('getHolidayLeaveModelHistory','Leave\Pc@getHolidayLeaveModelHistory');
 
                 //获取某条模板下的学生登记情况

@@ -131,7 +131,7 @@ class Pc{
     //———————————————————————————————节假日请假——————————————————————————————————————————
 
     /**
-     * 创建请假模板
+     * 创建节假日请假模板
      * @return string
      * @throws ParamValidateFailedException
      * @throws OperateFailedException

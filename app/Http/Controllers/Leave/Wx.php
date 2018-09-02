@@ -142,10 +142,6 @@ class Wx{
             Logger::fatal('leave|holiday_leave_was_deleted|id:' . $params['id']);
             throw new ResourceNotFoundException('抱歉，此条信息已被删除');
         }
-        if (strtotime($params['begin_time']) < strtotime($holidayLeaveModel['from']) || strtotime($params['end_time']) > strtotime($holidayLeaveModel['to'])){
-            Logger::notice('leave|illegal_leave_time_outside_model_range|params:' . json_encode($holidayLeaveModel));
-            throw new OperateFailedException('不能超出节假日起止时间，请重新填写');
-        }
         $userId = User::getUser(true);
         $data = [];
         !empty($params['destination']) ? $data['is_leave_hz'] = 1 : $data['is_leave_hz'] = 0;
