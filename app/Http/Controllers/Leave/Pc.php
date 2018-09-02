@@ -12,6 +12,7 @@ use App\Http\Model\Common\Wx;
 use App\Http\Model\Common\User;
 use App\Http\Model\Leave\DailyLeave;
 use App\Http\Model\Leave\DailyLeaveCourse;
+use App\Http\Model\Leave\HolidayLeave;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
 use App\Util\Logger;
@@ -25,14 +26,14 @@ use src\Exceptions\ResourceNotFoundException;
 
 class Pc{
 
-
+    //——————————————————————————————日常请假—————————————————————————————————————————————
     /**
      * 获取待审批的请假信息
      * @return string
      * @throws \src\Exceptions\UnAuthorizedException
      */
     public function getAuthingLeave(){
-        $teacherId = User::getUser()->id;
+        $teacherId = User::getUser(true);
         $data = DailyLeave::join('student','student.id','=','daily_leave.student_id')
             ->select('daily_leave.id','daily_leave.leave_reason','daily_leave.begin_time','daily_leave.end_time','daily_leave.begin_course','daily_leave.end_course','daily_leave.is_leave_hz','daily_leave.destination','daily_leave.created_at','student.name','student.uid','student.class')
             ->where('daily_leave.status',DailyLeave::AUTH_ING)
@@ -49,9 +50,10 @@ class Pc{
      * @throws \src\Exceptions\UnAuthorizedException
      */
     public function getLeaveAuthHistory(){
-        $teacherId = User::getUser()->id;
+        $teacherId = User::getUser(true);
         $data = DailyLeave::join('daily_leave_course','daily_leave.id','=','daily_leave_course.daily_leave_id')
-            ->select('daily_leave.*','daily_leave_course.course_name','daily_leave_course.teacher_phone','daily_leave_course.teacher_name')
+            ->join('student','student.id','=','daily_leave.student_id')
+            ->select('daily_leave.*','daily_leave_course.course_name','daily_leave_course.teacher_phone','daily_leave_course.teacher_name','student.name','student.uid')
             ->whereIn('daily_leave.status',[DailyLeave::AUTH_FAIL,DailyLeave::AUTH_SUCC])
             ->where('daily_leave.teacher_id',$teacherId)
             ->orderByDesc('daily_leave.updated_at')
@@ -64,7 +66,6 @@ class Pc{
      * 审核请假信息（支持批量）
      * @return string
      * @throws ParamValidateFailedException
-     * @throws ResourceNotFoundException
      * @throws \src\Exceptions\OperateFailedException
      */
     public function authLeave(){
@@ -75,6 +76,9 @@ class Pc{
         ]);
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
+        }
+        if ($params['status'] != DailyLeave::AUTH_SUCC && $params['status'] != DailyLeave::AUTH_FAIL){
+            throw new ParamValidateFailedException();
         }
         $data = [];
         $data['status'] = $params['status'];
@@ -112,6 +116,38 @@ class Pc{
                 }
             }
         }
+        return ApiResponse::responseSuccess();
+    }
+
+    //———————————————————————————————节假日请假——————————————————————————————————————————
+
+    /**
+     * 创建请假模板
+     * @return string
+     * @throws ParamValidateFailedException
+     * @throws \src\Exceptions\UnAuthorizedException
+     */
+    public function addHolidayLeaveModel(){
+        $validator = Validator::make($params = Request::all(),[
+            'title' => 'required',
+            'from' => 'date|required',
+            'to' => 'date|required',
+        ]);
+        if ($validator->fails()){
+            throw new ParamValidateFailedException($validator);
+        }
+        if (strtotime($params['begin_time']) >= strtotime($params['end_time'])){
+            throw new ParamValidateFailedException('节假日起止时间不合法，请重新输入');
+        }
+        $userId = User::getUser(true);
+        HolidayLeave::create([
+            'title' => $params['title'],
+            'from' => $params['from'],
+            'to' => $params['to'],
+            'begin_time' => $params['begin_time'],
+            'end_time' => $params['end_time'],
+            'teacher_id' => $userId
+        ]);
         return ApiResponse::responseSuccess();
     }
 

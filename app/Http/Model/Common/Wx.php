@@ -36,7 +36,7 @@ class Wx{
         $res = ApiRequest::sendRequest('GET',$requestUrl);
         if (!empty($res['errcode'])){
             Logger::notice('wx|get_access_token_failed|code:' . $code . '|errormsg:' . json_encode($res));
-            throw new OperateFailedException();
+            die('操作失败，请稍后重试');
         }
         $openid = $res['openid'];
         return $openid;

@@ -69,6 +69,7 @@ class Wx{
      * @throws OperateFailedException
      * @throws ParamValidateFailedException
      * @throws \src\Exceptions\UnAuthorizedException
+     * @throws ResourceNotFoundException
      */
     public function sendInfoEmail(){
         $validator = Validator::make($params = Request::all(),[
@@ -85,6 +86,10 @@ class Wx{
             throw new OperateFailedException('您还没有绑定邮箱信息，请先到公众号绑定信息');
         }
         $info = Info::where('batch_id',$params['batch_id'])->first();//同一通知批次url相同
+        if (!$info){
+            Logger::fatal('info|info_was_deleted|batch_id:' . $params['batch_id']);
+            throw new ResourceNotFoundException('抱歉，该通知已被删除');
+        }
         $fileUrls = explode(',',$info->attachment);//将数据库多文件的url分隔开
         Mail::send('email',['name' => $name,'fileUrls' => $fileUrls],function ($message) use ($email){
             $message->to($email)->subject('学院通知');//设置地址和标题 并发送邮件

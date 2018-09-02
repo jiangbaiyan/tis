@@ -58,6 +58,7 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
             Route::group(['prefix' => 'pc'],function (){
 
 
+                //——————————————————————————————日常请假——————————————————————————————
                 //获取待审核的请假信息
                 Route::get('getAuthingLeave','Leave\Pc@getAuthingLeave');
 
@@ -66,6 +67,12 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
                 //辅导员审核
                 Route::post('authLeave','Leave\Pc@authLeave');
+
+                //—————————————————————————————节假日请假————————————————————————————
+
+                //辅导员添加一条节假日信息
+                Route::post('addHolidayLeaveModel','Leave\Pc@addHolidayLeaveModel');
+
 
             });
 

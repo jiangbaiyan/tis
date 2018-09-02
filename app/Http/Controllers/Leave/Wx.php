@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Leave;
 use App\Http\Model\Common\User;
 use App\Http\Model\Leave\DailyLeave;
 use App\Http\Model\Leave\DailyLeaveCourse;
+use App\Http\Model\Leave\HolidayLeaveModel;
 use App\Http\Model\Teacher;
 use App\Util\Logger;
 use Illuminate\Support\Facades\Request;
@@ -22,6 +23,8 @@ use src\Exceptions\ParamValidateFailedException;
 use src\Exceptions\ResourceNotFoundException;
 
 class Wx{
+
+    //——————————————————————————————日常请假—————————————————————————————————————————————
 
     /**
      * 添加请假信息
@@ -41,6 +44,9 @@ class Wx{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
+        if (strtotime($params['begin_time']) >= strtotime($params['end_time'])){
+            throw new ParamValidateFailedException('请假起止时间不合法，请重新输入');
+        }
         $user = User::getUser();
         //分离基本信息和课程信息
         if (!empty($params['courses'])){
@@ -53,6 +59,7 @@ class Wx{
         $data['begin_course'] = $params['begin_course'];
         $data['end_course'] = $params['end_course'];
         !empty($params['destination']) ? $data['is_leave_hz'] = 1 : $data['is_leave_hz'] = 0;
+        !empty($params['destination']) && $data['destination'] = $params['destination'];
         $data['status'] = DailyLeave::AUTH_ING;
         $data['student_id'] = $user->id;
         $data['teacher_id'] = $user->teacher_id;
@@ -106,4 +113,48 @@ class Wx{
         return ApiResponse::responseSuccess($data);
     }
 
+
+    //———————————————————————————————节假日请假——————————————————————————————————————————
+
+    /**
+     * 登记节假日请假信息
+     * @return string
+     * @throws OperateFailedException
+     * @throws ParamValidateFailedException
+     * @throws ResourceNotFoundException
+     * @throws \src\Exceptions\UnAuthorizedException
+     */
+    public function addHolidayLeave(){
+        $validator = Validator::make($params = Request::all(),[
+            'id' => 'required',
+            'begin_time' => 'date|required',
+            'end_time' => "date|required",
+        ]);
+        if ($validator->fails()){
+            throw new ParamValidateFailedException($validator);
+        }
+        if (strtotime($params['begin_time']) >= strtotime($params['end_time'])){
+            Logger::notice('leave|illegal_leave_time|params:' . json_encode($params));
+            throw new ParamValidateFailedException('起止时间不合法，请重新输入');
+        }
+        $holidayLeaveModel = HolidayLeaveModel::find($params['id']);
+        if (!$holidayLeaveModel){
+            Logger::fatal('leave|holiday_leave_was_deleted|id:' . $params['id']);
+            throw new ResourceNotFoundException('抱歉，此条信息已被删除');
+        }
+        if (strtotime($params['begin_time']) < strtotime($holidayLeaveModel['from']) || strtotime($params['end_time']) > strtotime($holidayLeaveModel['to'])){
+            Logger::notice('leave|illegal_leave_time_outside_model_range|params:' . json_encode($holidayLeaveModel));
+            throw new OperateFailedException('不能超出节假日起止时间，请重新填写');
+        }
+        $userId = User::getUser(true);
+        $data = [];
+        !empty($params['destination']) ? $data['is_leave_hz'] = 1 : $data['is_leave_hz'] = 0;
+        !empty($params['destination']) && $data['destination'] = $params['destination'];
+        $data['begin_time'] = $params['begin_time'];
+        $data['end_time'] = $params['end_time'];
+        $data['holiday_leave_model_id'] = $holidayLeaveModel->id;
+        $data['student_id'] = $userId;
+        HolidayLeaveModel::create($data);
+        return ApiResponse::responseSuccess();
+    }
 }

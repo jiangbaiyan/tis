@@ -124,7 +124,6 @@ class HduLogin extends Controller {
      * 第一步getCode回调到这里，会传过来一个code，用来获取access_token
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws OperateFailedException
-     * @throws ParamValidateFailedException
      */
     public function getCodeCallback(){
         if (!Request::has('code')){
