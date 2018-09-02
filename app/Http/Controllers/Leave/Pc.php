@@ -52,9 +52,8 @@ class Pc{
      */
     public function getLeaveAuthHistory(){
         $teacherId = User::getUser(true);
-        $data = DailyLeave::join('daily_leave_course','daily_leave.id','=','daily_leave_course.daily_leave_id')
-            ->join('student','student.id','=','daily_leave.student_id')
-            ->select('daily_leave.*','daily_leave_course.course_name','daily_leave_course.teacher_phone','daily_leave_course.teacher_name','student.name','student.uid')
+        $data = DailyLeave::join('student','student.id','=','daily_leave.student_id')
+            ->select('daily_leave.*','student.name','student.uid')
             ->whereIn('daily_leave.status',[DailyLeave::AUTH_FAIL,DailyLeave::AUTH_SUCC])
             ->where('daily_leave.teacher_id',$teacherId)
             ->orderByDesc('daily_leave.updated_at')

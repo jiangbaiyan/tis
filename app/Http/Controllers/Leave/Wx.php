@@ -105,9 +105,7 @@ class Wx{
      */
     public function getLeaveHistory(){
         $user = User::getUser();
-        $data = DailyLeave::join('daily_leave_course','daily_leave.id','=','daily_leave_course.daily_leave_id')
-            ->select('daily_leave.*','daily_leave_course.course_name','daily_leave_course.teacher_phone','daily_leave_course.teacher_name')
-            ->where('daily_leave.student_id',$user->id)
+        $data = DailyLeave::where('student_id',$user->id)
             ->orderByDesc('daily_leave.updated_at')
             ->paginate(5);
         return ApiResponse::responseSuccess($data);
