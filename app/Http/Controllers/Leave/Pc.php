@@ -67,6 +67,7 @@ class Pc{
      * @return string
      * @throws ParamValidateFailedException
      * @throws \src\Exceptions\OperateFailedException
+     * @throws \src\Exceptions\UnAuthorizedException
      */
     public function authLeave(){
         $validator = Validator::make($params = Request::all(),[
@@ -78,6 +79,7 @@ class Pc{
             throw new ParamValidateFailedException($validator);
         }
         if ($params['status'] != DailyLeave::AUTH_SUCC && $params['status'] != DailyLeave::AUTH_FAIL){
+            Logger::notice('leave|wrong_auth_status|params:' . json_encode($params));
             throw new ParamValidateFailedException();
         }
         $data = [];
@@ -85,9 +87,15 @@ class Pc{
         $data['auth_reason'] = $params['auth_reason'];
         $builder = DailyLeave::whereIn('id',explode(',',$params['id']));
         $leave = $builder->get()->toArray();
+        $userId = User::getUser(true);
         foreach ($leave as $item){//判断状态是否合法
             if ($item['status'] != DailyLeave::AUTH_ING){
+                Logger::notice('leave|wrong_leave_status|leave:' . json_encode($item));
                 throw new OperateFailedException('错误的请假状态');
+            }
+            if ($item['teacher_id'] != $userId){
+                Logger::notice('leave|wrong_auth_teacher|leave:' . json_encode($item));
+                throw new OperateFailedException('您只能审批自己学生的请假信息');
             }
         }
         try {
