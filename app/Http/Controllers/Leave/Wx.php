@@ -49,11 +49,6 @@ class Wx{
             throw new ParamValidateFailedException('请假起止时间不合法，请重新输入');
         }
         $user = User::getUser();
-        //分离基本信息和课程信息
-        if (!empty($params['courses'])){
-            $courses = $params['courses'];
-            unset($params['courses']);
-        }
         $data['leave_reason'] = $params['leave_reason'];
         $data['begin_time'] = $params['begin_time'];
         $data['end_time'] = $params['end_time'];
@@ -67,8 +62,11 @@ class Wx{
         try {
             $dailyLeave = DailyLeave::create($data);//处理请假基本信息
             //处理课程信息(如果有)
-            if (!empty($courses)) {
+            if (!empty($params['courses'][0]['course_name'])
+                && !empty($params['courses'][0]['teacher_phone'])
+                && !empty($params['courses'][0]['teacher_name'])) {
                 $time = date('Y-m-d H:i:s');
+                $courses = $params['courses'];
                 foreach ($courses as &$course) {
                     $course['daily_leave_id'] = $dailyLeave->id;
                     $course['created_at'] = $time;

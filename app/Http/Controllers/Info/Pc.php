@@ -127,7 +127,6 @@ class Pc extends Controller{
      * 查看反馈情况
      * @return string
      * @throws ParamValidateFailedException
-     * @throws OperateFailedException
      * @throws ResourceNotFoundException
      */
     public function getFeedbackStatus(){
