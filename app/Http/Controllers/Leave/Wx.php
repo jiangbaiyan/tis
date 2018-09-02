@@ -135,7 +135,7 @@ class Wx{
         }
         if (strtotime($params['begin_time']) >= strtotime($params['end_time'])){
             Logger::notice('leave|illegal_leave_time|params:' . json_encode($params));
-            throw new ParamValidateFailedException('起止时间不合法，请重新输入');
+            throw new OperateFailedException('起止时间不合法，请重新输入');
         }
         $holidayLeaveModel = HolidayLeaveModel::find($params['id']);
         if (!$holidayLeaveModel){
