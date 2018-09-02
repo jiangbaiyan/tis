@@ -150,9 +150,7 @@ class Pc{
         HolidayLeave::create([
             'title' => $params['title'],
             'from' => $params['from'],
-            'to' => $params['to'],
-            'begin_time' => $params['begin_time'],
-            'end_time' => $params['end_time'],
+            'to' => $params['to']
         ]);
         return ApiResponse::responseSuccess();
     }
