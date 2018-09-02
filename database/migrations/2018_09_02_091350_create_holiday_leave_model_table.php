@@ -18,8 +18,6 @@ class CreateHolidayLeaveModelTable extends Migration
             $table->string('title','64')->default('')->comment('节假日模板标题');
             $table->date('from')->default('1971-01-01')->comment('节假日开始日期');
             $table->date('to')->default('1971-01-01')->comment('节假日结束日期');
-            $table->unsignedInteger('teacher_id')->default('0')->comment('辅导员id');
-            $table->index('teacher_id');
             $table->timestamps();
         });
     }

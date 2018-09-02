@@ -13,6 +13,7 @@ use App\Http\Model\Common\User;
 use App\Http\Model\Leave\DailyLeave;
 use App\Http\Model\Leave\DailyLeaveCourse;
 use App\Http\Model\Leave\HolidayLeave;
+use App\Http\Model\Leave\HolidayLeaveModel;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
 use App\Util\Logger;
@@ -133,7 +134,6 @@ class Pc{
      * 创建请假模板
      * @return string
      * @throws ParamValidateFailedException
-     * @throws \src\Exceptions\UnAuthorizedException
      */
     public function addHolidayLeaveModel(){
         $validator = Validator::make($params = Request::all(),[
@@ -147,21 +147,48 @@ class Pc{
         if (strtotime($params['begin_time']) >= strtotime($params['end_time'])){
             throw new ParamValidateFailedException('节假日起止时间不合法，请重新输入');
         }
-        $userId = User::getUser(true);
         HolidayLeave::create([
             'title' => $params['title'],
             'from' => $params['from'],
             'to' => $params['to'],
             'begin_time' => $params['begin_time'],
             'end_time' => $params['end_time'],
-            'teacher_id' => $userId
         ]);
         return ApiResponse::responseSuccess();
     }
 
 
+    /**
+     * 获取历史创建的节假日模板列表
+     * @return string
+     */
     public function getHolidayLeaveModelHistory(){
+        $data = HolidayLeaveModel::latest()->paginate(5);
+        return ApiResponse::responseSuccess($data);
+    }
+
+
+    /**
+     * 查看某一个模板下，自己的学生登记情况
+     * @return string
+     * @throws ParamValidateFailedException
+     * @throws \src\Exceptions\UnAuthorizedException
+     */
+    public function getHolidayLeaveDetail(){
+        $validator = Validator::make($params = Request::all(),[
+            'id' => 'required'
+        ]);
+        if ($validator->fails()){
+            throw new ParamValidateFailedException($validator);
+        }
         $userId = User::getUser(true);
+        $data = HolidayLeave::join('student','student.id','=','holiday_leave.student_id')
+            ->select('holiday_leave.*','student.name','student.uid')
+            ->where('holiday_leave.holiday_leave_model_id',$params['id'])//是这个模板
+            ->where('student.teacher_id',$userId)//自己的学生
+            ->orderByDesc('holiday_leave.created_at')
+            ->paginate(5);
+        return ApiResponse::responseSuccess($data);
 
     }
 }

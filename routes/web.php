@@ -57,8 +57,8 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
             Route::group(['prefix' => 'pc'],function (){
 
-
                 //——————————————————————————————日常请假——————————————————————————————
+
                 //获取待审核的请假信息
                 Route::get('getAuthingLeave','Leave\Pc@getAuthingLeave');
 
@@ -73,10 +73,17 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 //辅导员添加一条节假日信息
                 Route::post('addHolidayLeaveModel','Leave\Pc@addHolidayLeaveModel');
 
+                //获取当前辅导员之前创建的所有模板
+                Route::get('getHolidayLeaveModelHistory','Leave\Pc@getHolidayLeaveModelHistory');
+
+                //获取某条模板下的学生登记情况
+                Route::get('getHolidayLeaveDetail','Leave\Pc@getHolidayLeaveDetail');
 
             });
 
             Route::group(['prefix' => 'wx'],function (){
+
+                //——————————————————————————————日常请假——————————————————————————————
 
                 //添加一条请假信息
                 Route::post('addLeave','Leave\Wx@addLeave');
@@ -87,6 +94,13 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 //获取请假历史信息列表
                 Route::get('getLeaveHistory','Leave\Wx@getLeaveHistory');
 
+                //—————————————————————————————节假日请假————————————————————————————
+
+                //在某模板下登记节假日信息
+                Route::post('addHolidayLeave','Leave\Wx@addHolidayLeave');
+
+                //获取有效的节假日模板
+                Route::get('getHolidayLeaveModel','Leave\Wx@getHolidayLeaveModel');
             });
 
         });

@@ -156,4 +156,15 @@ class Wx{
         HolidayLeaveModel::create($data);
         return ApiResponse::responseSuccess();
     }
+
+    /**
+     * 获取有效的模板列表
+     * @return string
+     */
+    public function getHolidayLeaveModel(){
+        $data = HolidayLeaveModel::where('to','>=', date('Y-m-d',strtotime('-1 week')))
+            ->latest()
+            ->paginate(5);
+        return ApiResponse::responseSuccess($data);
+    }
 }
