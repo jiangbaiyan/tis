@@ -57,7 +57,7 @@ class Pc{
             ->whereIn('daily_leave.status',[DailyLeave::AUTH_FAIL,DailyLeave::AUTH_SUCC])
             ->where('daily_leave.teacher_id',$teacherId)
             ->orderByDesc('daily_leave.updated_at')
-            ->paginate(7);
+            ->paginate(5);
         return ApiResponse::responseSuccess($data);
     }
 
@@ -162,7 +162,7 @@ class Pc{
      * @return string
      */
     public function getHolidayLeaveModelHistory(){
-        $data = HolidayLeaveModel::latest()->paginate(5);
+        $data = HolidayLeaveModel::latest()->paginate(7);
         return ApiResponse::responseSuccess($data);
     }
 
