@@ -82,7 +82,8 @@
 			<select type="text" name="instructor">
 				<option value="1">卞广旭</option>
 				<option value="2">冯尉瑾</option>
-				<option value="3">袁理锋</option>
+				<option value="3">徐诚</option>
+				<option value="4">袁理锋</option>
 			</select>
 		@endif
         @if (count($errors) > 0)
