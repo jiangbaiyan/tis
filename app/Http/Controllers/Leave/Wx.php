@@ -11,7 +11,6 @@ namespace App\Http\Controllers\Leave;
 
 use App\Http\Model\Common\User;
 use App\Http\Model\Leave\DailyLeave;
-use App\Http\Model\Leave\DailyLeaveCourse;
 use App\Http\Model\Leave\HolidayLeave;
 use App\Http\Model\Leave\HolidayLeaveModel;
 use App\Http\Model\Teacher;
@@ -125,15 +124,10 @@ class Wx{
     public function addHolidayLeave(){
         $validator = Validator::make($params = Request::all(),[
             'id' => 'required',
-            'begin_time' => 'date|required',
-            'end_time' => "date|required",
+            'destination' => 'required'
         ]);
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
-        }
-        if (strtotime($params['begin_time']) >= strtotime($params['end_time'])){
-            Logger::notice('leave|illegal_leave_time|params:' . json_encode($params));
-            throw new OperateFailedException('起止时间不合法，请重新输入');
         }
         $holidayLeaveModel = HolidayLeaveModel::find($params['id']);
         if (!$holidayLeaveModel){
@@ -142,10 +136,7 @@ class Wx{
         }
         $userId = User::getUser(true);
         $data = [];
-        !empty($params['destination']) ? $data['is_leave_hz'] = 1 : $data['is_leave_hz'] = 0;
-        !empty($params['destination']) && $data['destination'] = $params['destination'];
-        $data['begin_time'] = $params['begin_time'];
-        $data['end_time'] = $params['end_time'];
+        $data['destination'] = $params['destination'];
         $data['holiday_leave_model_id'] = $holidayLeaveModel->id;
         $data['student_id'] = $userId;
         HolidayLeave::create($data);
