@@ -150,7 +150,7 @@ class Wx{
     public function getHolidayLeaveModel(){
         $data = HolidayLeaveModel::where('to','>=', date('Y-m-d',strtotime('-1 week')))
             ->latest()
-            ->paginate(5);
+            ->get();
         return ApiResponse::responseSuccess($data);
     }
 }
