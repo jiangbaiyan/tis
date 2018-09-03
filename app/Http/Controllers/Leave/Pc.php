@@ -181,7 +181,7 @@ class Pc{
         }
         $userId = User::getUser(true);
         $data = HolidayLeave::join('student','student.id','=','holiday_leave.student_id')
-            ->select('holiday_leave.updated_at','student.name','student.uid','student.class')
+            ->select('holiday_leave.updated_at','holiday_leave.destination','student.name','student.uid','student.class')
             ->where('holiday_leave.holiday_leave_model_id',$params['id'])//是这个模板
             ->where('student.teacher_id',$userId)//自己的学生
             ->orderByDesc('holiday_leave.created_at')
