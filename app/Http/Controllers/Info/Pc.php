@@ -18,7 +18,6 @@ use App\Util\Logger;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
-use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 use src\Exceptions\PermissionDeniedException;
 use src\Exceptions\ResourceNotFoundException;

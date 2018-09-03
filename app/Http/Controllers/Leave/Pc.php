@@ -57,7 +57,7 @@ class Pc{
             ->whereIn('daily_leave.status',[DailyLeave::AUTH_FAIL,DailyLeave::AUTH_SUCC])
             ->where('daily_leave.teacher_id',$teacherId)
             ->orderByDesc('daily_leave.updated_at')
-            ->paginate(5);
+            ->paginate(7);
         return ApiResponse::responseSuccess($data);
     }
 
