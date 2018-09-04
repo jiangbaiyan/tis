@@ -23,6 +23,7 @@
         姓名：{{$item->name}}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         |
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         通知模块权限：
         @if ($item->info_auth_state == \App\Http\Model\Teacher::NORMAL)
             普通教师<input type="radio" name="info_auth_state" value="0" checked>
@@ -55,6 +56,7 @@
             教务老师<input type="radio" name="leave_auth_state" value="2" checked>
         @endif
             <input type="hidden" name="uid" value="{{$item->uid}}">
+        |        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <input type="submit" value="点击修改权限">
     </form>
     <br>
