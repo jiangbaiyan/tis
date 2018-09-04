@@ -34,9 +34,9 @@
             辅导员<input type="radio" name="info_auth_state" value="1">
             教务老师<input type="radio" name="info_auth_state" value="2" checked>
         @endif
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         |
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
         请假模块权限：
         @if ($item->leave_auth_state == \App\Http\Model\Teacher::NORMAL)
             普通教师<input type="radio" name="leave_auth_state" value="0" checked>
