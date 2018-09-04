@@ -32,8 +32,8 @@ class AuthLevel{
         $teacher = Teacher::all();
         foreach ($teacher as &$item){
             $allAuthState = Teacher::getAuthState($item->uid);
-            $item['info_auth_state'] = $allAuthState['info_auth_state'];
-            $item['leave_auth_state'] = $allAuthState['leave_auth_state'];
+            $item['info_auth_state'] = isset($allAuthState['info_auth_state']) ?? 0;
+            $item['leave_auth_state'] = isset($allAuthState['leave_auth_state']) ?? 0;
         }
         return view('showauthstate',['teacher' => $teacher]);
     }
