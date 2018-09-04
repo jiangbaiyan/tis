@@ -103,6 +103,21 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 Route::get('getHolidayLeaveModel','Leave\Wx@getHolidayLeaveModel');
             });
 
+            //模块权限相关
+            Route::group(['prefix' => 'auth'],function (){
+
+                Route::group(['prefix' => 'pc'],function (){
+
+                    //获取所有老师的权限信息
+                    Route::get('getAllAuthState','Auth\AuthLevel@showAllAuthLevel');
+
+                    //新增或修改权限
+                    Route::post('setAuthState','Auth\AuthLeave@setAuthLevel');
+
+                });
+
+            });
+
         });
     });
 });
