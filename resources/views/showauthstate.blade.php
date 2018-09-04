@@ -19,7 +19,10 @@
 <body>
 @foreach($teacher as $item)
     <form action="" method="post">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         姓名：{{$item->name}}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        |
         通知模块权限：
         @if ($item->info_auth_state == \App\Http\Model\Teacher::NORMAL)
             普通教师<input type="radio" name="info_auth_state" value="0" checked>
