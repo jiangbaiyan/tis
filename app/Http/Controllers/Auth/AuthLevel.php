@@ -13,7 +13,6 @@ use App\Http\Model\Teacher;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\Exceptions\ParamValidateFailedException;
-use src\Exceptions\PermissionDeniedException;
 
 class AuthLevel{
 
