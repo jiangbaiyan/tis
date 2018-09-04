@@ -42,12 +42,12 @@ class AuthLevel{
      * 修改权限
      * @return string
      * @throws ParamValidateFailedException
-     * @throws \src\Exceptions\UnAuthorizedException
      */
     public function setAuthLevel(){
         $validator = Validator::make($params = Request::all(),[
             'info_auth_state' => 'required',
-            'leave_auth_state' => 'required'
+            'leave_auth_state' => 'required',
+            'uid' => 'required'
         ]);
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
@@ -58,8 +58,7 @@ class AuthLevel{
             'info_auth_state' => $infoAuthState,
             'leave_auth_state' => $leaveAuthState
         ];
-        $uid = User::getUser()->uid;
-        Teacher::setAuthState($uid,$data);
+        Teacher::setAuthState($params['uid'],$data);
         return ApiResponse::responseSuccess();
     }
 }

@@ -47,6 +47,8 @@
             辅导员：<input type="radio" name="leave_auth_state" value="1">
             教务老师：<input type="radio" name="leave_auth_state" value="2" checked>
         @endif
+            <input type="hidden" name="uid" value="{{$item->uid}}">
+            <input type="submit" value="点击修改权限">
     </form>
     <br>
 @endforeach
