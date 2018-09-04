@@ -26,7 +26,7 @@ class AuthLevel{
      */
     public function showAllAuthLevel(){
         $user = User::getUser();
-        if ($user->uid != '15075119' && $user->uid != '16271110'){
+        if ($user->uid != '41804'){
             throw new PermissionDeniedException();
         }
         $teacher = Teacher::all();
