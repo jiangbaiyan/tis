@@ -11,7 +11,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>网安信息平台</title>
     <style>
-
+        form{
+            border: 1px solid black;
+        }
     </style>
 </head>
 <body>
