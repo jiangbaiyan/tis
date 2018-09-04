@@ -114,7 +114,7 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
             Route::get('getAllAuthState','Auth\AuthLevel@showAllAuthLevel');
 
             //新增或修改权限
-            Route::post('setAuthState','Auth\AuthLeave@setAuthLevel');
+            Route::post('setAuthState','Auth\AuthLevel@setAuthLevel');
 
         });
     });
