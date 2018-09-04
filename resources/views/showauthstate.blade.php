@@ -18,7 +18,7 @@
 </head>
 <body>
 @foreach($teacher as $item)
-    <form action="" method="post">
+    <form action="{{url('/api/v1/auth/pc/setAuthState')}}" method="post">
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         姓名：{{$item->name}}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
