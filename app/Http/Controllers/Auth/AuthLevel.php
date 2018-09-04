@@ -59,6 +59,6 @@ class AuthLevel{
             'leave_auth_state' => $leaveAuthState
         ];
         Teacher::setAuthState($params['uid'],$data);
-        return ApiResponse::responseSuccess();
+        die('修改成功！');
     }
 }
