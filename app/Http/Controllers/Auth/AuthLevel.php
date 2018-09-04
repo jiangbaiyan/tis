@@ -20,13 +20,12 @@ class AuthLevel{
     /**
      * 展示所有教师的权限
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * @throws PermissionDeniedException
      * @throws \src\Exceptions\UnAuthorizedException
      */
     public function showAllAuthLevel(){
         $user = User::getUser();
         if ($user->uid != '41804'){
-            throw new PermissionDeniedException();
+            die('您无权访问该页面，请联系管理员获取权限');
         }
         $teacher = Teacher::all();
         foreach ($teacher as &$item){
