@@ -112,7 +112,7 @@ class HduLogin extends Controller {
             }
             catch (\Exception $e) {
                 Logger::notice('login|get_user_info_from_hdu_api_failed|msg:' . json_encode($e->getMessage()));
-                return redirect(self::LOGIN_SERVER . "?service=" .self::THIS_URL);
+                die('杭电官方系统异常，请稍后再试');
             }
         } else//没有ticket，说明没有登录，需要重定向到登录服务器
         {
