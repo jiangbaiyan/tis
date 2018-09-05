@@ -22,13 +22,15 @@ class SyncOldInfo{
             $res = $pdo->query($sqlGetContent);
             $data = [];
             foreach ($res as $row){
-                $data[]['title'] = $row['title'];
-                $data[]['content'] = $row['content'];
-                $data[]['uid'] = $row['userid'];
-                $data[]['name'] = $row['name'];
-                $data[]['type'] = $row['type'];
-                $data[]['status'] = $row['status'];
-                $data[]['attachment'] = $row['attach_url'];
+                for ($i = 0;$i<count($row);$i++){
+                    $data[$i]['title'] = $row['title'];
+                    $data[$i]['content'] = $row['content'];
+                    $data[$i]['uid'] = $row['userid'];
+                    $data[$i]['name'] = $row['name'];
+                    $data[$i]['type'] = $row['type'];
+                    $data[$i]['status'] = $row['status'];
+                    $data[$i]['attachment'] = $row['attach_url'];
+                }
             }
             print_r($data);
         } catch (\Exception $e) {
