@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\PermissionDeniedException;
+use src\Exceptions\ResourceNotFoundException;
 
 class Info extends Model {
 
@@ -46,14 +47,16 @@ class Info extends Model {
      * @return array
      * @throws PermissionDeniedException
      * @throws \src\Exceptions\UnAuthorizedException
+     * @throws ResourceNotFoundException
      */
     public static function getInfoObject($type,$target){
         $res = [];
+        $type = intval($type);
         if ($type >= self::TYPE_STUDENT_GRADE && $type <= self::TYPE_STUDENT_ALL){
             $studentMdl = new Student();
             $midRes = $studentMdl->select('id','openid','uid','name');
             switch ($type){
-                case self::TYPE_GRADUATE_GRADE:
+                case self::TYPE_STUDENT_GRADE:
                     $res = $midRes->whereIn('grade',explode(' ',$target));
                     break;
                 case self::TYPE_STUDENT_CLASS:
@@ -99,6 +102,9 @@ class Info extends Model {
                     $res = $midRes;
                     break;
             }
+        }
+        if (empty($res)){
+            throw new ResourceNotFoundException();
         }
         return $res->get()->toArray();
     }
