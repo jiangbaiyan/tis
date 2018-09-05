@@ -65,6 +65,7 @@ class Pc extends Controller{
      * @throws \src\Exceptions\OperateFailedException
      * @throws \src\Exceptions\UnAuthorizedException
      * @throws ResourceNotFoundException
+     * @throws PermissionDeniedException
      */
     public function sendInfo(){
         $validator = Validator::make($params = Request::all(),[
