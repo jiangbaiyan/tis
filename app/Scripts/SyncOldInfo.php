@@ -20,9 +20,10 @@ class SyncOldInfo{
             $pdo = new \PDO($conf['dsn'], $conf['user'], $conf['password']); //初始化一个PDO对象
             $sqlGetContent = 'select info_contents.*,info_feedbacks.info_content_id,info_feedbacks.student_id,students.name,students.userid from info_contents,info_feedbacks,students where info_feedbacks.info_content_id = info_contents.id and info_feedbacks.student_id = students.id';
             $res = $pdo->query($sqlGetContent);
+            $count = count($res);
             $data = [];
             foreach ($res as $row){
-                for ($i = 0;$i<count($row);$i++){
+                for ($i = 0;$i<$count;$i++){
                     $data[$i]['title'] = $row['title'];
                     $data[$i]['content'] = $row['content'];
                     $data[$i]['uid'] = $row['userid'];
