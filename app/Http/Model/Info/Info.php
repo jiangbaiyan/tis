@@ -9,6 +9,7 @@
 namespace App\Http\Model\Info;
 
 
+use App\Http\Model\Common\User;
 use App\Http\Model\Graduate;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
@@ -16,6 +17,7 @@ use App\Util\Logger;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use src\Exceptions\OperateFailedException;
+use src\Exceptions\PermissionDeniedException;
 
 class Info extends Model {
 
@@ -37,7 +39,14 @@ class Info extends Model {
 
     protected $guarded = [];
 
-    //查询并获取可通知对象
+    /**
+     * 获取可用通知对象
+     * @param $type
+     * @param $target
+     * @return array
+     * @throws PermissionDeniedException
+     * @throws \src\Exceptions\UnAuthorizedException
+     */
     public static function getInfoObject($type,$target){
         if ($type >= self::TYPE_STUDENT_GRADE && $type <= self::TYPE_STUDENT_ALL){
             $studentMdl = new Student();
@@ -74,6 +83,11 @@ class Info extends Model {
                     break;
             }
         } else{
+            $userId = User::getUser()->uid;
+            $infoAuthState = Teacher::getAuthState($userId)['info_auth_state'];
+            if ($infoAuthState != Teacher::DEAN){
+                throw new PermissionDeniedException();
+            }
             $teacherMdl = new Teacher();
             $midRes = $teacherMdl->select('id','openid','uid','name');
             switch ($type){
