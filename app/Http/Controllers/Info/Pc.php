@@ -47,13 +47,15 @@ class Pc extends Controller{
             'grade' => $grade,
             'class' => $class,
             'major' => $major,
-            'graduate_grade' => $graduateGrade
+            'graduate_grade' => $graduateGrade,
+            'is_show_teacher' => 0
         ];
         if($infoAuthState == Teacher::DEAN){
             $teacher = Teacher::select('id','uid','name')
                 ->where('openid','!=','')
                 ->get();
             $resData['teacher'] = $teacher;
+            $resData['is_show_teacher'] = 1;
         }
         return ApiResponse::responseSuccess($resData);
     }
