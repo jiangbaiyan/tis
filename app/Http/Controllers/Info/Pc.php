@@ -96,10 +96,14 @@ class Pc extends Controller{
             'status' => Info::STATUS_NOT_WATCHED,
             'teacher_name' => $teacherName,
             'attachment' => $path,
-            'batch_id' => $batchId
+            'batch_id' => $batchId,
         ];
+        !empty($params['target']) && $infoData['target'] = $params['target'];
+
         Info::insertInfo($infoObjects,$infoData);
+
         Wx::sendModelInfo($infoObjects,$infoData,Wx::MODEL_NUM_INFO);
+
         return ApiResponse::responseSuccess();
     }
 
@@ -111,7 +115,7 @@ class Pc extends Controller{
      */
     public function getInfoList(){
         $user = User::getUser();
-        $midRes = Info::select('title','content','type','attachment','teacher_name','batch_id','created_at');
+        $midRes = Info::select('title','content','type','target','attachment','teacher_name','batch_id','created_at');
         $infoAuthState = Teacher::getAuthState($user->uid)['info_auth_state'];
         if ($infoAuthState == Teacher::NORMAL){
             throw new PermissionDeniedException();
@@ -138,7 +142,7 @@ class Pc extends Controller{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        $feedbacks = Info::select('title','uid','name','status')->where('batch_id',$params['batch_id'])->get();
+        $feedbacks = Info::select('title','uid','target','name','status')->where('batch_id',$params['batch_id'])->get();
         if (!$feedbacks){
             Logger::fatal('info|info_was_deleted|batch_id:' . $params['batch_id']);
             throw new ResourceNotFoundException('该通知已被删除');

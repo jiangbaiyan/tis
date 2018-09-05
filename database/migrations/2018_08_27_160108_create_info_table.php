@@ -21,6 +21,7 @@ class CreateInfoTable extends Migration
             $table->unsignedInteger('uid')->default('0')->comment('通知接收人学号/工号');
             $table->string('name',32)->default('')->comment('通知接收人姓名');
             $table->unsignedTinyInteger('type')->default('0')->comment('通知对象类型');
+            $table->string('target',255)->default('0')->comment('通知对象');
             $table->unsignedTinyInteger('status')->default('0')->comment('是否查看|0-未查看|1-已查看');
             $table->string('attachment',512)->default('')->comment('附件URL');
             $table->timestamp('time')->default('1971-01-01 00:00:00')->comment('定时时间');

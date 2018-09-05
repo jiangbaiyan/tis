@@ -17,7 +17,7 @@ class Student extends Model{
     public static $majorMapping = [
         '24' => '网络工程',
         '36' => '信息安全',
-        '02' => '信息安全（卓越工程师计划）',
+        '02' => '信安卓越',
         '01' => '网络空间安全类'
     ];
 }

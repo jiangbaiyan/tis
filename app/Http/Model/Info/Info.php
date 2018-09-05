@@ -123,16 +123,14 @@ class Info extends Model {
                 'uid' => $infoObjects[$i]['uid'],
                 'name' => $infoObjects[$i]['name'],
                 'created_at' => $time,
-                'updated_at' => $time,
-                'batch_id' => $infoData['batch_id']
+                'updated_at' => $time
             ]);
         }
         try {
             DB::table('info')->insert($data);
         } catch (\Exception $e){
-            Logger::fatal('info|insert_to_info_table_failed|data:' . json_encode($data));
-            throw new OperateFailedException($e->getMessage());
+            Logger::fatal('info|insert_to_info_table_failed|data:' . json_encode($data) . '|msg:' . $e->getMessage());
+            throw new OperateFailedException('您输入的数据过长或不合法，请修改后重试');
         }
     }
-
 }
