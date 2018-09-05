@@ -48,6 +48,7 @@ class Info extends Model {
      * @throws \src\Exceptions\UnAuthorizedException
      */
     public static function getInfoObject($type,$target){
+        $res = [];
         if ($type >= self::TYPE_STUDENT_GRADE && $type <= self::TYPE_STUDENT_ALL){
             $studentMdl = new Student();
             $midRes = $studentMdl->select('id','openid','uid','name');
