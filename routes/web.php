@@ -103,9 +103,17 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 Route::get('getHolidayLeaveModel','Leave\Wx@getHolidayLeaveModel');
             });
         });
+
+        //教学模块
+        Route::group(['prefix' => 'teach'],function (){
+
+            //达成度计算
+            Route::post('calculateReachState','Teach\ReachState@calculate');
+        });
+
     });
 
-    //调整权限
+    //权限管理系统
     Route::group(['prefix' => 'auth'],function (){
 
         Route::group(['prefix' => 'pc'],function (){

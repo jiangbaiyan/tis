@@ -1,5 +1,7 @@
 <?php
 /**
+ * 教师权限管理系统
+ * https://tis.hzcloudservice.com/api/v1/auth/getAllAuthState
  * Created by PhpStorm.
  * User: jiangbaiyan
  * Date: 2018/9/4
