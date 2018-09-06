@@ -107,7 +107,8 @@ class ReachState
 
             File::deleteFile($path);
 
-            return ApiResponse::responseSuccess(['cg' => $CG, 'gg' => $GS]);
+            return ApiResponse::responseSuccess();
+
         } catch (\Exception $e) {
             throw new OperateFailedException('teach|reach_state_calculate_failed|msg:' . json_encode($e->getMessage()));
         }
@@ -120,29 +121,8 @@ class ReachState
      */
     public function getAllReachState(){
         $userId = User::getUser(true);
-        $data = ReachStateModel::select('id','course_name','year','term','created_at')->where('teacher_id',$userId)->latest()->get();
+        $data = ReachStateModel::where('teacher_id',$userId)->latest()->paginate(5);
         return ApiResponse::responseSuccess($data);
     }
 
-    /**
-     * 查看达成度详情
-     * @return string
-     * @throws ParamValidateFailedException
-     * @throws ResourceNotFoundException
-     */
-    public function getReachStateDetail(){
-        $validator = Validator::make($params = Request::all(),[
-            'id' => 'required'
-        ]);
-        if ($validator->fails()){
-            throw new ParamValidateFailedException($validator);
-        }
-        $id = $params['id'];
-        $data = ReachStateModel::find($id);
-        if (!$data){
-            Logger::notice('teach|reach_state_not_found|id:' . json_encode($params));
-            throw new ResourceNotFoundException();
-        }
-        return ApiResponse::responseSuccess($data);
-    }
 }
