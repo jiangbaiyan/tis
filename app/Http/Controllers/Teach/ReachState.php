@@ -11,7 +11,6 @@ namespace App\Http\Controllers\Teach;
 
 use App\Http\Model\Common\User;
 use App\Util\File;
-use App\Util\Logger;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
@@ -19,7 +18,6 @@ use src\ApiHelper\ApiResponse;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 use App\Http\Model\Teach\ReachState as ReachStateModel;
-use src\Exceptions\ResourceNotFoundException;
 
 class ReachState
 {
@@ -89,15 +87,14 @@ class ReachState
                 if (!$num){
                     break;
                 }
-                $gg[$i-1] = $num;//取出"1-1"，即毕业要求指标点，并存入gg(graduation goal)数组中
-                $GS[$gg[$i-1]] = round((double)($CG[1] * $data[$i + 15][8] + $CG[2] * $data[$i + 15][9] + $CG[3] * $data[$i + 15][10] + $CG[4] * $data[$i + 15][11]), 2);//累加求和，得出最终结果
+                $GG[$num] = round((double)($CG[1] * $data[$i + 15][8] + $CG[2] * $data[$i + 15][9] + $CG[3] * $data[$i + 15][10] + $CG[4] * $data[$i + 15][11]), 2);//累加求和，得出最终结果
             }
 
-            $jsonGS = json_encode($GS);
+            $jsonGG = json_encode($GG);
 
             ReachStateModel::create([
                 'cg' => $jsonCG,//课程目标指标点
-                'gg' => $jsonGS,//毕业要求指标点
+                'gg' => $jsonGG,//毕业要求指标点
                 'year' => $year,
                 'term' => $term,
                 'course_name' => $courseName,
