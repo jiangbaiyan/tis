@@ -64,6 +64,10 @@ class ReachState
                 }
             }
 
+            if (empty($studentLen)){
+                throw new OperateFailedException('您的表格数据还没有完善，请填写完整后再上传');
+            }
+
             //1、课程目标达成度计算
             for ($i = 2,$j = 0 ; $j<$studentLen; $i++,$j++) {//数组下标为[行-2,列相等]
                 $sum1 += $data[$i][1];//评价环节成绩总和
