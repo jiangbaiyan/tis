@@ -96,7 +96,7 @@ class File
         if (empty($path)){
             return;
         }
-        $filePath = '/home/wwwroot/TeacherInfoSystem/storage/' . $path;
+        $filePath = '/home/wwwroot/TeacherInfoSystem/storage/app/public/' . $path;
         if (!file_exists($filePath)){
             throw new ResourceNotFoundException();
         }
