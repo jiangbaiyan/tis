@@ -15,15 +15,13 @@ use App\Http\Model\Common\Wx;
 use App\Http\Model\Graduate;
 use App\Http\Model\Student;
 use App\Http\Model\Teacher;
+use App\Util\Logger;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use src\Exceptions\OperateFailedException;
-use src\Exceptions\ParamValidateFailedException;
-use App\Util\Logger;
-use src\Exceptions\PermissionDeniedException;
 
 class HduLogin extends Controller {
 

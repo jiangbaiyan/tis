@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Teach;
 
 
 use App\Http\Model\Common\User;
+use App\Http\Model\Teach\ReachState as ReachStateModel;
 use App\Util\File;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,7 +18,6 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use src\ApiHelper\ApiResponse;
 use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
-use App\Http\Model\Teach\ReachState as ReachStateModel;
 
 class ReachState
 {
