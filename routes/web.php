@@ -109,6 +109,13 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
             //达成度计算
             Route::post('calculateReachState','Teach\ReachState@calculate');
+
+            //获取历史计算过的达成度列表
+            Route::get('getAllReachState','Teach\ReachState@getAllReachState');
+
+            //获取达成度计算详情
+            Route::get('getReachStateDetail','Teach\ReachState@getReachStateDetail');
+
         });
 
     });

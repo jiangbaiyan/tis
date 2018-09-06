@@ -46,10 +46,11 @@ class ReachState
         $courseName = $params['course_name'];
         $year = $params['year'];
         $term = $params['term'];
+
         try {
-            $path = File::saveFile($file);
+            $path = File::saveFile($file,'public');
             $reader = new Xlsx();
-            $spreadSheet = $reader->load($path);
+            $spreadSheet = $reader->load('./storage/' . $path);
             $data = $spreadSheet->getActiveSheet()->toArray();
             $length = count($data);
             $sum1 = 0;
@@ -57,16 +58,16 @@ class ReachState
             $sum3 = 0;
             $sum4 = 0;
             $studentLen = 0;
-
-            for ($i = 1; $i < $length; $i++) {//获取填写的学生人数
-                if ($data[$i][1] == null) {
-                    $studentLen = --$i;
+            for ($i = 2; $i < $length; $i++) {//获取填写的学生人数
+                if ($data[$i][1]) {
+                    $studentLen++;
+                } else{
                     break;
                 }
             }
 
             //1、课程目标达成度计算
-            for ($i = 1; $i <= $studentLen; $i++) {//数组下标为[行-2,列相等]
+            for ($i = 2,$j = 0 ; $j<$studentLen; $i++,$j++) {//数组下标为[行-2,列相等]
                 $sum1 += $data[$i][1];//评价环节成绩总和
                 $sum2 += $data[$i][2];
                 $sum3 += $data[$i][3];
@@ -77,17 +78,21 @@ class ReachState
             $v[2] = $sum2 / ($studentLen);
             $v[3] = $sum3 / ($studentLen);
             $v[4] = $sum4 / ($studentLen);
-
-            for ($i = 1; $i <= 4; $i++) {//默认最多4个课程目标
-                $CG[$i] = round((double)($v[1] * $data[$i + 2][8] + $v[2] * $data[$i + 2][9] + $v[3] * $data[$i + 2][10] + $v[4] * $data[$i + 2][11]), 2); //累加
+            for ($i = 2; $i <= 5; $i++) {//默认最多4个课程目标
+                $CG[$i-1] = round((double)($v[1] * $data[$i + 2][8] + $v[2] * $data[$i + 2][9] + $v[3] * $data[$i + 2][10] + $v[4] * $data[$i + 2][11]), 2); //累加
             }
             $jsonCG = json_encode($CG);
 
             //2、毕业要求指标点达成度计算
-            for ($i = 1; $i <= 8; $i++) {//默认最多8个毕业要求指标点
-                $gg[$i] = $data[$i + 15][7];//取出"1-1"，即毕业要求指标点，并存入gg(graduation goal)数组中
-                $GS[$gg[$i]] = round((double)($CG[1] * $data[$i + 15][8] + $CG[2] * $data[$i + 15][9] + $CG[3] * $data[$i + 15][10] + $CG[4] * $data[$i + 15][11]), 2);//累加求和，得出最终结果
+            for ($i = 2; $i <= 9; $i++) {//默认最多8个毕业要求指标点
+                $num = $data[$i+15][7];
+                if (!$num){
+                    break;
+                }
+                $gg[$i-1] = $num;//取出"1-1"，即毕业要求指标点，并存入gg(graduation goal)数组中
+                $GS[$gg[$i-1]] = round((double)($CG[1] * $data[$i + 15][8] + $CG[2] * $data[$i + 15][9] + $CG[3] * $data[$i + 15][10] + $CG[4] * $data[$i + 15][11]), 2);//累加求和，得出最终结果
             }
+
             $jsonGS = json_encode($GS);
 
             ReachStateModel::create([
@@ -99,9 +104,10 @@ class ReachState
                 'teacher_id' => $userId
             ]);
 
+
             File::deleteFile($path);
 
-            return ApiResponse::responseSuccess(['CG' => $jsonCG, 'GS' => $jsonGS]);
+            return ApiResponse::responseSuccess(['CG' => $CG, 'GS' => $GS]);
         } catch (\Exception $e) {
             throw new OperateFailedException('teach|reach_state_calculate_failed|msg:' . json_encode($e->getMessage()));
         }
@@ -114,7 +120,7 @@ class ReachState
      */
     public function getAllReachState(){
         $userId = User::getUser(true);
-        $data = ReachStateModel::where('teacher_id',$userId)->latest()->paginate(7);
+        $data = ReachStateModel::select('id','course_name','year','term','created_at')->where('teacher_id',$userId)->latest()->paginate(7);
         return ApiResponse::responseSuccess($data);
     }
 

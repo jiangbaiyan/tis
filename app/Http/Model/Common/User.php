@@ -7,8 +7,6 @@
  */
 namespace App\Http\Model\Common;
 
-use App\Http\Model\Student;
-use App\Http\Model\Teacher;
 use Illuminate\Support\Facades\Session;
 
 class User{
@@ -24,7 +22,6 @@ class User{
      */
     public static function getUser($isRtnId = false){
         $user = Session::get('user');
-        //$user = Student::find(1);
         if (!$user){
             throw new \src\Exceptions\UnAuthorizedException();
         }

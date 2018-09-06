@@ -11,6 +11,7 @@ namespace App\Util;
 
 use Illuminate\Support\Facades\Storage;
 use src\Exceptions\OperateFailedException;
+use src\Exceptions\ResourceNotFoundException;
 
 class File
 {
@@ -26,27 +27,36 @@ class File
     /**
      * 存储文件并返回文件路径(支持批量存储)
      * @param $file
+     * @param string $disk
      * @return array|false|string
      * @throws OperateFailedException
      */
-    public static function saveFile($file)
+    public static function saveFile($file,$disk = 'upyun')
     {
         $path = [];
         self::isAllowedFormat($file);
         if (is_array($file)) {
             foreach ($file as $fileItem) {
-                $upyunPath = Storage::disk('upyun')->putFileAs('/tis/' . date('Y') . '/' . date('md'),$fileItem,$fileItem->getClientOriginalName(),'public');
-                if (empty($upyunPath)){
+                $filePath = Storage::disk($disk)->putFileAs('/tis/' . date('Y') . '/' . date('md'),$fileItem,$fileItem->getClientOriginalName(),'public');
+                if (empty($filePath)){
                     throw new OperateFailedException(self::UPLOAD_FAILED);
                 }
-                $path[] = self::UPYUN_HOST . $upyunPath;
+                if ($disk == 'upyun'){
+                    $path[] = self::UPYUN_HOST . $filePath;
+                }else{
+                    $path[] = $filePath;
+                }
             }
         } else {
-            $upyunPath = Storage::disk('upyun')->putFileAs('/tis/' . date('Y') . '/' . date('md'),$file,$file->getClientOriginalName(),'public');
-            if (empty($upyunPath)){
+            $filePath = Storage::disk($disk)->putFileAs('/tis/' . date('Y') . '/' . date('md'),$file,$file->getClientOriginalName(),'public');
+            if (empty($filePath)){
                 throw new OperateFailedException(self::UPLOAD_FAILED);
             }
-            $path = self::UPYUN_HOST . $upyunPath;
+            if ($disk == 'upyun'){
+                $path = self::UPYUN_HOST . $filePath;
+            }else{
+                $path = $filePath;
+            }
         }
         if (is_array($path)){
             return implode(',',$path);
@@ -80,10 +90,18 @@ class File
      * 删除文件
      * @param $path
      * @throws OperateFailedException
+     * @throws ResourceNotFoundException
      */
     public static function deleteFile($path){
+        if (empty($path)){
+            return;
+        }
+        $filePath = '/home/wwwroot/TeacherInfoSystem/storage/' . $path;
+        if (!file_exists($filePath)){
+            throw new ResourceNotFoundException();
+        }
         try {
-            Storage::disk('upyun')->delete($path);
+            unlink($filePath);
         } catch (\Exception $e){
             throw new OperateFailedException($e->getMessage());
         }
