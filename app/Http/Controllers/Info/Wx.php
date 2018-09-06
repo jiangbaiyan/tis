@@ -45,8 +45,10 @@ class Wx{
             Logger::fatal('info|info_was_deleted|batch_id:' . $params['batch_id']);
             throw new ResourceNotFoundException('抱歉，该通知已被删除');
         }
-        $info->status = Info::STATUS_WATCHED;
-        $info->save();
+        if ($info->status == Info::STATUS_NOT_WATCHED){
+            $info->status = Info::STATUS_WATCHED;
+            $info->save();
+        }
         return ApiResponse::responseSuccess($info);
     }
 
