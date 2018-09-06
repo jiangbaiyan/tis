@@ -56,9 +56,8 @@ class Handler extends ExceptionHandler
             'line' => $exception->getLine(),
             'url' => $request->fullUrl(),
             'params' => $request->all(),
-            'user' => Session::get('user'),
-            'ip' => !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
-            'userAgent' => $_SERVER['HTTP_USER_AGENT']
+            'ip' => $request->ip(),
+            'user' => Session::get('user')
         ];
         Logger::fatal(json_encode($errArr));
         if ($exception->getCode() == 0){
