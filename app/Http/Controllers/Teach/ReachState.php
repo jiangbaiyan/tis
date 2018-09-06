@@ -66,7 +66,7 @@ class ReachState
             }
 
             if (empty($studentLen)){
-                throw new OperateFailedException('您的表格数据还没有完善，请填写完整后再上传');
+                throw new OperateFailedException('表格数据不完整，请完善后重新上传');
             }
 
             //1、课程目标达成度计算
