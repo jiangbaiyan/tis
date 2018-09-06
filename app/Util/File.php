@@ -75,4 +75,17 @@ class File
             }
         }
     }
+
+    /**
+     * 删除文件
+     * @param $path
+     * @throws OperateFailedException
+     */
+    public static function deleteFile($path){
+        try {
+            Storage::disk('upyun')->delete($path);
+        } catch (\Exception $e){
+            throw new OperateFailedException($e->getMessage());
+        }
+    }
 }
