@@ -96,8 +96,8 @@ class ReachState
             $jsonGS = json_encode($GS);
 
             ReachStateModel::create([
-                'course_result' => $jsonCG,
-                'graduate_result' => $jsonGS,
+                'cg' => $jsonCG,//课程目标指标点
+                'gg' => $jsonGS,//毕业要求指标点
                 'year' => $year,
                 'term' => $term,
                 'course_name' => $courseName,
@@ -107,7 +107,7 @@ class ReachState
 
             File::deleteFile($path);
 
-            return ApiResponse::responseSuccess(['CG' => $CG, 'GS' => $GS]);
+            return ApiResponse::responseSuccess(['cg' => $CG, 'gg' => $GS]);
         } catch (\Exception $e) {
             throw new OperateFailedException('teach|reach_state_calculate_failed|msg:' . json_encode($e->getMessage()));
         }
