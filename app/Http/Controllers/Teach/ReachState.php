@@ -120,7 +120,7 @@ class ReachState
      */
     public function getAllReachState(){
         $userId = User::getUser(true);
-        $data = ReachStateModel::select('id','course_name','year','term','created_at')->where('teacher_id',$userId)->latest()->paginate(7);
+        $data = ReachStateModel::select('id','course_name','year','term','created_at')->where('teacher_id',$userId)->latest()->get();
         return ApiResponse::responseSuccess($data);
     }
 
