@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Teach;
 use App\Http\Model\Common\User;
 use App\Http\Model\Teach\ReachState as ReachStateModel;
 use App\Util\File;
+use App\Util\Logger;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
@@ -111,7 +112,8 @@ class ReachState
             return ApiResponse::responseSuccess();
 
         } catch (\Exception $e) {
-            throw new OperateFailedException('teach|reach_state_calculate_failed|msg:' . json_encode($e->getMessage()));
+            Logger::notice('teach|reach_state_calculate_failed|msg:' . json_encode($e->getMessage()));
+            throw new OperateFailedException($e->getMessage());
         }
     }
 
