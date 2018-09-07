@@ -10,6 +10,7 @@
 namespace App\Scripts;
 
 
+use App\Util\Db;
 use App\Util\Logger;
 
 class SyncOldTeacherInfo{
@@ -26,10 +27,8 @@ class SyncOldTeacherInfo{
 
         try {
 
-            $conf = $this->initOld();
-            $newConf = $this->initNew();
-            $this->oldPdo = new \PDO($conf['dsn'], $conf['user'], $conf['password']);
-            $this->newPdo = new \PDO($newConf['dsn'], $newConf['user'], $newConf['password']);
+            $this->oldPdo = Db::initOldCon();
+            $this->newPdo = Db::initNewCon();
             $sql = 'select info_contents.*,teacher_info_feedbacks.info_content_id,teacher_info_feedbacks.account_id as teacher_id,teacher_info_feedbacks.status ,accounts.name from info_contents,teacher_info_feedbacks,accounts where teacher_info_feedbacks.info_content_id = info_contents.id and teacher_info_feedbacks.account_id = accounts.id order by teacher_info_feedbacks.info_content_id desc';
             $sql2 = 'select info_contents.* ,      info_feedbacks.info_content_id,                      info_feedbacks.student_id ,       info_feedbacks.status ,students.name from info_contents,        info_feedbacks,students where         info_feedbacks.info_content_id = info_contents.id and         info_feedbacks.student_id = students.id order by         info_feedbacks.info_content_id desc';
             $res = $this->oldPdo->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
@@ -44,28 +43,6 @@ class SyncOldTeacherInfo{
         }
     }
 
-    private function initOld()
-    {
-        $conf = [];
-        $conf['dbms'] = 'mysql';
-        $conf['host'] = 'localhost';
-        $conf['dbName'] = 'laravel_db';
-        $conf['user'] = 'root';
-        $conf['password'] = 'DUTWSRG2016-go';
-        $conf['dsn'] = "{$conf['dbms']}:host={$conf['host']};dbname={$conf['dbName']}";
-        return $conf;
-    }
-
-    private function initNew(){
-        $conf = [];
-        $conf['dbms'] = 'mysql';
-        $conf['host'] = 'localhost';
-        $conf['dbName'] = 'tis';
-        $conf['user'] = 'root';
-        $conf['password'] = 'DUTWSRG2016-go';
-        $conf['dsn'] = "{$conf['dbms']}:host={$conf['host']};dbname={$conf['dbName']}";
-        return $conf;
-    }
 
     private function packAndInsertData($oldData){
         $infoContentId = 0;
