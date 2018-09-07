@@ -1,5 +1,6 @@
 <?php
 /**
+ * 同步老表数据到新表离线脚本
  * Created by PhpStorm.
  * User: jiangbaiyan
  * Date: 2018/9/7
@@ -9,6 +10,8 @@
 namespace App\Scripts;
 
 
+use App\Util\Logger;
+
 class SyncOldTeacherInfo{
 
 
@@ -16,27 +19,28 @@ class SyncOldTeacherInfo{
     private $newPdo;
     private $batchId;
 
+    /**
+     * 入口
+     */
     public function run(){
 
         try {
+
             $conf = $this->initOld();
             $newConf = $this->initNew();
             $this->oldPdo = new \PDO($conf['dsn'], $conf['user'], $conf['password']);
             $this->newPdo = new \PDO($newConf['dsn'], $newConf['user'], $newConf['password']);
             $sql = 'select info_contents.*,teacher_info_feedbacks.info_content_id,teacher_info_feedbacks.account_id as teacher_id,teacher_info_feedbacks.status ,accounts.name from info_contents,teacher_info_feedbacks,accounts where teacher_info_feedbacks.info_content_id = info_contents.id and teacher_info_feedbacks.account_id = accounts.id order by teacher_info_feedbacks.info_content_id desc';
-            $sql2 = 'select info_contents.* ,info_feedbacks.info_content_id,info_feedbacks.student_id as student_id,info_feedbacks.status ,accounts.name from info_contents,info_feedbacks,accounts where info_feedbacks.info_content_id = info_contents.id and info_feedbacks.student_id = students.id order by info_feedbacks.info_content_id desc';
+            $sql2 = 'select info_contents.* ,      info_feedbacks.info_content_id,                      info_feedbacks.student_id ,       info_feedbacks.status ,students.name from info_contents,        info_feedbacks,students where         info_feedbacks.info_content_id = info_contents.id and         info_feedbacks.student_id = students.id order by         info_feedbacks.info_content_id desc';
             $res = $this->oldPdo->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
             $res2 = $this->oldPdo->query($sql2)->fetchAll(\PDO::FETCH_ASSOC);
-            if (empty($res) || empty($res2)){
-                die('老表无数据或获取数据失败');
-            }
 
             $this->packAndInsertData($res);
 
             $this->packAndInsertData($res2);
 
         }catch (\Exception $e){
-            echo $e->getMessage();
+            Logger::notice('sync_info_from_old_table_failed|msg:' . json_encode($e->getMessage()));
         }
     }
 
@@ -77,9 +81,15 @@ class SyncOldTeacherInfo{
                 $data['batchId'] = $this->batchId;
             }
             $data['content'] = $item['content'];
-            $teacherId = $item['teacher_id'];
-            $row = $this->oldPdo->query("select name ,userid from accounts where id = $teacherId")->fetch(\PDO::FETCH_ASSOC);
-            if (empty($row)){
+            if (isset($item['teacher_id'])){
+                $teacherId = $item['teacher_id'];
+                $row = $this->oldPdo->query("select name ,userid from accounts where id = $teacherId")->fetch(\PDO::FETCH_ASSOC);
+            }
+            else{
+                $studentId = $item['student_id'];
+                $row = $this->oldPdo->query("select name ,userid from students where id = $studentId")->fetch(\PDO::FETCH_ASSOC);
+            }
+            if (empty($row['name']) || empty($row['userid'])){
                 die('查询结果为空');
             }
             $data['name'] = $row['name'];
@@ -88,7 +98,8 @@ class SyncOldTeacherInfo{
             $data['target'] = $item['send_to'];
             $data['status'] = $item['status'];
             $data['attachment'] = $item['attach_url'];
-            $data['teacher_name'] = '刘霞';
+            $row = $this->oldPdo->query("select name from accounts where userid = {$item['account_id']}")->fetch(\PDO::FETCH_ASSOC);
+            $data['teacher_name'] = $row['name'];
             $data['created_at'] = $item['created_at'];
             $data['updated_at'] = $item['updated_at'];
             $sql = "insert into info (batch_id,
