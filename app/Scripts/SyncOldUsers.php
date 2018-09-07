@@ -42,7 +42,9 @@ class SyncOldUsers{
                 $grade = $item['grade'];
                 $major = $item['major'];
                 $class = $item['class_num'];
-                $this->newPdo->exec("insert into student(uid,name,openid,sex,phone,email,unit,grade,major,class) values ('$uid','$name','$openid','$sex','$phone','$email','$unit','$grade','$major','$class')");
+                $created_at = $item['created_at'];
+                $updated_at = $item['updated_at'];
+                $this->newPdo->exec("insert into student(uid,name,openid,sex,phone,email,unit,grade,major,class,created_at,updated_at) values ('$uid','$name','$openid','$sex','$phone','$email','$unit','$grade','$major','$class','$created_at','$updated_at')");
             }
         } elseif ($table == self::TABLE_GRADUATE){
             foreach ($res as $item){
@@ -54,7 +56,9 @@ class SyncOldUsers{
                 $email = $item['email'];
                 $unit = $item['unit'];
                 $grade = $item['grade'];
-                $this->newPdo->exec("insert into graduate(uid,name,openid,sex,phone,email,unit,grade) values ('$uid','$name','$openid','$sex','$phone','$email','$unit','$grade')");
+                $created_at = $item['created_at'];
+                $updated_at = $item['updated_at'];
+                $this->newPdo->exec("insert into graduate(uid,name,openid,sex,phone,email,unit,grade,created_at,updated_at) values ('$uid','$name','$openid','$sex','$phone','$email','$unit','$grade','$created_at','$updated_at')");
             }
         } else{
             foreach ($res as $item){
@@ -64,7 +68,9 @@ class SyncOldUsers{
                 $sex = $item['sex'] == '男' ? 1 :2;
                 $email = $item['email'];
                 $unit = $item['academy'];
-                $this->newPdo->exec("insert into teacher(uid,name,openid,sex,email,unit) values ('$uid','$name','$openid','$sex','$email','$unit')");
+                $created_at = $item['created_at'];
+                $updated_at = $item['updated_at'];
+                $this->newPdo->exec("insert into teacher(uid,name,openid,sex,email,unit,created_at,updated_at) values ('$uid','$name','$openid','$sex','$email','$unit','$created_at','$updated_at')");
             }
         }
     }
