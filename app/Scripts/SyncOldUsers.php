@@ -21,8 +21,8 @@ class SyncOldUsers{
     private $newPdo;
 
     public function run(){
-        $this->oldPdo = Db::initOldCon();
-        $this->newPdo = Db::initNewCon();
+        $this->oldPdo = $this->initOldCon();
+        $this->newPdo = $this->initNewCon();
         $this->insert(self::TABLE_STUDENT);
         $this->insert(self::TABLE_TEACHER);
         $this->insert(self::TABLE_GRADUATE);
@@ -67,6 +67,31 @@ class SyncOldUsers{
                 $this->newPdo->exec("insert into teacher(uid,name,openid,sex,email,unit) values ($uid,$name,$openid,$sex,$email,$unit)");
             }
         }
+    }
+
+    //老库
+    private function initOldCon()
+    {
+        $dbms = 'mysql';
+        $host = 'localhost';
+        $dbName = 'laravel_db';
+        $user = 'root';
+        $password = 'DUTWSRG2016-go';
+        $dsn = "$dbms:host=$host;dbname=$dbName";
+        $pdo = new \PDO($dsn,$user,$password);
+        return $pdo;
+    }
+
+    //新库
+    private function initNewCon(){
+        $dbms = 'mysql';
+        $host = 'localhost';
+        $dbName = 'tis';
+        $user = 'root';
+        $password = 'DUTWSRG2016-go';
+        $dsn = "$dbms:host=$host;dbname=$dbName";
+        $pdo = new \PDO($dsn,$user,$password);
+        return $pdo;
     }
 }
 

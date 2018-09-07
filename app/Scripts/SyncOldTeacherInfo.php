@@ -27,8 +27,8 @@ class SyncOldTeacherInfo{
 
         try {
 
-            $this->oldPdo = Db::initOldCon();
-            $this->newPdo = Db::initNewCon();
+            $this->oldPdo = $this->initOldCon();
+            $this->newPdo = $this->initNewCon();
             $sql = 'select info_contents.*,teacher_info_feedbacks.info_content_id,teacher_info_feedbacks.account_id as teacher_id,teacher_info_feedbacks.status ,accounts.name from info_contents,teacher_info_feedbacks,accounts where teacher_info_feedbacks.info_content_id = info_contents.id and teacher_info_feedbacks.account_id = accounts.id order by teacher_info_feedbacks.info_content_id desc';
             $sql2 = 'select info_contents.* ,      info_feedbacks.info_content_id,                      info_feedbacks.student_id ,       info_feedbacks.status ,students.name from info_contents,        info_feedbacks,students where         info_feedbacks.info_content_id = info_contents.id and         info_feedbacks.student_id = students.id order by         info_feedbacks.info_content_id desc';
             $res = $this->oldPdo->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
@@ -87,6 +87,31 @@ title,content,name,uid,type,target,status,attachment,teacher_name,created_at,upd
                 die('插入失败');
             }
         }
+    }
+
+    //老库
+    private function initOldCon()
+    {
+        $dbms = 'mysql';
+        $host = 'localhost';
+        $dbName = 'laravel_db';
+        $user = 'root';
+        $password = 'DUTWSRG2016-go';
+        $dsn = "$dbms:host=$host;dbname=$dbName";
+        $pdo = new \PDO($dsn,$user,$password);
+        return $pdo;
+    }
+
+    //新库
+    private function initNewCon(){
+        $dbms = 'mysql';
+        $host = 'localhost';
+        $dbName = 'tis';
+        $user = 'root';
+        $password = 'DUTWSRG2016-go';
+        $dsn = "$dbms:host=$host;dbname=$dbName";
+        $pdo = new \PDO($dsn,$user,$password);
+        return $pdo;
     }
 }
 
