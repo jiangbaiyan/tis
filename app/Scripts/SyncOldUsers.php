@@ -69,3 +69,10 @@ class SyncOldUsers{
         }
     }
 }
+
+$obj = new SyncOldUsers();
+try {
+    $obj->run();
+} catch (\Exception $e){
+    die($e->getMessage());
+}
