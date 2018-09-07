@@ -138,7 +138,7 @@ class Pc extends Controller{
         if($infoAuthState == Teacher::INSTRUCTOR){
             $midRes = $midRes->whereBetween('type',[Info::TYPE_STUDENT_GRADE,Info::TYPE_GRADUATE_ALL]);
         }
-        $res = $midRes->distinct()
+        $res = $midRes->groupBy('title','content','type','target','attachment','teacher_name','batch_id','created_at')
             ->latest()
             ->paginate(5);
         return ApiResponse::responseSuccess($res);
