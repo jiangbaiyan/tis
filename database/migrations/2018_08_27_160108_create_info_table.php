@@ -17,7 +17,7 @@ class CreateInfoTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedinteger('batch_id')->default('0')->comment('通知批次id');
             $table->string('title',512)->default('')->comment('通知标题');
-            $table->string('content',1024)->default('')->comment('通知内容');
+            $table->string('content',2048)->default('')->comment('通知内容');
             $table->unsignedInteger('uid')->default('0')->comment('通知接收人学号/工号');
             $table->string('name',32)->default('')->comment('通知接收人姓名');
             $table->unsignedTinyInteger('type')->default('0')->comment('通知对象类型');

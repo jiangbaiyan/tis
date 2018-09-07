@@ -80,9 +80,11 @@ class Wx{
             if ($infoData['status'] == DailyLeave::AUTH_SUCC){
                 $modelInfo['data']['keyword5']['value'] = '审核通过';
                 $modelInfo['data']['keyword5']['color'] = '#00B642';
+                $modelInfo['data']['remark']['color'] = '#00B642';
             } else {
                 $modelInfo['data']['keyword5']['value'] = '审核不通过';
                 $modelInfo['data']['keyword5']['color'] = '#FF3333';
+                $modelInfo['data']['remark']['color'] = '#FF3333';
             }
             $modelInfo['data']['remark']['value'] = '辅导员意见：' . $infoData['auth_reason'];
             $modelInfo['url'] = ComConf::HOST . '/client/qingjia_his.html';

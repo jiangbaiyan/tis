@@ -18,6 +18,7 @@ use App\Util\Logger;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use src\ApiHelper\ApiResponse;
+use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 use src\Exceptions\PermissionDeniedException;
 use src\Exceptions\ResourceNotFoundException;
@@ -78,6 +79,20 @@ class Pc extends Controller{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
+        if (strlen($params['title']) > 512 || strlen($params['content']) > 1024) {
+            Logger::notice('info|too_long_for_title_or_content|params:' . json_encode($params));
+            throw new OperateFailedException('标题或内容过长，请修改后重试');
+        }
+        if ($params['type'] < Info::TYPE_STUDENT_GRADE || $params['type'] > Info::TYPE_TEACHER_ALL){
+            Logger::notice('info|illegal_info_type|params:' . json_encode($params));
+            throw new OperateFailedException();
+        }
+        if (!empty($params['target'])){
+            if (strlen($params['target']) > 255){
+                Logger::notice('info|too_long_for_targets|params:' . json_encode($params));
+                throw new OperateFailedException('通知对象过多，请修改后重试');
+            }
+        }
         $path = '';
         if (Request::hasFile('file')){
             $file = Request::file('file');
@@ -86,9 +101,9 @@ class Pc extends Controller{
         $teacherName = User::getUser()->name;
         $infoObjects = Info::getInfoObject($params['type'],$params['target']);
         if (empty($infoObjects)){
-            throw new ResourceNotFoundException('无可用通知对象');
+            throw new ResourceNotFoundException('暂无可用通知对象');
         }
-        $batchId = time();
+        $batchId = time();//通知批次号
         $infoData = [
             'title' => $params['title'],
             'content' => $params['content'],
