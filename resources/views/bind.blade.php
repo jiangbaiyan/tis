@@ -74,9 +74,9 @@
 		<h1>请填写您的信息</h1>
 		<br>
 		<label for="phone">联系电话</label>
-		<input type="text" name="phone" value="{{empty($data) ? $data->phone : old('phone')}}"><br><br>
+		<input type="text" name="phone" value="{{!empty($data) ? $data->phone : old('phone')}}"><br><br>
 		<label for="email">电子邮箱</label>
-		<input type="text" name="email" value="{{empty($data) ? $data->email : old('email')}}"><br><br>
+		<input type="text" name="email" value="{{!empty($data) ? $data->email : old('email')}}"><br><br>
 		@if ($idType == \App\Http\Model\Common\User::TYPE_STUDENT || $idType == \App\Http\Model\Common\User::TYPE_GRADUATE)
 			<label for="instructor">辅导员</label>
 			<select type="text" name="instructor">
