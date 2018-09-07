@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Login;
 use App\Http\Config\ComConf;
 use App\Http\Config\WxConf;
 use App\Http\Controller;
+use App\Http\Model\Common\User;
 use App\Http\Model\Common\Wx;
 use App\Http\Model\Graduate;
 use App\Http\Model\Student;
@@ -91,7 +92,7 @@ class HduLogin extends Controller {
                 }
                 //教师PC端
                 if (!Wx::isFromWx()){
-                    if ($data['idType'] == 1 ||$data['idType'] == 2){//学生禁止访问
+                    if ($data['idType'] == User::TYPE_STUDENT ||$data['idType'] == User::TYPE_GRADUATE){//学生禁止访问
                         Logger::notice('login|user_is_not_a_teacher|user:' . json_encode($data));
                         die('您无权访问本系统，请联系管理员获取权限');
                     }
@@ -144,11 +145,20 @@ class HduLogin extends Controller {
 
     //获取错误的时候要加一个中间跳转
     public function getErrorAndDispatch(){
-        $idType = json_decode(Session::get('userInfo'),true)['idType'];
-        if (empty($idType)){
-            Logger::notice('login|get_idtype_from_session_failed|msg:' . json_encode($idType));
+        $userInfo = json_decode(Session::get('userInfo'),true);
+        if (empty($userInfo)){
+            Logger::notice('login|get_userInfo_from_session_failed|userInfo:' . json_encode($userInfo));
         }
-        return view('bind',compact('idType'));
+        $idType = $userInfo['idType'];
+        $uid = $userInfo['uid'];
+        if ($idType == User::TYPE_STUDENT){
+            $data = Student::where('uid',$uid)->first();
+        }else if ($idType == User::TYPE_GRADUATE){
+            $data = Graduate::where('uid',$uid)->first();
+        }else{
+            $data = Teacher::where('uid',$uid)->first();
+        }
+        return view('bind',compact('idType','data'));
     }
 
 

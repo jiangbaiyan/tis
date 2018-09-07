@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Session;
 
 class User{
 
-    const TYPE_STUDENT = 0;
-    const TYPE_GRADUATE = 1;
-    const TYPE_TEACHER = 2;
+    const TYPE_STUDENT = 1;
+    const TYPE_GRADUATE = 2;
+    const TYPE_TEACHER = 3;
 
     /**
      * 获取当前登录用户对象
