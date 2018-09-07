@@ -28,10 +28,10 @@ class Teacher extends Model{
 
     //辅导员id对应的姓名
     public static $instructorMapping = [
-        1 => '卞广旭',
+        5 => '卞广旭',
         2 => '冯尉瑾',
-        3 => '徐诚',
-        4 => '袁理锋'
+        41 => '徐诚',
+        18 => '袁理锋'
     ];
 
     /**
