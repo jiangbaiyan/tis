@@ -12,7 +12,7 @@ namespace App\Scripts;
 
 use App\Util\Logger;
 
-class SyncOldTeacherInfo{
+class SyncOldInfo{
 
 
     private $oldPdo;
@@ -114,5 +114,5 @@ title,content,name,uid,type,target,status,attachment,teacher_name,created_at,upd
     }
 }
 
-$obj = new SyncOldTeacherInfo();
+$obj = new SyncOldInfo();
 $obj->run();
