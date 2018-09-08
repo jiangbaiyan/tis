@@ -10,7 +10,6 @@
 namespace App\Scripts;
 
 
-use App\Util\Db;
 use App\Util\Logger;
 
 class SyncOldTeacherInfo{

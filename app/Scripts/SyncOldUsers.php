@@ -9,8 +9,6 @@
 namespace App\Scripts;
 
 
-use App\Util\Db;
-
 class SyncOldUsers{
 
     const TABLE_STUDENT = 'students';
@@ -20,6 +18,9 @@ class SyncOldUsers{
     private $oldPdo;
     private $newPdo;
 
+    /*
+     * 入口
+     */
     public function run(){
         $this->oldPdo = $this->initOldCon();
         $this->newPdo = $this->initNewCon();
