@@ -158,7 +158,10 @@ class Pc extends Controller{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        $feedbacks = Info::select('title','uid','target','name','status')->where('batch_id',$params['batch_id'])->get();
+        $feedbacks = Info::select('title','uid','target','name','status')
+            ->where('batch_id',$params['batch_id'])
+            ->orderBy('uid')
+            ->get();
         if (!$feedbacks){
             Logger::fatal('info|info_was_deleted|batch_id:' . $params['batch_id']);
             throw new ResourceNotFoundException('该通知已被删除');
