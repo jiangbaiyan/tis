@@ -44,9 +44,10 @@ class Sms{
         try{
             $result = ApiRequest::sendRequest('POST',self::UPYUN_URL,$params);
             if (isset($result['message_ids'][0]['error_code'])){//如果又拍云短信官方报错
-                Logger::fatal('sms|send_leave_upyun_sms_failed|msg:' . $result['message_ids'][0]['error_code'] . '|conf:' . json_encode($conf) . '|phone:' . $phone);
-                throw new OperateFailedException();
+                Logger::fatal('sms|send_leave_upyun_sms_failed|msg:' . $result['message_ids'][0]['error_code'] . '|conf:' . json_encode($conf));
+                throw new OperateFailedException('短信发送失败，请联系管理员');
             }
+            Logger::notice('sms|send_leave_upyun_sms_succ|params:' . json_encode($conf));
         }catch (\Exception $e){
             Logger::fatal('sms|send_leave_upyun_sms_failed|params:' . json_encode($params) . '|errorMsg:' . json_encode($e->getMessage()));
             throw new OperateFailedException('短信发送失败，请联系管理员');
