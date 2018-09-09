@@ -44,10 +44,6 @@ class Wx{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        if (strtotime($params['begin_time']) >= strtotime($params['end_time'])){
-            Logger::notice('leave|illegal_leave_time|params:' . json_encode($params));
-            throw new OperateFailedException('请假起止时间不合法，请重新输入');
-        }
         $user = User::getUser();
         $data['leave_reason'] = $params['leave_reason'];
         $data['begin_time'] = $params['begin_time'];
