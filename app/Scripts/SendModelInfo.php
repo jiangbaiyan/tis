@@ -58,3 +58,6 @@ class SendModelInfo{
         return $pdo;
     }
 }
+
+$obj = new SendModelInfo();
+$obj->run();
