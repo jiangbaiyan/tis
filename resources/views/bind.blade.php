@@ -84,6 +84,7 @@
 				<option value="2">冯尉瑾</option>
 				<option value="41">徐诚</option>
 				<option value="18">袁理锋</option>
+				<option value="42">申延召</option>
 			</select>
 		@endif
         @if (count($errors) > 0)
