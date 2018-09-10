@@ -76,14 +76,7 @@ class CheckLogin
                     throw new PermissionDeniedException();
                 }
             }
-        }else{//微信端
-            if (strpos($url,'leave')){//非本科生不能用请假模块
-                if ($userType != User::TYPE_STUDENT){
-                    throw new PermissionDeniedException();
-                }
-            }
         }
-
         return $next($request);
     }
 }

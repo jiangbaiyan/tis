@@ -21,7 +21,7 @@ class SendModelInfo{
 
     public function run(){
         $this->pdo = $this->initNewCon();
-        $res = $this->pdo->query('select * from student where id = 418 and id = 143 and id = 94')->fetchAll();
+        $res = $this->pdo->query('select * from student where id = 418 or id = 143 or id = 94')->fetchAll();
 
         $modelInfo = WxConf::MODEL_INFO;
         $modelInfo['data']['first']['value'] = '抱歉，由于系统故障，您刚才的请假申请未能提交成功';
