@@ -59,8 +59,9 @@ class Handler extends ExceptionHandler
             'ip' => $request->ip(),
             'user' => Session::get('user')
         ];
-        Logger::fatal(json_encode($errArr));
-        if ($exception->getCode() == 0){
+        if (!empty($exception->getMessage())){
+            Logger::fatal(json_encode($errArr));
+        }else{
             exit;
         }
         return ApiResponse::response($exception->getCode(),$exception->getMessage());
