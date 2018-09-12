@@ -111,11 +111,11 @@ class Wx{
                     ]);
                     if (!empty($res['errcode'])){
                         Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($modelInfo) . '|errormsg:' . json_encode($res));
-                        throw new OperateFailedException();
+                        continue;
                     }
                 } catch (\Exception $e){
                     Logger::fatal('wx|send_model_info_failed|user:' . json_encode($item) . '|infoData:' . json_encode($modelInfo) . '|exceptionMsg:' . $e->getMessage());
-                    throw new OperateFailedException();
+                    continue;
                 }
             }
         } else{
@@ -126,14 +126,11 @@ class Wx{
                 ]);
                 if (!empty($res['errcode'])){
                     Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjects) . '|infoData:' . json_encode($modelInfo) . '|errormsg:' . json_encode($res));
-                    throw new OperateFailedException();
                 }
             } catch (\Exception $e){
                 Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjects) . '|infoData:' . json_encode($modelInfo) . '|exceptionMsg:' . $e->getMessage());
-                throw new OperateFailedException();
             }
         }
-
     }
 
     /**
