@@ -12,6 +12,7 @@ namespace App\Http\Controllers\FrontLog;
 use App\Http\Controller;
 use App\Util\Logger;
 use src\ApiHelper\ApiResponse;
+use src\Exceptions\OperateFailedException;
 use src\Exceptions\ParamValidateFailedException;
 
 class Log extends Controller{
@@ -23,6 +24,7 @@ class Log extends Controller{
      * 前端写日志
      * @return string
      * @throws ParamValidateFailedException
+     * @throws OperateFailedException
      */
     public function writeLog(){
         $validator = \Validator::make($params = \Request::all(),[
@@ -38,6 +40,7 @@ class Log extends Controller{
             file_put_contents($logPath,$content,FILE_APPEND);
         } catch (\Exception $e){
             Logger::notice('log|fe_write_log_failed|msg:' . $e->getMessage());
+            throw new OperateFailedException($e->getMessage());
         }
         return ApiResponse::responseSuccess();
     }
