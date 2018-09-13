@@ -130,4 +130,8 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
 
         });
     });
+
+    //前端写日志
+    Route::get('writeLog','FrontLog\Log@writeLog');
+
 });
