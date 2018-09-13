@@ -2,11 +2,17 @@
 
 namespace App\Console;
 
+use App\Http\Model\Common\Wx;
+use App\Util\Logger;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Redis;
 
 class Kernel extends ConsoleKernel
 {
+
+    const REDIS_QUEUE_SEND_MODEL_INFO_KEY = 'tis_send_model_info';
+
     /**
      * The Artisan commands provided by your application.
      *
@@ -24,8 +30,24 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->call(function (){
+            $data = Redis::rpop(self::REDIS_QUEUE_SEND_MODEL_INFO_KEY);
+            if (empty($data)){
+                Logger::notice('cron|no_send_model_info_task|exit');
+                exit;
+            }
+
+            Logger::notice('cron|check_send_model_info_task|data:' . $data);
+
+            $data = json_decode($data,true);
+
+            if (!is_array($data) || empty($data['info_object']) || empty($data['info_data'])){
+                Logger::notice('cron|send_model_info_wrong_data|data:' . $data);
+            }
+
+            Wx::send($data['info_object'],$data['info_data']);
+
+        })->everyMinute();
     }
 
     /**

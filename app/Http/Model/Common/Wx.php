@@ -24,6 +24,8 @@ class Wx{
     const MODEL_NUM_LEAVE_AUTH_RESULT = 3;//学生请假结果通知模板
     const MODEL_NUM_NOTIFY_TEACHER = 4;//提醒辅导员审核模板
 
+    const REDIS_QUEUE_SEND_MODEL_INFO_KEY = 'tis_send_model_info';
+
 
     /**
      * 第二步通过code换取openid
@@ -53,10 +55,11 @@ class Wx{
      * @param $infoObjects
      * @param $infoData
      * @param $modelNum
-     * @return bool
+     * @param bool $isInstant
+     * @return void
      * @throws OperateFailedException
      */
-    public static function  sendModelInfo($infoObjects, $infoData,$modelNum){
+    public static function  sendModelInfo($infoObjects, $infoData,$modelNum,$isInstant = false){
 
         if ($modelNum == self::MODEL_NUM_INFO){//通知模板
             $modelInfo = WxConf::MODEL_INFO;
@@ -96,9 +99,33 @@ class Wx{
             $modelInfo['url'] = ComConf::HOST . '/manager/qingjia.html';
         }
         else{
-            return false;
+            throw new OperateFailedException('模板不存在，请联系管理员添加');
         }
 
+        //非即时通知，写队列
+        if (!$isInstant){
+            $data = [
+                'info_object' => $infoObjects,
+                'info_data' => $modelInfo,
+            ];
+            $data = json_encode($data);
+            Redis::lpush(self::REDIS_QUEUE_SEND_MODEL_INFO_KEY,$data);
+            Logger::notice('wx|send_model_info_push_queue|data:' . $data);
+            return;
+        }
+
+        //即时通知，直接发送请求
+        self::send($infoObjects,$modelInfo);
+        return;
+    }
+
+    /**
+     * 请求官方接口，发送
+     * @param $infoObjects
+     * @param $modelInfo
+     * @throws OperateFailedException
+     */
+    public static function send($infoObjects,$modelInfo){
         //发送
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
@@ -131,7 +158,9 @@ class Wx{
                 Logger::fatal('wx|send_model_info_failed|user:' . json_encode($infoObjects) . '|infoData:' . json_encode($modelInfo) . '|exceptionMsg:' . $e->getMessage());
             }
         }
+        return;
     }
+
 
     /**
      * 获取access_token（带缓存)

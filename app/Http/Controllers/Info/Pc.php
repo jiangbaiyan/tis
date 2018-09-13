@@ -117,12 +117,12 @@ class Pc extends Controller{
 
         Info::insertInfo($infoObjects,$infoData);
 
-        Wx::sendModelInfo($infoObjects,$infoData,Wx::MODEL_NUM_INFO);
+        Wx::sendModelInfo($infoObjects,$infoData,Wx::MODEL_NUM_INFO,false);
 
         return ApiResponse::responseSuccess();
     }
 
-    /**
+    /**`
      * 查看已发送通知列表
      * @return string
      * @throws PermissionDeniedException
