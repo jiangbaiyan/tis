@@ -122,7 +122,7 @@ class Pc extends Controller{
         return ApiResponse::responseSuccess();
     }
 
-    /**`
+    /**
      * 查看已发送通知列表
      * @return string
      * @throws PermissionDeniedException
