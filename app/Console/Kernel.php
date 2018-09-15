@@ -33,7 +33,6 @@ class Kernel extends ConsoleKernel
         $schedule->call(function (){
             $data = Redis::rpop(self::REDIS_QUEUE_SEND_MODEL_INFO_KEY);
             if (empty($data)){
-                Logger::notice('cron|no_send_model_info_task|exit');
                 exit;
             }
 

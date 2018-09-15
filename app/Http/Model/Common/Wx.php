@@ -24,7 +24,7 @@ class Wx{
     const MODEL_NUM_LEAVE_AUTH_RESULT = 3;//学生请假结果通知模板
     const MODEL_NUM_NOTIFY_TEACHER = 4;//提醒辅导员审核模板
 
-    const REDIS_QUEUE_SEND_MODEL_INFO_KEY = 'tis_send_model_info';
+    const REDIS_QUEUE_SEND_MODEL_INFO_KEY = 'tis_send_model_info';//发送通知mq
 
 
     /**
@@ -79,7 +79,7 @@ class Wx{
             $modelInfo = WxConf::MODEL_LEAVE_RESULT;
             $modelInfo['data']['keyword2']['value'] = $infoData['leave_time'];
             $modelInfo['data']['keyword3']['value'] = $infoData['leave_reason'];
-            $modelInfo['data']['keyword4']['value'] = $infoData['dean_name'];
+            $modelInfo['data']['keyword4']['v`alue'] = $infoData['dean_name'];
             if ($infoData['status'] == DailyLeave::AUTH_SUCC){
                 $modelInfo['data']['keyword5']['value'] = '审核通过';
                 $modelInfo['data']['keyword5']['color'] = '#00B642';
