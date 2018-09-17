@@ -36,7 +36,7 @@ class Kernel extends ConsoleKernel
                 exit;
             }
 
-            //Logger::notice('cron|check_send_model_info_task|data:' . $data);
+            Logger::notice('cron|check_send_model_info_task_from_mq|data:' . $data);
 
             $data = json_decode($data,true);
 

@@ -110,7 +110,7 @@ class Wx{
             ];
             $data = json_encode($data);
             Redis::lpush(self::REDIS_QUEUE_SEND_MODEL_INFO_KEY,$data);
-            Logger::notice('wx|send_model_info_push_queue|data:' . json_encode($modelInfo));
+            Logger::notice('wx|send_model_info_push_mq|data:' . json_encode($modelInfo));
             return;
         }
 
