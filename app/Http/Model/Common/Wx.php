@@ -79,7 +79,7 @@ class Wx{
             $modelInfo = WxConf::MODEL_LEAVE_RESULT;
             $modelInfo['data']['keyword2']['value'] = $infoData['leave_time'];
             $modelInfo['data']['keyword3']['value'] = $infoData['leave_reason'];
-            $modelInfo['data']['keyword4']['v`alue'] = $infoData['dean_name'];
+            $modelInfo['data']['keyword4']['value'] = $infoData['dean_name'];
             if ($infoData['status'] == DailyLeave::AUTH_SUCC){
                 $modelInfo['data']['keyword5']['value'] = '审核通过';
                 $modelInfo['data']['keyword5']['color'] = '#00B642';
