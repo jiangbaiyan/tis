@@ -143,7 +143,7 @@ class Pc{
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        if (strtotime($params['from']) >= strtotime($params['to'])){
+        if (strtotime($params['from']) > strtotime($params['to'])){
             Logger::notice('leave|illegal_leave_model_time|params:' . json_encode($params));
             throw new OperateFailedException('节假日起止时间不合法，请重新输入');
         }
