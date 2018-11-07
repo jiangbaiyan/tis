@@ -4,9 +4,9 @@ namespace App\Console;
 
 use App\Http\Model\Common\Wx;
 use App\Util\Logger;
+use App\Util\Mq;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\Redis;
 
 class Kernel extends ConsoleKernel
 {
@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call(function (){
-            $data = Redis::rpop(self::REDIS_QUEUE_SEND_MODEL_INFO_KEY);
+            $data = Mq::pop(self::REDIS_QUEUE_SEND_MODEL_INFO_KEY);
             if (empty($data)){
                 exit;
             }

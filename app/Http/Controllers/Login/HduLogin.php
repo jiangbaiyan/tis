@@ -93,8 +93,8 @@ class HduLogin extends Controller {
                 //教师PC端
                 if (!Wx::isFromWx()){
                     if ($data['idType'] == User::TYPE_STUDENT ||$data['idType'] == User::TYPE_GRADUATE){//学生禁止访问
-                        Logger::notice('login|user_is_not_a_teacher|user:' . json_encode($data));
-                        die('您无权访问本系统，请联系管理员获取权限');
+                        Logger::notice('login|user_wrong_terminal|user:' . json_encode($data));
+                        die('学生只允许在手机端使用，教师只允许电脑端使用。');
                     }
                     $res = $this->updateOrInsertAndSetToken($data);
                     return view('pcsettoken',['token' => $res->token]);

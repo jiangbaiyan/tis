@@ -11,6 +11,7 @@ use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
+use src\Exceptions\OperateFailedException;
 use src\Exceptions\PermissionDeniedException;
 use src\Exceptions\UnAuthorizedException;
 
@@ -23,8 +24,9 @@ class CheckLogin
      * @param  \Illuminate\Http\Request $request
      * @param  \Closure $next
      * @return mixed
-     * @throws UnAuthorizedException
+     * @throws OperateFailedException
      * @throws PermissionDeniedException
+     * @throws UnAuthorizedException
      */
     public function handle($request, Closure $next)
     {
@@ -41,6 +43,7 @@ class CheckLogin
         }
         if ($user->unit != '网络空间安全学院、浙江保密学院'){
             Logger::notice('auth|user_not_from_cbs|user:' . json_encode($user));
+            throw new OperateFailedException('您不属于本学院，无系统使用权限');
         }
         if (Redis::ttl($user->uid) <= 0) {
             Logger::notice('auth|token_expired|user:' . json_encode($user));

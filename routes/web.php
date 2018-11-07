@@ -79,6 +79,9 @@ Route::group(['prefix' => 'v1','middleware' => ['web']], function () {
                 //获取某条模板下的学生登记情况
                 Route::get('getHolidayLeaveDetail','Leave\Pc@getHolidayLeaveDetail');
 
+                //导出节假日登记表格
+                Route::get('exportHolidayLeave','Leave\Excel@exportHolidayLeave');
+
             });
 
             Route::group(['prefix' => 'wx'],function (){

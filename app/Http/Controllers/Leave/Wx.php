@@ -67,6 +67,10 @@ class Wx{
                     $course['daily_leave_id'] = $dailyLeave->id;
                     $course['created_at'] = $time;
                     $course['updated_at'] = $time;
+                    if (empty($course['teacher_phone']) || empty($course['course_name']) || empty($course['teacher_name'])){
+                        Logger::notice('leave|wrong_course_params|params:' . json_encode($params));
+                        throw new OperateFailedException('您的信息没有填写完整，请检查');
+                    }
                 }
                 \DB::table('daily_leave_course')->insert($courses);//插入请假课程信息
             }
