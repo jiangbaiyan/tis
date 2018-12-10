@@ -71,16 +71,16 @@ class HduLogin extends Controller {
                         case 'id_type'://用户类型 1-本科生 2-研究生 其他-教师
                             $data['idType'] = $attribute['@attributes']['value'];
                             break;
-                        case 'userName'://学号/工号
+                        case 'id_number'://学号/工号
                             $data['uid'] = $attribute['@attributes']['value'];
                             break;
-                        case 'user_sex'://性别 1-男 其他-女
-                            $data['sex'] = $attribute['@attributes']['value'];
+                        case 'sex'://性别 1-男 其他-女
+                            $data['sex'] = $attribute['@attributes']['value'] == '男' ? 1 : 2;
                             break;
-                        case 'unit_name'://学院
-                            $data['unit'] = $attribute['@attributes']['value'];
+                        case 'dwh'://学院
+                            $data['unit'] = $attribute['@attributes']['value'] == '27' ? '网络空间安全学院、浙江保密学院' : '未知学院';
                             break;
-                        case 'classid'://班级号
+                        case 'bh'://班级号
                             $data['class'] = $attribute['@attributes']['value'];
                             break;
                     }
