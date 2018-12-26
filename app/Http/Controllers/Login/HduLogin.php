@@ -80,7 +80,7 @@ class HduLogin extends Controller {
                         case 'dwh'://学院
                             $data['unit'] = $attribute['@attributes']['value'] == '27' ? '网络空间安全学院、浙江保密学院' : '未知学院';
                             break;
-                        case 'bh'://班级号
+                        case 'classid'://班级号
                             $data['class'] = $attribute['@attributes']['value'];
                             break;
                     }
